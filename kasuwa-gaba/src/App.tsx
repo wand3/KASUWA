@@ -1,9 +1,10 @@
 import './App.css'
 import Kasuwa from './pages/Kasuwa';
-import { ProductsProvider } from './context/ProductsProvider';
+import { ProductsProvider } from './context/ProductProvider'
 
 
 // import baseURL from './config';
+
 
 function App() {
   return (
