@@ -1,18 +1,23 @@
 import Nav from "./Nav";
 import Footer from "./Footer";
-import KasuwaItems from "../components/KasuwaItems";
-import NavButtom from "../components/navButtom";
+import React, { FC } from "react";
 
 
-const Jiki = () => {
+type BodyProps = {
+    nav : boolean,
+    children? : React.ReactNode,
+}
+
+const Jiki: FC<BodyProps> = ({ nav, children }) => {
 
     return (
         <>
-            <Nav />
+            { nav && <Nav />}
+            { children }
             <div >Jiki</div>
-            <KasuwaItems />
+            {/* <KasuwaItems />
+            <NavButtom /> */}
             <Footer />
-            <NavButtom />
 
         </>
     )

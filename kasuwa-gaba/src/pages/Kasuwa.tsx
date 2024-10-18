@@ -5,14 +5,11 @@ import NavButtom from "../components/navButtom";
 const Kasuwa = () => {
 
     return (
-        <>
-            <body navButtom={true}>
-                <Jiki>
+        <> 
+            <Jiki nav>
+                <NavButtom />
 
-                </Jiki>
-            
-            </body>
-            
+            </Jiki>          
         </>
     )
 }
