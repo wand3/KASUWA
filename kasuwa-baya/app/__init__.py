@@ -1,9 +1,8 @@
-from flask import Flask, Blueprint
+from flask import Flask, request, current_app
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from config import Config
 
-bp = Blueprint('api', __name__)
 db = SQLAlchemy()
 migrate = Migrate()
 
@@ -14,11 +13,18 @@ def create_app(config_class=Config):
     db.init_app(app)
     migrate.init_app(app, db)
 
-    from app.api import auth, order, product, user
-    app.register_blueprint(auth.bp)
-    app.register_blueprint(order.bp)
-    app.register_blueprint(product.bp)
-    app.register_blueprint(user.bp)
+    from app.api import bp as api_bp
+    app.register_blueprint(api_bp, url_prefix='/api')
+
+    from app.main import bp as main_bp
+    app.register_blueprint(main_bp)
+
+    # from app.api import auth, order, product, user, category
+    # app.register_blueprint(auth.bp)
+    # app.register_blueprint(order.bp)
+    # app.register_blueprint(product.bp)
+    # app.register_blueprint(user.bp)
+    # app.register_blueprint(category.bp)
 
     #if not app.debug and not app.testing:
 
