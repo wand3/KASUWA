@@ -1,6 +1,8 @@
 const Footer = () => {
     return (
-        <div>Footer</div>
+        <div className="hidden md:block justify-center mt-[90vh] h-7 bg-slate-600 w-full">
+            <p>Footer</p>
+        </div>
     )
 }
 
