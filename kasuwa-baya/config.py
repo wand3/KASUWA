@@ -10,3 +10,4 @@ class Config:
     MAX_CONTENT_LENGTH = 6144 * 6144
     UPLOAD_EXTENSIONS = ['.jpg', '.png', '.img', '.jpeg']
     PRODUCT_IMAGE_UPLOAD_PATH = os.path.join(basedir, 'app', 'static', 'images', 'product_images', 'default')
+    PRODUCT_IMAGES_UPLOAD_PATH = os.path.join(basedir, 'app', 'static', 'images', 'product_images')

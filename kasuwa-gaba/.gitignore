@@ -12,6 +12,7 @@ dist
 dist-ssr
 *.local
 ../kasuwa-baya
+services
 
 # Editor directories and files
 .vscode/*

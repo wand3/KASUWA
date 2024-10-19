@@ -4,67 +4,79 @@ import os
 from app.models.product import Product, ProductImage
 from app.api import bp
 from werkzeug.utils import secure_filename
+import logging
+
+# Configure logging to display messages to the terminal
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[logging.StreamHandler()])
 
 @bp.route('/product', methods=['POST'])
 def create_product():
-    # Validate and extract data from the request
     data = request.form
-    required_fields = ['product_name', 'description', 'price', 'category_id', 'quantity']
-
-    for field in required_fields:
-        if field not in data:
-            return jsonify({"error": f"Missing required field: {field}"}), 400
-
-    # Convert data types
-    try:
-        price = float(data['price'])
-        category_id = int(data['category_id'])
-        quantity = int(data['quantity'])
-        sold = int(data.get('sold', 0))
-    except ValueError as e:
-        return jsonify({"error": "Invalid data type for one of the fields."}), 400
 
     # Create a new product instance
     new_product = Product(
         product_name=data['product_name'],
         description=data['description'],
-        price=price,
-        category_id=category_id,
-        quantity=quantity,
-        sold=sold,
+        price=data['price'],
+        category_id=data['category_id'],
+        quantity=data['quantity'],
+        sold=data['sold'],
     )
 
-    db.session.add(new_product)
+    # Get the uploaded images
+    product_images = request.files.getlist('photos')
+    image_paths = []
 
-    # Handle file uploads
-    files = request.files.getlist('photos')
-    for file in files:
-        if file and file.filename:
-            name = secure_filename(file.filename)
-            filename = f"{new_product.product_name}_{name}"
-            file_path = os.path.join(current_app.config['PRODUCT_IMAGE_UPLOAD_PATH'], filename)
-            file.save(file_path)
+    if product_images:
+        # Set the product_image to the first image's filename
+        first_image = product_images[0]
+        first_image_name = secure_filename(first_image.filename)
+        new_product.product_image = first_image_name  # Set the product_image field
+
+        # Save the first image
+        first_image.save(os.path.join(current_app.config['PRODUCT_IMAGE_UPLOAD_PATH'], first_image_name))
+        image_paths.append(first_image_name)
+
+        # Save the other images as ProductImage instances
+        for image in product_images:
+            name = secure_filename(image.filename)
+            logging.info(f"storage: {name}")
+
+            image.save(os.path.join(current_app.config['PRODUCT_IMAGES_UPLOAD_PATH'], name))
+            image_paths.append(name)
 
             new_image = ProductImage(
                 product_id=new_product.id,
-                image_path=f'images/product_images/{filename}'
+                image_path=name
             )
             db.session.add(new_image)
 
+    # Add the new product to the session
+    db.session.add(new_product)
+    logging.info(f"new product: {new_product}")
+
     try:
-        db.session.commit()  # Commit the session
-        return jsonify({"message": "Product created", "product_id": new_product.id}), 201
+        db.session.commit()  # Commit the session to save the product and images
+        return jsonify({
+            "message": "Product added successfully",
+            "id": new_product.id,
+            "image_paths": image_paths  # Return the list of image paths
+        }), 201
     except Exception as e:
         db.session.rollback()  # Rollback in case of error
-        return jsonify({"error": str(e)}), 500
+        return jsonify({'error': f'Failed to add product: {str(e)}'}), 500
 
-# return first image or route to set default image
+    return jsonify({'error': 'Invalid image file'}), 400
+
+
+# return first image or route to set default image and update default product image
 @bp.route('/products', methods=['GET'])
 def get_products():
     products = Product.query.all()
 
     product_list = []
     for product in products:
+        logging.info(f"each product: {product}")
         product_data = {
             'id': product.id,
             'product_name': product.product_name,
@@ -75,7 +87,7 @@ def get_products():
             'sold': product.sold,
             'created_at': product.created_at,
             'updated_at': product.updated_at,
-            'images': [image.image_path for image in product.images]
+            'product_image': product.product_image
         }
         product_list.append(product_data)
     return jsonify(product_list), 200
