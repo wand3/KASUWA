@@ -91,3 +91,29 @@ def get_products():
         }
         product_list.append(product_data)
     return jsonify(product_list), 200
+
+
+@bp.route('/products/<int:product_id>/default-image/<int:image_id>', methods=['PUT'])
+def update_default_product_image(product_id, image_id):
+    # Fetch the product
+    product = Product.query.get(product_id)
+    if not product:
+        return jsonify({'error': 'Product not found'}), 404
+
+    # Fetch the product image
+    product_image = ProductImage.query.get(image_id)
+    if not product_image:
+        return jsonify({'error': 'Product image not found'}), 404
+
+    # Update the product's default image
+    product.product_image = product_image.image_path
+
+    try:
+        db.session.commit()
+        return jsonify({
+            'message': 'Default product image updated successfully',
+            'product_image': product.product_image
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Failed to update product image: {str(e)}'}), 500
