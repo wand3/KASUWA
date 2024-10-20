@@ -1,6 +1,7 @@
 from flask import Flask, request, current_app
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_cors import CORS
 from config import Config
 
 db = SQLAlchemy()
@@ -12,6 +13,7 @@ def create_app(config_class=Config):
 
     db.init_app(app)
     migrate.init_app(app, db)
+    CORS(app)
 
     from app.api import bp as api_bp
     app.register_blueprint(api_bp, url_prefix='/api')

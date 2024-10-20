@@ -37,6 +37,15 @@ def create_product():
         first_image.save(os.path.join(current_app.config['PRODUCT_IMAGE_UPLOAD_PATH'], first_image_name))
         image_paths.append(first_image_name)
 
+    # Add the new product to the session
+    db.session.add(new_product)
+
+    try:
+        db.session.commit()  # Commit the session to save the product and get its ID
+
+        # Now that the product is committed, we can get its ID
+        product_id = new_product.id
+
         # Save the other images as ProductImage instances
         for image in product_images:
             name = secure_filename(image.filename)
@@ -46,20 +55,17 @@ def create_product():
             image_paths.append(name)
 
             new_image = ProductImage(
-                product_id=new_product.id,
+                product_id=product_id,  # Use the committed product's ID
                 image_path=name
             )
             db.session.add(new_image)
 
-    # Add the new product to the session
-    db.session.add(new_product)
-    logging.info(f"new product: {new_product}")
+        # Commit the session again to save the images
+        db.session.commit()
 
-    try:
-        db.session.commit()  # Commit the session to save the product and images
         return jsonify({
             "message": "Product added successfully",
-            "id": new_product.id,
+            "id": product_id,
             "image_paths": image_paths  # Return the list of image paths
         }), 201
     except Exception as e:
@@ -67,6 +73,65 @@ def create_product():
         return jsonify({'error': f'Failed to add product: {str(e)}'}), 500
 
     return jsonify({'error': 'Invalid image file'}), 400
+
+# @bp.route('/product', methods=['POST'])
+# def create_product():
+#     data = request.form
+
+#     # Create a new product instance
+#     new_product = Product(
+#         product_name=data['product_name'],
+#         description=data['description'],
+#         price=data['price'],
+#         category_id=data['category_id'],
+#         quantity=data['quantity'],
+#         sold=data['sold'],
+#     )
+
+#     # Get the uploaded images
+#     product_images = request.files.getlist('photos')
+#     image_paths = []
+
+#     if product_images:
+#         # Set the product_image to the first image's filename
+#         first_image = product_images[0]
+#         first_image_name = secure_filename(first_image.filename)
+#         new_product.product_image = first_image_name  # Set the product_image field
+
+#         # Save the first image
+#         first_image.save(os.path.join(current_app.config['PRODUCT_IMAGE_UPLOAD_PATH'], first_image_name))
+#         image_paths.append(first_image_name)
+
+#         # Save the other images as ProductImage instances
+#         for image in product_images:
+#             name = secure_filename(image.filename)
+#             logging.info(f"storage: {name}")
+
+#             image.save(os.path.join(current_app.config['PRODUCT_IMAGES_UPLOAD_PATH'], name))
+#             image_paths.append(name)
+
+#             new_image = ProductImage(
+#                 product_id=new_product.id,
+#                 image_path=name
+#             )
+#             db.session.add(new_image)
+
+#     # Add the new product to the session
+#     db.session.add(new_product)
+#     logging.info(f"new product: {new_product}")
+
+#     try:
+#         db.session.commit()  # Commit the session to save the product and images
+#         return jsonify({
+#             "message": "Product added successfully",
+#             "id": new_product.id,
+#             "image_paths": image_paths  # Return the list of image paths
+#         }), 201
+#     except Exception as e:
+#         db.session.rollback()  # Rollback in case of error
+#         return jsonify({'error': f'Failed to add product: {str(e)}'}), 500
+
+#     return jsonify({'error': 'Invalid image file'}), 400
 
 
 # return first image or route to set default image and update default product image
@@ -87,7 +152,8 @@ def get_products():
             'sold': product.sold,
             'created_at': product.created_at,
             'updated_at': product.updated_at,
-            'product_image': product.product_image
+            'product_image': product.product_image,
+            'product_images': [image.image_path for image in product.product_images]
         }
         product_list.append(product_data)
     return jsonify(product_list), 200
