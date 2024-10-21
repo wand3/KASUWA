@@ -1,7 +1,7 @@
 from flask import request, jsonify, current_app
 from app import db
 import os
-from app.models.product import Product, ProductImage
+from app.models.product import Product, ProductImage, Cart
 from app.api import bp
 from werkzeug.utils import secure_filename
 import logging
@@ -74,64 +74,34 @@ def create_product():
 
     return jsonify({'error': 'Invalid image file'}), 400
 
-# @bp.route('/product', methods=['POST'])
-# def create_product():
-#     data = request.form
+@bp.route('/add_to_cart', methods=['POST'])
+def add_to_cart():
+    data = request.json()
 
-#     # Create a new product instance
-#     new_product = Product(
-#         product_name=data['product_name'],
-#         description=data['description'],
-#         price=data['price'],
-#         category_id=data['category_id'],
-#         quantity=data['quantity'],
-#         sold=data['sold'],
-#     )
+    user_id = current_user()
+    product_id = data.get('product_id')
+    quantity = data.get('quantity', 1)
 
-#     # Get the uploaded images
-#     product_images = request.files.getlist('photos')
-#     image_paths = []
+    add_item = Cart(user_id, )
+    db.session.add(add_item)
+    db.session.commit()
 
-#     if product_images:
-#         # Set the product_image to the first image's filename
-#         first_image = product_images[0]
-#         first_image_name = secure_filename(first_image.filename)
-#         new_product.product_image = first_image_name  # Set the product_image field
 
-#         # Save the first image
-#         first_image.save(os.path.join(current_app.config['PRODUCT_IMAGE_UPLOAD_PATH'], first_image_name))
-#         image_paths.append(first_image_name)
+    return jsonify({"message": "Product added to cart successfully"}), 201
 
-#         # Save the other images as ProductImage instances
-#         for image in product_images:
-#             name = secure_filename(image.filename)
-#             logging.info(f"storage: {name}")
 
-#             image.save(os.path.join(current_app.config['PRODUCT_IMAGES_UPLOAD_PATH'], name))
-#             image_paths.append(name)
+    try:
+        db.session.commit()  # Commit the session to save the product and images
+        return jsonify({
+            "message": "Product added successfully",
+            "id": new_product.id,
+            "image_paths": image_paths  # Return the list of image paths
+        }), 201
+    except Exception as e:
+        db.session.rollback()  # Rollback in case of error
+        return jsonify({'error': f'Failed to add product: {str(e)}'}), 500
 
-#             new_image = ProductImage(
-#                 product_id=new_product.id,
-#                 image_path=name
-#             )
-#             db.session.add(new_image)
-
-#     # Add the new product to the session
-#     db.session.add(new_product)
-#     logging.info(f"new product: {new_product}")
-
-#     try:
-#         db.session.commit()  # Commit the session to save the product and images
-#         return jsonify({
-#             "message": "Product added successfully",
-#             "id": new_product.id,
-#             "image_paths": image_paths  # Return the list of image paths
-#         }), 201
-#     except Exception as e:
-#         db.session.rollback()  # Rollback in case of error
-#         return jsonify({'error': f'Failed to add product: {str(e)}'}), 500
-
-#     return jsonify({'error': 'Invalid image file'}), 400
+    return jsonify({'error': 'Invalid image file'}), 400
 
 
 # return first image or route to set default image and update default product image

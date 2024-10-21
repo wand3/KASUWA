@@ -16,7 +16,7 @@ const Jiki: FC<BodyProps> = ({ nav, children }) => {
       <div>Jiki</div>
       {/* <KasuwaItems />
             <NavButtom /> */}
-      <AddProduct />
+      {/* <AddProduct /> */}
       <Footer />
     </>
   );
