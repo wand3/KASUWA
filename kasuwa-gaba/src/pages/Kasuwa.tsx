@@ -1,15 +1,20 @@
 import Jiki from "../components/Jiki";
-import NavButtom from "../components/navButtom";
+import NavButtom from "../components/NavButtom";
+import KasuwaItems from "../components/KasuwaItems";
+import { ProductsProvider } from "../context/ProductsProvider";
 
 
 const Kasuwa = () => {
 
     return (
         <> 
-            <Jiki nav>
-                <NavButtom />
+            <ProductsProvider>
+                <Jiki nav>
+                    <KasuwaItems />
+                    <NavButtom />
 
-            </Jiki>          
+                </Jiki>
+            </ProductsProvider>          
         </>
     )
 }
