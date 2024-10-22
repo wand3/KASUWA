@@ -4,9 +4,9 @@ import { Button } from "@headlessui/react";
 import React, { useRef, useState } from "react";
 
 type FormErrorType = {
-    email: string;
+    email?: string;
     password?: string;
-
+    confirmPassword?: boolean;
 }
 
 const LoginPage = () => {
@@ -21,10 +21,7 @@ const LoginPage = () => {
         const password = passwordField.current ? passwordField.current.value : '';
 
         console.log(`${email}, ${password}`)
-        const errors: FormErrorType = {
-            email: "",
-            password: ""
-        };
+        const errors: FormErrorType = {};
         if (!email) {
             errors.email = 'email must not be empty'
         }
