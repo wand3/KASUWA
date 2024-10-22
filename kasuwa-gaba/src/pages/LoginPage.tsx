@@ -2,6 +2,8 @@ import Jiki from "../components/Jiki";
 import { InputField } from "../components/Auth/FormInput";
 import { Button } from "@headlessui/react";
 import React, { useRef, useState } from "react";
+import UseApi from "../hooks/UseApi";
+
 
 type FormErrorType = {
     email?: string;
@@ -11,11 +13,12 @@ type FormErrorType = {
 
 const LoginPage = () => {
     const [ formerrors, setFormerrors ] = useState<FormErrorType>({});
+    const api = UseApi();
 
     const emailField = useRef<HTMLInputElement>(null)
     const passwordField = useRef<HTMLInputElement>(null)
 
-    const onSubmit = (ev: React.FormEvent) =>  {
+    const onSubmit = async (ev: React.FormEvent) =>  {
         ev.preventDefault();
         const email = emailField.current ? emailField.current.value : '';
         const password = passwordField.current ? passwordField.current.value : '';
@@ -28,7 +31,15 @@ const LoginPage = () => {
         if (!password) {
             errors.password = 'password must not be empty'
         }
-        setFormerrors(errors)
+        setFormerrors(errors);
+        if (Object.keys(errors).length > 0){
+            return;
+        }
+
+        // const result = await api.post('/auth/signin')
+        // if (result === 'Login failed Wrong password' ) {
+        //     console.log('wrong password')
+        // }
 
 
     }
@@ -60,6 +71,8 @@ const LoginPage = () => {
                     type="submit">
                     Login
                     </Button>
+                    <hr />
+                    <p>Don&apos;t have an account? <a href="/RegisterPage">Register here</a>!</p>
                 </form>     
             </Jiki>
             

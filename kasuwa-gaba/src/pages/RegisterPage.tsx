@@ -1,6 +1,6 @@
 import Jiki from "../components/Jiki";
 import { InputField } from "../components/Auth/FormInput";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button } from "@headlessui/react";
 
 type FormErrorType = {
@@ -15,6 +15,12 @@ const RegisterPage = () => {
     const emailField = useRef<HTMLInputElement>(null)
     const passwordField = useRef<HTMLInputElement>(null)
     const confirmField = useRef<HTMLInputElement>(null)
+    
+    useEffect(() => {
+        if (emailField.current) {
+            emailField.current.focus()
+        }
+    }, []);
 
     const onSubmit = (ev: React.FormEvent) => {
         ev.preventDefault();
