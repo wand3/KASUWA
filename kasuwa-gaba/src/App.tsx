@@ -6,7 +6,6 @@ import ApiProvider from './context/ApiProvider';
 import About from './pages/About';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import { ProductsProvider } from './context/ProductsProvider';
 
 
 // import baseURL from './config';
@@ -16,8 +15,6 @@ function App() {
   return (
     <>
         <ApiProvider>
-        <ProductsProvider>
-          <Kasuwa />
           <Routes>
             <Route path='/' element={<Kasuwa />} />
             <Route path='/About' element={ <About /> } />
@@ -26,8 +23,6 @@ function App() {
             <Route path="*" element={<Navigate to="/" />} />
 
           </Routes>
-
-        </ProductsProvider>
         </ApiProvider>
       {/* <Counter>{(num: number) => <>{num}</>}</Counter> */}
 
