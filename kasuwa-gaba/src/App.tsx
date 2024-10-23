@@ -1,19 +1,17 @@
 import './App.css'
 import { Routes, Route, Navigate } from "react-router-dom"
 import Kasuwa from './pages/Kasuwa';
-// import { ProductsProvider } from './context/ProductsProvider';
 import ApiProvider from './context/ApiProvider';
 import About from './pages/About';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-
-
-// import baseURL from './config';
-
+import { FlashProvider } from './context/FlashProvider';
 
 function App() {
   return (
     <>
+        
+      <FlashProvider>
         <ApiProvider>
           <Routes>
             <Route path='/' element={<Kasuwa />} />
@@ -24,8 +22,8 @@ function App() {
 
           </Routes>
         </ApiProvider>
-      {/* <Counter>{(num: number) => <>{num}</>}</Counter> */}
-
+      </FlashProvider>  
+       
     </>
   )
 }
