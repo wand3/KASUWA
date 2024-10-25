@@ -1,7 +1,7 @@
 import Nav from "./Nav";
 import Footer from "./Footer";
 import React, { FC } from "react";
-// import AddProduct from "./AddProduct";
+import AddProduct from "./AddProduct";
 
 type BodyProps = {
   nav: boolean;
