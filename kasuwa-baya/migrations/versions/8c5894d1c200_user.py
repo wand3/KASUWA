@@ -1,8 +1,8 @@
-"""in
+"""user
 
-Revision ID: 75bc524dde02
+Revision ID: 8c5894d1c200
 Revises: 
-Create Date: 2024-10-19 06:36:03.128028
+Create Date: 2024-10-25 02:03:03.850446
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '75bc524dde02'
+revision = '8c5894d1c200'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -30,22 +30,15 @@ def upgrade():
     with op.batch_alter_table('categories', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_categories_created_at'), ['created_at'], unique=False)
 
-    op.create_table('orders',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(), nullable=False),
-    sa.Column('updated_at', sa.DateTime(), nullable=False),
-    sa.Column('type', sa.String(length=50), nullable=False),
-    sa.PrimaryKeyConstraint('id')
-    )
-    with op.batch_alter_table('orders', schema=None) as batch_op:
-        batch_op.create_index(batch_op.f('ix_orders_created_at'), ['created_at'], unique=False)
-
     op.create_table('users',
-    sa.Column('name', sa.String(length=64), nullable=False),
+    sa.Column('full_name', sa.String(length=64), nullable=False),
     sa.Column('email', sa.String(length=64), nullable=False),
     sa.Column('username', sa.String(length=64), nullable=False),
     sa.Column('hashed_password', sa.String(length=256), nullable=False),
     sa.Column('role', sa.Integer(), nullable=False),
+    sa.Column('phone', sa.String(length=20), nullable=True),
+    sa.Column('token', sa.String(length=32), nullable=True),
+    sa.Column('token_expiration', sa.DateTime(), nullable=True),
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
@@ -55,7 +48,25 @@ def upgrade():
     with op.batch_alter_table('users', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_users_created_at'), ['created_at'], unique=False)
         batch_op.create_index(batch_op.f('ix_users_email'), ['email'], unique=True)
+        batch_op.create_index(batch_op.f('ix_users_token'), ['token'], unique=True)
         batch_op.create_index(batch_op.f('ix_users_username'), ['username'], unique=True)
+
+    op.create_table('addresses',
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('city', sa.String(length=50), nullable=False),
+    sa.Column('state', sa.String(length=50), nullable=False),
+    sa.Column('country', sa.String(length=50), nullable=False),
+    sa.Column('zipcode', sa.Integer(), nullable=False),
+    sa.Column('street', sa.String(length=50), nullable=False),
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('type', sa.String(length=50), nullable=False),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    with op.batch_alter_table('addresses', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_addresses_created_at'), ['created_at'], unique=False)
 
     op.create_table('products',
     sa.Column('product_name', sa.String(length=64), nullable=False),
@@ -75,6 +86,41 @@ def upgrade():
     with op.batch_alter_table('products', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_products_created_at'), ['created_at'], unique=False)
         batch_op.create_index(batch_op.f('ix_products_product_name'), ['product_name'], unique=False)
+
+    op.create_table('carts',
+    sa.Column('product_id', sa.Integer(), nullable=False),
+    sa.Column('quantity', sa.Integer(), nullable=True),
+    sa.Column('shipping', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('type', sa.String(length=50), nullable=False),
+    sa.ForeignKeyConstraint(['product_id'], ['products.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    with op.batch_alter_table('carts', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_carts_created_at'), ['created_at'], unique=False)
+
+    op.create_table('orders',
+    sa.Column('transaction_id', sa.String(length=256), nullable=False),
+    sa.Column('amount', sa.Float(), nullable=False),
+    sa.Column('address', sa.String(length=256), nullable=False),
+    sa.Column('status', sa.String(length=20), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('product_id', sa.Integer(), nullable=False),
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('type', sa.String(length=50), nullable=False),
+    sa.ForeignKeyConstraint(['product_id'], ['products.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('transaction_id')
+    )
+    with op.batch_alter_table('orders', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_orders_created_at'), ['created_at'], unique=False)
 
     op.create_table('product_images',
     sa.Column('product_id', sa.Integer(), nullable=False),
@@ -98,21 +144,30 @@ def downgrade():
         batch_op.drop_index(batch_op.f('ix_product_images_created_at'))
 
     op.drop_table('product_images')
+    with op.batch_alter_table('orders', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_orders_created_at'))
+
+    op.drop_table('orders')
+    with op.batch_alter_table('carts', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_carts_created_at'))
+
+    op.drop_table('carts')
     with op.batch_alter_table('products', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_products_product_name'))
         batch_op.drop_index(batch_op.f('ix_products_created_at'))
 
     op.drop_table('products')
+    with op.batch_alter_table('addresses', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_addresses_created_at'))
+
+    op.drop_table('addresses')
     with op.batch_alter_table('users', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_users_username'))
+        batch_op.drop_index(batch_op.f('ix_users_token'))
         batch_op.drop_index(batch_op.f('ix_users_email'))
         batch_op.drop_index(batch_op.f('ix_users_created_at'))
 
     op.drop_table('users')
-    with op.batch_alter_table('orders', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_orders_created_at'))
-
-    op.drop_table('orders')
     with op.batch_alter_table('categories', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_categories_created_at'))
 

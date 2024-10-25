@@ -13,8 +13,8 @@ def get_user(id):
 
 @bp.route('/user', methods=['POST'])
 def create_user():
-    data = request.json()
-    if 'name' not in data or 'username' not in data or 'email' not in data or 'password' not in data:
+    data = request.get_json()
+    if 'full_name' not in data or 'username' not in data or 'email' not in data or 'password' not in data:
         return bad_request('Must include name, username, email and password')
 
     if db.session.scalar(select(User).where(User.username == data['username'])):
@@ -25,7 +25,7 @@ def create_user():
 
     user = User()
     user.from_dict(data, new_user=True)
-    db.session.add('user')
+    db.session.add(user)
     db.session.commit()
 
     return {'message': 'User Created Successfully', 'id': user.id}
