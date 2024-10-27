@@ -1,7 +1,6 @@
 import Nav from "./Nav";
 import Footer from "./Footer";
 import React, { FC } from "react";
-import AddProduct from "./AddProduct";
 
 type BodyProps = {
   nav: boolean;
@@ -16,7 +15,6 @@ const Jiki: FC<BodyProps> = ({ nav, children }) => {
       <div>Jiki</div>
       {/* <KasuwaItems />
             <NavButtom /> */}
-      {/* <AddProduct /> */}
       <Footer />
     </>
   );
