@@ -3,13 +3,24 @@ from app import db
 import os
 from app.models.user import User
 from app.api import bp
+from app.api.auth import token_auth
 from app.api.errors import bad_request
 from sqlalchemy import select
 import logging
 
+
 @bp.route('/user/<int:id>', methods=['GET'])
+@token_auth.login_required
 def get_user(id):
-    return db.get_or_404(User, id).to_dict()
+    data = db.get_or_404(User, id).to_dict()
+    return data
+
+@bp.route('/users', methods=['GET'])
+def all_users():
+    users = User.query.all()
+    logging.info(f'user:', users)
+    users_list = [user.to_dict() for user in users]  # Convert each user to a dictionary
+    return jsonify({'users': users_list})
 
 @bp.route('/user', methods=['POST'])
 def create_user():
