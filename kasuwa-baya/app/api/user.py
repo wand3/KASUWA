@@ -8,18 +8,18 @@ from app.api.errors import bad_request
 from sqlalchemy import select
 import logging
 
-
-@bp.route('/user/<int:id>', methods=['GET'])
+@bp.route('/user', methods=['GET'])
 @token_auth.login_required
-def get_user(id):
-    data = db.get_or_404(User, id).to_dict()
-    return data
+def get_user():
+    current_user = token_auth.current_user()
+    data = current_user.to_dict(include_email=True)
+    return jsonify(data)
 
 @bp.route('/users', methods=['GET'])
 def all_users():
     users = User.query.all()
-    logging.info(f'user:', users)
-    users_list = [user.to_dict() for user in users]  # Convert each user to a dictionary
+    logging.info(f'tk_auth:', token_auth)
+    users_list = [user.to_dict() for user in users]
     return jsonify({'users': users_list})
 
 @bp.route('/user', methods=['POST'])
