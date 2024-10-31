@@ -25,11 +25,8 @@ def all_users():
 @bp.route('/user', methods=['POST'])
 def create_user():
     data = request.get_json()
-    if 'full_name' not in data or 'username' not in data or 'email' not in data or 'password' not in data:
-        return bad_request('Must include name, username, email and password')
-
-    if db.session.scalar(select(User).where(User.username == data['username'])):
-        return bad_request('Username Already taken, Pick another')
+    if 'email' not in data or 'password' not in data:
+        return bad_request('Must include email and password')
 
     if db.session.scalar(select(User).where(User.email == data['email'])):
         return bad_request('Use a Different Email')

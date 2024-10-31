@@ -10,5 +10,11 @@ class Category(BaseModel):
     category_name: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
     products: Mapped[list['Product']] = relationship("Product", back_populates="category")
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'category_name': self.category_name
+        }
+
     def __repr__(self):
         return f"<Category(category_name={self.category_name}, id={self.id})>"
