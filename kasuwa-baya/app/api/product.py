@@ -11,7 +11,7 @@ import logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[logging.StreamHandler()])
 
 @bp.route('/product', methods=['POST'])
-# @token_auth.login_required(role=1)
+@token_auth.login_required(role=1)
 def create_product():
     data = request.form
 
@@ -66,137 +66,40 @@ def create_product():
 
     return jsonify({'error': 'Invalid image file'}), 400
 
-# @bp.route('/product', methods=['POST'])
-# @token_auth.login_required(role=1)
-# def create_product():
-#     data = request.form
-
-#     # Create a new product instance
-#     new_product = Product(
-#         product_name=data['product_name'],
-#         description=data['description'],
-#         price=data['price'],
-#         category_id=data['category_id'],
-#         quantity=data['quantity']
-#     )
-
-#     # Get the uploaded images
-#     product_images = request.files.getlist('photos')
-#     image_paths = []
-
-#     if product_images:
-#         # Set the product_image to the first image's filename
-#         first_image = product_images[0]
-#         first_image_name = secure_filename(first_image.filename)
-#         new_product.product_image = first_image_name  # Set the product_image field
-
-#         # Save the first image
-#         first_image.save(os.path.join(current_app.config['PRODUCT_IMAGE_UPLOAD_PATH'], first_image_name))
-#         image_paths.append(first_image_name)
-
-#     # Add the new product to the session
-#     db.session.add(new_product)
-
-#     try:
-#         db.session.commit()  # Commit the session to save the product and get its ID
-
-#         # Now that the product is committed, we can get its ID
-#         product_id = new_product.id
-
-#         # Save the other images as ProductImage instances
-#         for image in product_images:
-#             name = secure_filename(image.filename)
-#             logging.info(f"storage: {name}")
-
-#             image.save(os.path.join(current_app.config['PRODUCT_IMAGES_UPLOAD_PATH'], name))
-#             image_paths.append(name)
-
-#             new_image = ProductImage(
-#                 product_id=product_id,  # Use the committed product's ID
-#                 image_path=name
-#             )
-#             db.session.add(new_image)
-
-#         # Commit the session again to save the images
-#         db.session.commit()
-
-#         return jsonify({
-#             "message": "Product added successfully",
-#             "id": product_id,
-#             "image_paths": image_paths  # Return the list of image paths
-#         }), 201
-#     except Exception as e:
-#         db.session.rollback()  # Rollback in case of error
-#         return jsonify({'error': f'Failed to add product: {str(e)}'}), 500
-
-#     return jsonify({'error': 'Invalid image file'}), 400
-
-@bp.route('/add_to_cart', methods=['POST'])
+@bp.route('/cart', methods=['POST'])
+@token_auth.login_required
 def add_to_cart():
-    data = request.json()
+    data = request.json
 
-    user_id = current_user()
-    product_id = data.get('product_id')
-    quantity = data.get('quantity', 1)
+    user_id = token_auth.current_user().id
+    data['user_id'] = user_id
 
-    add_item = Cart(user_id, )
-    db.session.add(add_item)
+    cart_item = Cart()
+    cart_item.from_dict(data)
+    db.session.add(cart_item)
     db.session.commit()
-
 
     return jsonify({"message": "Product added to cart successfully"}), 201
 
+@bp.route('/cart', methods=['GET'])
+@token_auth.login_required
+def get_cart():
+    user_id = token_auth.current_user().id
+    cart_items = Cart.query.filter_by(user_id=user_id).all()
+    if not cart_items:
+        return jsonify({"message": "Cart is empty"}), 200
+    return jsonify([cart_item.to_dict() for cart_item in cart_items]), 200
 
-    try:
-        db.session.commit()  # Commit the session to save the product and images
-        return jsonify({
-            "message": "Product added successfully",
-            "id": new_product.id,
-            "image_paths": image_paths  # Return the list of image paths
-        }), 201
-    except Exception as e:
-        db.session.rollback()  # Rollback in case of error
-        return jsonify({'error': f'Failed to add product: {str(e)}'}), 500
-
-    return jsonify({'error': 'Invalid image file'}), 400
-
-
-# return first image or route to set default image and update default product image
 @bp.route('/products', methods=['GET'])
 def get_products():
     products = Product.query.all()
     return jsonify([product.to_dict() for product in products]), 200
-
 
 @bp.route('/products', methods=['DELETE'])
 def delete_products():
     Product.query.delete()
     db.session.commit()
     return jsonify({"message": "All products deleted successfully"}), 200
-
-# @bp.route('/products', methods=['GET'])
-# def get_products():
-#     products = Product.query.all()
-
-#     product_list = []
-#     for product in products:
-#         logging.info(f"each product: {product}")
-#         product_data = {
-#             'id': product.id,
-#             'product_name': product.product_name,
-#             'description': product.description,
-#             'price': product.price,
-#             'category_id': product.category_id,
-#             'quantity': product.quantity,
-#             'sold': product.sold,
-#             'created_at': product.created_at,
-#             'updated_at': product.updated_at,
-#             'product_image': product.product_image,
-#             'product_images': [image.image_path for image in product.product_images]
-#         }
-#         product_list.append(product_data)
-#     return jsonify(product_list), 200
-
 
 @bp.route('/products/<int:product_id>/default-image/<int:image_id>', methods=['PUT'])
 def update_default_product_image(product_id, image_id):
