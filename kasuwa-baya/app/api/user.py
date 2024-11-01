@@ -1,7 +1,7 @@
 from flask import request, jsonify, current_app
 from app import db
 import os
-from app.models.user import User
+from app.models.user import User, UserAddress
 from app.api import bp
 from app.api.auth import token_auth
 from app.api.errors import bad_request
@@ -14,6 +14,19 @@ def get_user():
     current_user = token_auth.current_user()
     data = current_user.to_dict(include_email=True)
     return jsonify(data)
+
+@bp.route('/address', methods=['POST'])
+@token_auth.login_required
+def add_address():
+    data = request.json
+    user_id = token_auth.current_user().id
+    data['user_id'] = user_id
+    address = UserAddress()
+    address.from_dict(data)
+    db.session.add(address)
+    db.session.commit()
+
+    return {'message': 'Address Added Successfully', 'id': address.id}
 
 @bp.route('/users', methods=['GET'])
 def all_users():
@@ -42,10 +55,6 @@ def create_user():
 def update_user(id):
     user = db.get_or_404(User, id)
     data = request.get_json()
-    if 'username' in data and data['username'] != user.username and \
-        db.session.scalar(select(User).where(
-            User.username == data['username'])):
-        return bad_request('please use a different username')
     if 'email' in data and data['email'] != user.email and \
         db.session.scalar(select(User).where(
             User.email == data['email'])):

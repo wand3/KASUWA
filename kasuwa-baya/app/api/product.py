@@ -10,6 +10,53 @@ import logging
 # Configure logging to display messages to the terminal
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[logging.StreamHandler()])
 
+@bp.route('/products', methods=['GET'])
+def get_products():
+    products = Product.query.all()
+    return jsonify([product.to_dict() for product in products]), 200
+
+@bp.route('/product/<int:product_id>', methods=['GET'])
+def get_product(product_id):
+    product = Product.query.get(product_id)
+    if product is None:
+        return {'error': 'Product not found'}, 404
+    try:
+        return product.to_dict()
+    except Exception as e:
+        return {'error': 'Failed to retrieve product'}, 500
+
+@bp.route('/products', methods=['DELETE'])
+def delete_products():
+    Product.query.delete()
+    db.session.commit()
+    return jsonify({"message": "All products deleted successfully"}), 200
+
+@bp.route('/cart', methods=['POST'])
+@token_auth.login_required
+def add_to_cart():
+    data = request.json
+
+    user_id = token_auth.current_user().id
+    data['user_id'] = user_id
+
+    cart_item = Cart()
+    cart_item.from_dict(data)
+    db.session.add(cart_item)
+    db.session.commit()
+
+    return jsonify({"message": "Product added to cart successfully"}), 201
+
+@bp.route('/cart', methods=['GET'])
+@token_auth.login_required
+def get_cart():
+    user_id = token_auth.current_user().id
+    cart_items = Cart.query.filter_by(user_id=user_id).all()
+    if not cart_items:
+        return jsonify({"message": "Cart is empty"}), 200
+    return jsonify([cart_item.to_dict() for cart_item in cart_items]), 200
+
+
+# ADMIN ROUTES
 @bp.route('/product', methods=['POST'])
 @token_auth.login_required(role=1)
 def create_product():
@@ -66,42 +113,8 @@ def create_product():
 
     return jsonify({'error': 'Invalid image file'}), 400
 
-@bp.route('/cart', methods=['POST'])
-@token_auth.login_required
-def add_to_cart():
-    data = request.json
-
-    user_id = token_auth.current_user().id
-    data['user_id'] = user_id
-
-    cart_item = Cart()
-    cart_item.from_dict(data)
-    db.session.add(cart_item)
-    db.session.commit()
-
-    return jsonify({"message": "Product added to cart successfully"}), 201
-
-@bp.route('/cart', methods=['GET'])
-@token_auth.login_required
-def get_cart():
-    user_id = token_auth.current_user().id
-    cart_items = Cart.query.filter_by(user_id=user_id).all()
-    if not cart_items:
-        return jsonify({"message": "Cart is empty"}), 200
-    return jsonify([cart_item.to_dict() for cart_item in cart_items]), 200
-
-@bp.route('/products', methods=['GET'])
-def get_products():
-    products = Product.query.all()
-    return jsonify([product.to_dict() for product in products]), 200
-
-@bp.route('/products', methods=['DELETE'])
-def delete_products():
-    Product.query.delete()
-    db.session.commit()
-    return jsonify({"message": "All products deleted successfully"}), 200
-
 @bp.route('/products/<int:product_id>/default-image/<int:image_id>', methods=['PUT'])
+@token_auth.login_required(role=1)
 def update_default_product_image(product_id, image_id):
     # Fetch the product
     product = Product.query.get(product_id)
