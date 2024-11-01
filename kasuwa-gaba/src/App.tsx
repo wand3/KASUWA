@@ -7,6 +7,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import { FlashProvider } from "./context/FlashProvider";
 import AddProduct from "./components/AddProduct";
+import PaymentComponent from "./components/PaymentComponent";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
             <Route path="/LoginPage" element={<LoginPage />} />
             <Route path="/RegisterPage" element={<RegisterPage />} />
             <Route path="/add" element={<AddProduct />} />
+            <Route path="/order" element={<PaymentComponent />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </ApiProvider>
