@@ -25,6 +25,19 @@ def get_product(product_id):
     except Exception as e:
         return {'error': 'Failed to retrieve product'}, 500
 
+@bp.route('/product/<int:product_id>', methods=['DELETE'])
+def delete_product(product_id):
+    product = Product.query.get(product_id)
+    if product is None:
+        return {'error': 'Product not found'}, 404
+    try:
+        db.session.delete(product)
+        db.session.commit()
+        return {'message': 'Product deleted successfully'}
+    except Exception as e:
+        db.session.rollback()
+        return {'error': 'Failed to delete product'}, 500
+
 @bp.route('/products', methods=['DELETE'])
 def delete_products():
     Product.query.delete()
