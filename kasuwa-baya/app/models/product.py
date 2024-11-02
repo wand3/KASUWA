@@ -14,7 +14,7 @@ class Product(BaseModel):
     sold: Mapped[int] = mapped_column(Integer, default=0)
     product_image: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     category: Mapped['Category'] = relationship("Category", back_populates="products")
-    product_images: Mapped[List['ProductImage']] = relationship("ProductImage", back_populates="product")
+    product_images: Mapped[List['ProductImage']] = relationship("ProductImage", back_populates="product", cascade="all, delete-orphan")
 
     def to_dict(self):
         return {

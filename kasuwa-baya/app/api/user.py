@@ -15,6 +15,12 @@ def get_user():
     data = current_user.to_dict(include_email=True)
     return jsonify(data)
 
+@bp.route('/address', methods=['GET'])
+@token_auth.login_required
+def get_address():
+    addresses = token_auth.current_user().shipping_addresses
+    return [address.to_dict() for address in addresses]
+
 @bp.route('/address', methods=['POST'])
 @token_auth.login_required
 def add_address():

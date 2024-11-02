@@ -25,19 +25,6 @@ def get_product(product_id):
     except Exception as e:
         return {'error': 'Failed to retrieve product'}, 500
 
-@bp.route('/product/<int:product_id>', methods=['DELETE'])
-def delete_product(product_id):
-    product = Product.query.get(product_id)
-    if product is None:
-        return {'error': 'Product not found'}, 404
-    try:
-        db.session.delete(product)
-        db.session.commit()
-        return {'message': 'Product deleted successfully'}
-    except Exception as e:
-        db.session.rollback()
-        return {'error': 'Failed to delete product'}, 500
-
 @bp.route('/products', methods=['DELETE'])
 def delete_products():
     Product.query.delete()
@@ -151,3 +138,73 @@ def update_default_product_image(product_id, image_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': f'Failed to update product image: {str(e)}'}), 500
+
+
+@bp.route('/product/<int:product_id>', methods=['PUT'])
+@token_auth.login_required(role=1)
+def edit_product(product_id):
+    product = Product.query.get(product_id)
+    if product is None:
+        return {'error': 'Product not found'}, 404
+
+    data = request.get_json()
+    if 'product_name' not in data or not data['product_name']:
+        return {'error': 'Product name is required'}, 400
+    if 'description' not in data or not data['description']:
+        return {'error': 'Description is required'}, 400
+    if 'price' not in data or not data['price']:
+        return {'error': 'Price is required'}, 400
+    if 'category_id' not in data or not data['category_id']:
+        return {'error': 'Category ID is required'}, 400
+
+    product.product_name = data['product_name']
+    product.description = data['description']
+    product.price = data['price']
+    product.category_id = data['category_id']
+    if 'quantity' in data:
+        product.quantity = data['quantity']
+    if 'product_image' in data:
+        product.product_image = data['product_image']
+
+    try:
+        db.session.commit()  # Commit the session to save the product and get its ID
+
+        # Now that the product is committed, we can get its ID
+        product_id = product.id
+
+        # Save the new images as ProductImage instances
+        product_images = request.files.getlist('product_images')
+        for image in product_images:
+            name = secure_filename(image.filename)
+            image.save(os.path.join(current_app.config['PRODUCT_IMAGES_UPLOAD_PATH'], name))
+            new_image = ProductImage(
+                product_id=product_id,  # Use the committed product's ID
+                image_path=name
+            )
+            db.session.add(new_image)
+
+        # Commit the session again to save the images
+        db.session.commit()
+        return product.to_dict()
+    except Exception as e:
+        db.session.rollback()
+        return {'error': 'Failed to update product'}, 500
+
+
+
+@bp.route('/product/<int:product_id>', methods=['DELETE'])
+@token_auth.login_required(role=1)
+def delete_product(product_id):
+    product = Product.query.get(product_id)
+    if product is None:
+        return {'error': 'Product not found'}, 404
+
+    try:
+        db.session.delete(product)
+        db.session.commit()
+        return {'message': 'Product deleted successfully'}, 200
+    except Exception as e:
+        db.session.rollback()
+        # Log the actual exception message for debugging purposes
+        print(f"Error deleting product: {str(e)}")
+        return {'error': 'Failed to delete product'}, 500
