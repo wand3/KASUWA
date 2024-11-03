@@ -17,7 +17,6 @@ class OrderItem(BaseModel):
 class Order(BaseModel):
     __tablename__ = 'orders'
 
-    transaction_id: Mapped[str] = mapped_column(String(256), unique=True, default="")
     amount: Mapped[float] = mapped_column(Float)
     address: Mapped[str] = mapped_column(String(256))
     status: Mapped[str] = mapped_column(String(20), default="Not processed")
@@ -29,7 +28,6 @@ class Order(BaseModel):
     def to_dict(self):
             return {
                 'id': self.id,
-                'transaction_id': self.transaction_id,
                 'amount': self.amount,
                 'address': self.address,
                 'status': self.status,
@@ -40,4 +38,4 @@ class Order(BaseModel):
             }
 
     def __repr__(self):
-        return f"<Order(transaction_id={self.transaction_id}, amount={self.amount}, status={self.status})>"
+        return f"<Order(amount={self.amount}, status={self.status})>"

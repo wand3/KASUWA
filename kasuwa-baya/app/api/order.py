@@ -11,6 +11,13 @@ import logging
 # Configure logging to display messages to the terminal
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[logging.StreamHandler()])
 
+@bp.route('/admin/orders', methods=['DELETE'])
+def delete_orders():
+    Order.query.delete()
+    db.session.commit()
+    return jsonify({"message": "All Orders deleted successfully"}), 200
+
+
 @bp.route('/admin/orders', methods=['GET'])
 def get_orders():
     orders = Order.query.all()
@@ -20,17 +27,17 @@ def verify_transaction(reference):
     secret_key = os.getenv('PAYMENT_KEY')
     url = f'https://api.paystack.co/transaction/verify/{reference}'
     headers = {
-        'Authorization': f'Bearer 39311bce5ca76204100b120f70941db2',
+        'Authorization': f'Bearer {secret_key}',
         'Content-Type': 'application/json'
     }
-
     response = requests.get(url, headers=headers)
-    logging.info(f'work', response)
-    if response.status_code == 200:
-        return response.json()['data']  # Return the transaction data
-    else:
-        return {'status': 'failed', 'message': 'Verification failed'}
+    logging.info(f"Verification response: {response.json()}")
 
+    if response.status_code == 200 and response.json().get('data'):
+        return response.json()['data']
+    else:
+        logging.error(f"Verification failed: {response.json()}")
+        return {'status': 'failed', 'message': 'Verification failed'}
 
 @bp.route('/checkout', methods=['POST'])
 @token_auth.login_required
@@ -41,7 +48,7 @@ def create_order():
 
     try:
         # Create the order
-        order = Order(user_id=user_id, address=request.json.get('address'), transaction_id=None)
+        order = Order(user_id=user_id, address=request.json.get('address'))
         cart_items = Cart.query.filter_by(user_id=user_id).all()
 
         # Add items to the order
@@ -78,8 +85,11 @@ def create_order():
         response.raise_for_status()  # Raises error for non-200 status codes
 
         data = response.json()
+        logging.info(f'data ord: {data.get("data")}')
+
         access_code = data['data']['access_code']
         order.reference = data['data']['reference']
+        # order.transaction_id = data['data']['trans']
         db.session.commit()  # Save reference to order
 
         return jsonify({'order_id': order.id, 'total_cost': order.amount, 'access_code': access_code})
@@ -94,25 +104,24 @@ def create_order():
 
 @bp.route('/payment-success', methods=['GET'])
 def payment_success():
-    logging.info(f'dance')
-    # Extract query parameters from the URL
-    transaction_id = request.args.get('trans')  # Get transaction ID from query params
-    reference = request.args.get('reference')     # Get reference from query params
+    reference = request.args.get('reference')
+    logging.info(f"Payment success route hit with reference: {reference}")
 
-    if not transaction_id or not reference:
-        return jsonify({'error': 'Transaction ID or reference missing'}), 400
+    if not reference:
+        return jsonify({'error': 'reference missing'}), 400
 
-    # Verify the transaction
     verification_response = verify_transaction(reference)
-
+    logging.info(f'veri: {verification_response}')
     if verification_response.get('status') == 'success':
         order = Order.query.filter_by(reference=reference).first()
         if order:
-            order.transaction_id = transaction_id  # Set the transaction ID here
             order.status = 'Processing'
             db.session.commit()
+            logging.info(f"Order {order.id} updated successfully")
             return jsonify({'message': 'Order updated successfully', 'order_id': order.id})
         else:
+            logging.error(f"Order with reference {reference} not found")
             return jsonify({'error': 'Order not found'}), 404
     else:
+        logging.error(f"Transaction verification failed: {verification_response}")
         return jsonify({'error': 'Transaction verification failed'}), 400

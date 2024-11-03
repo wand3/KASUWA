@@ -35,7 +35,7 @@ const Cart: React.FC = () => {
         const response = await fetch("http://127.0.0.1:5000/api/cart", {
           method: "GET",
           headers: {
-            Authorization: `Bearer 39311bce5ca76204100b120f70941db2`, // Adjust as needed
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Adjust as needed
             "Content-Type": "application/json",
           },
         });
