@@ -17,9 +17,10 @@ def get_user():
 
 @bp.route('/address', methods=['GET'])
 @token_auth.login_required
-def get_address():
+def get_addresses():
     addresses = token_auth.current_user().shipping_addresses
-    return [address.to_dict() for address in addresses]
+    formatted_addresses = [address.to_dict() for address in addresses]
+    return jsonify(formatted_addresses), 200
 
 @bp.route('/address', methods=['POST'])
 @token_auth.login_required
@@ -27,12 +28,42 @@ def add_address():
     data = request.json
     user_id = token_auth.current_user().id
     data['user_id'] = user_id
+
+    # Check if the user already has addresses
+    existing_addresses = UserAddress.query.filter_by(user_id=user_id).all()
+
+    # Create a new address
     address = UserAddress()
     address.from_dict(data)
+
+    # If the user has no addresses, set the new one as default
+    if not existing_addresses:
+        address.is_default = True  # Set this address as default
+
     db.session.add(address)
     db.session.commit()
 
     return {'message': 'Address Added Successfully', 'id': address.id}
+
+
+@bp.route('/address/<int:address_id>/set-default', methods=['PATCH'])
+@token_auth.login_required
+def set_default_address(address_id):
+    user = token_auth.current_user()
+    address = UserAddress.query.filter_by(id=address_id, user_id=user.id).first()
+
+    if not address:
+        return jsonify({"error": "Address not found"}), 404
+
+    # Reset all addresses for this user to `is_default=False`
+    UserAddress.query.filter_by(user_id=user.id).update({"is_default": False})
+
+    # Set the selected address to `is_default=True`
+    address.is_default = True
+    db.session.commit()
+
+    return jsonify({"message": "Default address set successfully"}), 200
+
 
 @bp.route('/users', methods=['GET'])
 def all_users():

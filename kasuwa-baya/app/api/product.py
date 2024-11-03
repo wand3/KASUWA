@@ -51,10 +51,36 @@ def add_to_cart():
 def get_cart():
     user_id = token_auth.current_user().id
     cart_items = Cart.query.filter_by(user_id=user_id).all()
-    if not cart_items:
-        return jsonify({"message": "Cart is empty"}), 200
-    return jsonify([cart_item.to_dict() for cart_item in cart_items]), 200
 
+    if not cart_items:
+        return jsonify({"message": "Cart is empty", "total": 0}), 200
+
+    # Calculate total price
+    total_price = sum(item.total_price() for item in cart_items)
+
+    return jsonify({
+        "items": [cart_item.to_dict() for cart_item in cart_items],
+        "total": total_price
+    }), 200
+
+@bp.route('/cart/<int:product_id>', methods=['DELETE'])
+@token_auth.login_required
+def delete_cart_item(product_id):
+    user_id = token_auth.current_user().id
+    cart_item = Cart.query.filter_by(user_id=user_id, product_id=product_id).first()
+
+    if cart_item is None:
+        return {'error': 'Product not found in cart'}, 404
+
+    try:
+        db.session.delete(cart_item)
+        db.session.commit()
+        return {'message': 'Product in Cart deleted successfully'}, 200
+    except Exception as e:
+        db.session.rollback()
+        # Log the actual exception message for debugging purposes
+        print(f"Error deleting product: {str(e)}")
+        return {'error': 'Failed to delete product'}, 500
 
 # ADMIN ROUTES
 @bp.route('/product', methods=['POST'])

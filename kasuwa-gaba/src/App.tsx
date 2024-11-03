@@ -7,7 +7,8 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import { FlashProvider } from "./context/FlashProvider";
 import AddProduct from "./components/AddProduct";
-import PaymentComponent from "./components/PaymentComponent";
+import Cart from "./components/Cart";
+import Checkout from "./components/Checkout";
 
 function App() {
   return (
@@ -20,7 +21,8 @@ function App() {
             <Route path="/LoginPage" element={<LoginPage />} />
             <Route path="/RegisterPage" element={<RegisterPage />} />
             <Route path="/add" element={<AddProduct />} />
-            <Route path="/order" element={<PaymentComponent />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/check" element={<Checkout />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </ApiProvider>

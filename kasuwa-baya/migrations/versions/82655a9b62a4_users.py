@@ -1,8 +1,8 @@
 """users
 
-Revision ID: df35665a29a3
+Revision ID: 82655a9b62a4
 Revises: 
-Create Date: 2024-10-31 06:20:19.288330
+Create Date: 2024-11-03 02:06:17.938462
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'df35665a29a3'
+revision = '82655a9b62a4'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -51,11 +51,12 @@ def upgrade():
 
     op.create_table('addresses',
     sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('street', sa.String(length=50), nullable=False),
     sa.Column('city', sa.String(length=50), nullable=False),
     sa.Column('state', sa.String(length=50), nullable=False),
     sa.Column('country', sa.String(length=50), nullable=False),
-    sa.Column('zipcode', sa.Integer(), nullable=False),
-    sa.Column('street', sa.String(length=50), nullable=False),
+    sa.Column('zipcode', sa.String(length=50), nullable=False),
+    sa.Column('is_default', sa.Boolean(), nullable=False),
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
@@ -65,6 +66,24 @@ def upgrade():
     )
     with op.batch_alter_table('addresses', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_addresses_created_at'), ['created_at'], unique=False)
+
+    op.create_table('orders',
+    sa.Column('transaction_id', sa.String(length=256), nullable=False),
+    sa.Column('amount', sa.Float(), nullable=False),
+    sa.Column('address', sa.String(length=256), nullable=False),
+    sa.Column('status', sa.String(length=20), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('reference', sa.String(length=256), nullable=False),
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('created_at', sa.DateTime(), nullable=False),
+    sa.Column('updated_at', sa.DateTime(), nullable=False),
+    sa.Column('type', sa.String(length=50), nullable=False),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('transaction_id')
+    )
+    with op.batch_alter_table('orders', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_orders_created_at'), ['created_at'], unique=False)
 
     op.create_table('products',
     sa.Column('product_name', sa.String(length=64), nullable=False),
@@ -101,24 +120,20 @@ def upgrade():
     with op.batch_alter_table('carts', schema=None) as batch_op:
         batch_op.create_index(batch_op.f('ix_carts_created_at'), ['created_at'], unique=False)
 
-    op.create_table('orders',
-    sa.Column('transaction_id', sa.String(length=256), nullable=False),
-    sa.Column('amount', sa.Float(), nullable=False),
-    sa.Column('address', sa.String(length=256), nullable=False),
-    sa.Column('status', sa.String(length=20), nullable=False),
-    sa.Column('user_id', sa.Integer(), nullable=False),
+    op.create_table('order_items',
+    sa.Column('order_id', sa.Integer(), nullable=False),
     sa.Column('product_id', sa.Integer(), nullable=False),
+    sa.Column('quantity', sa.Integer(), nullable=True),
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('updated_at', sa.DateTime(), nullable=False),
     sa.Column('type', sa.String(length=50), nullable=False),
+    sa.ForeignKeyConstraint(['order_id'], ['orders.id'], ),
     sa.ForeignKeyConstraint(['product_id'], ['products.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('transaction_id')
+    sa.PrimaryKeyConstraint('id')
     )
-    with op.batch_alter_table('orders', schema=None) as batch_op:
-        batch_op.create_index(batch_op.f('ix_orders_created_at'), ['created_at'], unique=False)
+    with op.batch_alter_table('order_items', schema=None) as batch_op:
+        batch_op.create_index(batch_op.f('ix_order_items_created_at'), ['created_at'], unique=False)
 
     op.create_table('product_images',
     sa.Column('product_id', sa.Integer(), nullable=False),
@@ -142,10 +157,10 @@ def downgrade():
         batch_op.drop_index(batch_op.f('ix_product_images_created_at'))
 
     op.drop_table('product_images')
-    with op.batch_alter_table('orders', schema=None) as batch_op:
-        batch_op.drop_index(batch_op.f('ix_orders_created_at'))
+    with op.batch_alter_table('order_items', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_order_items_created_at'))
 
-    op.drop_table('orders')
+    op.drop_table('order_items')
     with op.batch_alter_table('carts', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_carts_created_at'))
 
@@ -155,6 +170,10 @@ def downgrade():
         batch_op.drop_index(batch_op.f('ix_products_created_at'))
 
     op.drop_table('products')
+    with op.batch_alter_table('orders', schema=None) as batch_op:
+        batch_op.drop_index(batch_op.f('ix_orders_created_at'))
+
+    op.drop_table('orders')
     with op.batch_alter_table('addresses', schema=None) as batch_op:
         batch_op.drop_index(batch_op.f('ix_addresses_created_at'))
 

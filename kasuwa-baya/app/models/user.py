@@ -78,29 +78,40 @@ class User(BaseModel):
 
 class UserAddress(BaseModel):
     __tablename__ = 'addresses'
-    user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
-    user: Mapped[User] = relationship("User", back_populates="shipping_addresses")
-    city: Mapped[str] = mapped_column(String(50))
-    state: Mapped[str] = mapped_column(String(50))
-    country: Mapped[str] = mapped_column(String(50))
-    zipcode: Mapped[str] = mapped_column(Integer)
-    street: Mapped[str] = mapped_column(String(50))
 
+    # Fields for storing address details
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
+    user: Mapped['User'] = relationship("User", back_populates="shipping_addresses")
+
+    street: Mapped[str] = mapped_column(String(50), nullable=False)
+    city: Mapped[str] = mapped_column(String(50), nullable=False)
+    state: Mapped[str] = mapped_column(String(50), nullable=False)
+    country: Mapped[str] = mapped_column(String(50), nullable=False)
+    zipcode: Mapped[str] = mapped_column(String(50), nullable=False)
+    is_default: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    # Convert to dictionary format (useful for JSON responses)
     def to_dict(self):
-        data = {
+        return {
             'id': self.id,
             'street': self.street,
             'city': self.city,
             'state': self.state,
             'country': self.country,
-            'zipcode': self.zipcode
+            'zipcode': self.zipcode,
+            'is_default': self.is_default
         }
-        return data
 
     def from_dict(self, data):
-        for field in ['street', 'city', 'state', 'country', 'zipcode', 'user_id']:
-            if field in data:
-                setattr(self, field, data[field])
+            for field in ['street', 'city', 'state', 'country', 'zipcode', 'user_id']:
+                if field in data:
+                    setattr(self, field, data[field])
+
+    # Format address as a single string
+    def formatted_address(self):
+        return f"{self.street}, {self.city}, {self.state}, {self.country}, {self.zipcode}"
 
     def __repr__(self):
-        return f"<UserAddress(city={self.city}, state={self.state}, country={self.country}, zipcode={self.zipcode}, street={self.street})>"
+        return (f"<UserAddress(id={self.id}, user_id={self.user_id}, street='{self.street}', "
+                f"city='{self.city}', state='{self.state}', country='{self.country}', "
+                f"zipcode='{self.zipcode}', is_default={self.is_default})>")

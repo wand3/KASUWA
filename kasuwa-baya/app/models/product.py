@@ -45,7 +45,6 @@ class ProductImage(BaseModel):
     def __repr__(self):
             return f"Product Image ('{self.image_path}', '{self.product_id}')"
 
-
 class Cart(BaseModel):
     __tablename__ = 'carts'
 
@@ -56,10 +55,11 @@ class Cart(BaseModel):
     user: Mapped['User'] = relationship("User", back_populates="cart")
 
     def to_dict(self):
+        # Attempt to get the product, if it exists
         product = Product.query.get(self.product_id)
         return {
             'id': self.id,
-            'product': product.to_dict(),
+            'product': product.to_dict() if product else None,  # Handle the None case
             'quantity': self.quantity,
             'shipping': self.shipping
         }
@@ -69,5 +69,9 @@ class Cart(BaseModel):
             if field in data:
                 setattr(self, field, data[field])
 
+    def total_price(self):
+            product = Product.query.get(self.product_id)
+            return self.quantity * product.price if product and product.price is not None else 0
+
     def __repr__(self):
-            return f"<Cart(id={self.id}, user_id={self.user_id}, quantity={self.quantity})>"
+        return f"<Cart(id={self.id}, user_id={self.user_id}, quantity={self.quantity})>"

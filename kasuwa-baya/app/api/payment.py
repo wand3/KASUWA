@@ -3,6 +3,7 @@ import requests
 from app import db
 import os
 from app.models.user import User, UserAddress
+from app.models.product import Cart
 from app.api import bp
 from app.api.auth import token_auth
 from app.api.errors import bad_request
@@ -12,10 +13,12 @@ import logging
 @bp.route('/initialize-transaction', methods=['POST'])
 @token_auth.login_required
 def initialize_transaction():
-    data = request.get_json()
-    email = data['email']
-    # email = token_auth.current_user().email
-    amount = data['amount']
+    email = token_auth.current_user().email
+
+    user_id = token_auth.current_user().id
+    cart_items = Cart.query.filter_by(user_id=user_id).all()
+
+    total_amount = sum(item.total_price() for item in cart_items)
 
     # Set your Paystack secret key
     secret_key = os.getenv('PAYMENT_KEY')
@@ -28,7 +31,7 @@ def initialize_transaction():
     }
     payload = {
         'email': email,
-        'amount': amount
+        'amount': total_amount
     }
 
     response = requests.post(url, headers=headers, json=payload)

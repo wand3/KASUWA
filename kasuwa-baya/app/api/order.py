@@ -4,12 +4,36 @@ from app import db
 import os
 from app.api.auth import token_auth
 from app.models.order import Order, OrderItem
-from app.models.product import Cart
+from app.models.product import Cart, Product
 from app.api import bp
 import logging
 
+# Configure logging to display messages to the terminal
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[logging.StreamHandler()])
+
+@bp.route('/admin/orders', methods=['GET'])
+def get_orders():
+    orders = Order.query.all()
+    return jsonify([order.to_dict() for order in orders])
+
+def verify_transaction(reference):
+    secret_key = os.getenv('PAYMENT_KEY')
+    url = f'https://api.paystack.co/transaction/verify/{reference}'
+    headers = {
+        'Authorization': f'Bearer 39311bce5ca76204100b120f70941db2',
+        'Content-Type': 'application/json'
+    }
+
+    response = requests.get(url, headers=headers)
+    logging.info(f'work', response)
+    if response.status_code == 200:
+        return response.json()['data']  # Return the transaction data
+    else:
+        return {'status': 'failed', 'message': 'Verification failed'}
+
 
 @bp.route('/checkout', methods=['POST'])
+@token_auth.login_required
 def create_order():
     user = token_auth.current_user()
     user_id = user.id
@@ -17,7 +41,7 @@ def create_order():
 
     try:
         # Create the order
-        order = Order(user_id=user_id, address=request.json.get('address'))
+        order = Order(user_id=user_id, address=request.json.get('address'), transaction_id=None)
         cart_items = Cart.query.filter_by(user_id=user_id).all()
 
         # Add items to the order
@@ -28,8 +52,7 @@ def create_order():
             )
             order.items.append(order_item)
 
-        # Calculate total amount
-        order.amount = sum(item.product.price * item.quantity for item in cart_items)
+        order.amount = sum(item.quantity * Product.query.get(item.product_id).price for item in cart_items)
 
         # Save order to the database
         db.session.add(order)
@@ -69,25 +92,27 @@ def create_order():
         return jsonify({'error': str(e)}), 500
 
 
-@bp.route('/payment-success', methods=['POST'])
+@bp.route('/payment-success', methods=['GET'])
 def payment_success():
-    data = request.get_json()
-
-    # Extract the transaction_id and reference from the payment success response
-    transaction_id = data.get('transaction_id')  # "trans" from client
-    reference = data.get('reference')            # "reference" from client
+    logging.info(f'dance')
+    # Extract query parameters from the URL
+    transaction_id = request.args.get('trans')  # Get transaction ID from query params
+    reference = request.args.get('reference')     # Get reference from query params
 
     if not transaction_id or not reference:
         return jsonify({'error': 'Transaction ID or reference missing'}), 400
 
-    # Find the order with the matching reference
-    order = Order.query.filter_by(reference=reference).first()
+    # Verify the transaction
+    verification_response = verify_transaction(reference)
 
-    if order:
-        # Update the order with the transaction ID and mark as processed
-        order.transaction_id = transaction_id
-        order.status = 'Processed'
-        db.session.commit()
-        return jsonify({'message': 'Order updated successfully', 'order_id': order.id})
+    if verification_response.get('status') == 'success':
+        order = Order.query.filter_by(reference=reference).first()
+        if order:
+            order.transaction_id = transaction_id  # Set the transaction ID here
+            order.status = 'Processing'
+            db.session.commit()
+            return jsonify({'message': 'Order updated successfully', 'order_id': order.id})
+        else:
+            return jsonify({'error': 'Order not found'}), 404
     else:
-        return jsonify({'error': 'Order not found'}), 404
+        return jsonify({'error': 'Transaction verification failed'}), 400
