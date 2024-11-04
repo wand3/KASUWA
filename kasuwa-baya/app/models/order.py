@@ -17,24 +17,27 @@ class OrderItem(BaseModel):
 class Order(BaseModel):
     __tablename__ = 'orders'
 
-    amount: Mapped[float] = mapped_column(Float)
-    address: Mapped[str] = mapped_column(String(256))
-    status: Mapped[str] = mapped_column(String(20), default="Not processed")
+    amount: Mapped[float] = mapped_column(Float, nullable=False)
+    transaction_id: Mapped[str] = mapped_column(String(64))
+    address_id: Mapped[int] = mapped_column(Integer, ForeignKey('addresses.id'), nullable=False)
+    address: Mapped['UserAddress'] = relationship("UserAddress")
+    status: Mapped[str] = mapped_column(String(20), default="Pending")
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
     user: Mapped['User'] = relationship("User", back_populates="orders")
-    reference: Mapped[str] = mapped_column(String(256), default="")
+    reference: Mapped[str] = mapped_column(String(64), unique=True)
     items: Mapped[List['OrderItem']] = relationship("OrderItem", back_populates="order")
 
     def to_dict(self):
             return {
                 'id': self.id,
                 'amount': self.amount,
-                'address': self.address,
                 'status': self.status,
                 'user_id': self.user_id,
                 'reference': self.reference,
                 'created_at': self.created_at,
                 'updated_at': self.updated_at,
+                'transaction_id': self.transaction_id,
+                'address': self.address.formatted_address() if self.address else None,
             }
 
     def __repr__(self):

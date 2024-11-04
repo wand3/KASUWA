@@ -9,5 +9,5 @@ class Config:
         'sqlite:///' + os.path.join(basedir, 'app.db')
     MAX_CONTENT_LENGTH = 6144 * 6144
     UPLOAD_EXTENSIONS = ['.jpg', '.png', '.img', '.jpeg']
-    PRODUCT_IMAGE_UPLOAD_PATH = os.path.join(basedir, 'app', 'static', 'images', 'product_images', 'default')
+    REVIEW_IMAGE_UPLOAD_PATH = os.path.join(basedir, 'app', 'static', 'images', 'review_images')
     PRODUCT_IMAGES_UPLOAD_PATH = os.path.join(basedir, 'app', 'static', 'images', 'product_images')

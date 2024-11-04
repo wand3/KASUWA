@@ -6,6 +6,7 @@ from app.api.auth import token_auth
 from app.models.order import Order, OrderItem
 from app.models.product import Cart, Product
 from app.api import bp
+import uuid
 import logging
 
 # Configure logging to display messages to the terminal
@@ -31,7 +32,7 @@ def verify_transaction(reference):
         'Content-Type': 'application/json'
     }
     response = requests.get(url, headers=headers)
-    logging.info(f"Verification response: {response.json()}")
+    # logging.info(f"Verification response: {response.json()}")
 
     if response.status_code == 200 and response.json().get('data'):
         return response.json()['data']
@@ -48,7 +49,12 @@ def create_order():
 
     try:
         # Create the order
-        order = Order(user_id=user_id, address=request.json.get('address'))
+        address_id = int(request.json.get('address'))
+        unique_reference = str(uuid.uuid4())
+        unique_transaction_id = str(uuid.uuid4())
+
+        order = Order(user_id=user_id, address_id=address_id, transaction_id=unique_transaction_id,
+                      reference=unique_reference)
         cart_items = Cart.query.filter_by(user_id=user_id).all()
 
         # Add items to the order
@@ -89,8 +95,12 @@ def create_order():
 
         access_code = data['data']['access_code']
         order.reference = data['data']['reference']
-        # order.transaction_id = data['data']['trans']
         db.session.commit()  # Save reference to order
+
+        # Clear the user's cart after transaction initialization
+        for item in cart_items:
+            db.session.delete(item)
+        db.session.commit()
 
         return jsonify({'order_id': order.id, 'total_cost': order.amount, 'access_code': access_code})
 
@@ -111,13 +121,24 @@ def payment_success():
         return jsonify({'error': 'reference missing'}), 400
 
     verification_response = verify_transaction(reference)
-    logging.info(f'veri: {verification_response}')
+    logging.info(f'verificate: {verification_response}')
     if verification_response.get('status') == 'success':
         order = Order.query.filter_by(reference=reference).first()
         if order:
+            # Update the order status and transaction ID
             order.status = 'Processing'
+            order.transaction_id = verification_response['id']
+
+            # Adjust product quantities
+            for item in order.items:
+                product = Product.query.get(item.product_id)
+                if product:
+                    product.sold += item.quantity
+                    product.quantity -= item.quantity
+
+            # Save changes to the database
             db.session.commit()
-            logging.info(f"Order {order.id} updated successfully")
+            logging.info(f"Order {order.id} updated successfully with adjusted product quantities")
             return jsonify({'message': 'Order updated successfully', 'order_id': order.id})
         else:
             logging.error(f"Order with reference {reference} not found")

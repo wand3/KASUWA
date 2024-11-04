@@ -2,7 +2,7 @@ from flask import request, jsonify, current_app
 from app import db
 import os
 from app.api.auth import token_auth
-from app.models.product import Product, ProductImage, Cart
+from app.models.product import Product, ProductImage, Cart, Review, ReviewImage
 from app.api import bp
 from werkzeug.utils import secure_filename
 import logging
@@ -81,6 +81,55 @@ def delete_cart_item(product_id):
         # Log the actual exception message for debugging purposes
         print(f"Error deleting product: {str(e)}")
         return {'error': 'Failed to delete product'}, 500
+
+@bp.route('/products/<int:product_id>/reviews', methods=['POST'])
+@token_auth.login_required
+def add_review(product_id):
+    user = token_auth.current_user()
+    data = request.form
+
+    # Ensure required fields are present
+    rating = data.get('rating')
+    message = data.get('message')
+    if not rating or not message:
+        return jsonify({'error': 'Rating and message are required'}), 400
+
+    # Validate the product
+    product = Product.query.get(product_id)
+    if not product:
+        return jsonify({'error': 'Product not found'}), 404
+
+    # Create the review
+    review = Review(user_id=user.id, product_id=product_id, rating=rating, message=message)
+    db.session.add(review)
+    db.session.commit()
+
+    # Handle image uploads
+    uploaded_files = request.files.getlist('images')
+    if uploaded_files:
+        review_image_paths = []
+        for file in uploaded_files:
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file_path = os.path.join(current_app.config['REVIEW_IMAGE_UPLOAD_PATH'], filename)
+
+                # Save the file and associate it with the review
+                file.save(file_path)
+                review_image = ReviewImage(review_id=review.id, image_path=file_path)
+                db.session.add(review_image)
+
+                review_image_paths.append(file_path)
+            else:
+                return jsonify({'error': f'File type not allowed: {file.filename}'}), 400
+
+        db.session.commit()
+        return jsonify({
+            'message': 'Review added successfully',
+            'review_id': review.id,
+            'images': review_image_paths
+        }), 201
+    else:
+        return jsonify({'message': 'Review added successfully', 'review_id': review.id}), 201
 
 # ADMIN ROUTES
 @bp.route('/product', methods=['POST'])

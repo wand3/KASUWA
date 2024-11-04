@@ -75,3 +75,42 @@ class Cart(BaseModel):
 
     def __repr__(self):
         return f"<Cart(id={self.id}, user_id={self.user_id}, quantity={self.quantity})>"
+
+
+class Review(BaseModel):
+    __tablename__ = 'reviews'
+
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'), nullable=False)
+    product_id: Mapped[int] = mapped_column(Integer, ForeignKey('products.id'), nullable=False)
+    rating: Mapped[int] = mapped_column(Integer, nullable=False)
+    message: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    images: Mapped[List['ReviewImage']] = relationship("ReviewImage", back_populates="review", cascade="all, delete-orphan")
+
+    user: Mapped['User'] = relationship("User", back_populates="reviews")
+    product: Mapped['Product'] = relationship("Product", back_populates="reviews")
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'product_id': self.product_id,
+            'rating': self.rating,
+            'message': self.message,
+            'images': [image.image_path for image in self.images]
+        }
+
+    def __repr__(self):
+        return f"<Review(user_id={self.user_id}, product_id={self.product_id}, rating={self.rating})>"
+
+class ReviewImage(BaseModel):
+    __tablename__ = 'review_images'
+
+    review_id: Mapped[int] = mapped_column(Integer, ForeignKey('reviews.id'), nullable=False)
+    image_path: Mapped[str] = mapped_column(String(255), nullable=False)
+
+    review: Mapped[Review] = relationship("Review", back_populates="images")
+
+    def __repr__(self):
+        return f"<ReviewImage(image_path={self.image_path}, review_id={self.review_id})>"
+
+class ShippingMethod(BaseModel):
