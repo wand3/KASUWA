@@ -14,7 +14,6 @@ const Jiki: FC<BodyProps> = ({ nav, children }) => {
     <>
       {nav && <Nav />}
       {children}
-      <div>Jiki</div>
       <FlashMessage />
       {/* <KasuwaItems />
             <NavButtom /> */}
