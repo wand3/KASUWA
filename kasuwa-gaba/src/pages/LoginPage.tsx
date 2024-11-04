@@ -1,9 +1,10 @@
 import Jiki from "../components/Jiki";
 import { InputField } from "../components/Auth/FormInput";
 import { Button } from "@headlessui/react";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import useFlash from "../hooks/UseFlash";
+import UseApi from "../hooks/UseApi";
 
 
 type FormErrorType = {
@@ -29,6 +30,12 @@ const LoginPage = () => {
     console.log("data2: ", passwordField);
     const email = emailField.current ? emailField.current.value : "";
     const password = passwordField.current ? passwordField.current.value : "";
+
+    // useEffect(() => {
+    //   if (emailField.current) {
+    //     emailField.current.focus();
+    //   }
+    // }, []);
 
     console.log("data: ", email);
     console.log("data2: ", password);
