@@ -2,6 +2,7 @@ import Nav from "./Nav";
 import Footer from "./Footer";
 import React, { FC } from "react";
 // import AddProduct from "./AddProduct";
+import FlashMessage from "./FlashMessage";
 
 type BodyProps = {
   nav: boolean;
@@ -14,6 +15,7 @@ const Jiki: FC<BodyProps> = ({ nav, children }) => {
       {nav && <Nav />}
       {children}
       <div>Jiki</div>
+      <FlashMessage />
       {/* <KasuwaItems />
             <NavButtom /> */}
       {/* <AddProduct /> */}

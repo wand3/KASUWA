@@ -6,8 +6,8 @@ import { useContext } from "react";
 
 
 export const FlashMessage = () => {
-    // const { flashMessage, hideFlash, visible }: FlashContextType =  useFlash()
-    const { hideFlash, flashMessage, visible } = useContext(FlashContext);
+    const { flashMessage, hideFlash, visible } = useContext(FlashContext) as FlashContextType;
+    // const { hideFlash, flashMessage, visible } = useContext(FlashContext);
 
     const baseStyles = "fixed top-0 right-0 p-4 rounded shadow-md text-white w-fit";
 

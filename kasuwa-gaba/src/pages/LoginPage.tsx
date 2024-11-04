@@ -62,20 +62,23 @@ const LoginPage = () => {
             if (location.state && location.state.next) {
                 next = location.state.next;
             }
+            flash('login success', 'success')
             navigate(next);
-            flash('login success', 'info')
+            
         } else {
+          flash('check credentials', 'danger')
           setLoginError("Login failed. Please check your credentials.");
 
         }
       } else {
-        flash('login success', 'info');
 
         setLoginError("Login failed. Please try again.");
+        flash('check credentials', 'error')
+
         
 
       }
-    } catch (error) {
+     } catch (error) {
       console.error("Login error:", error);
 
       setLoginError("Login failed. Please try again.");
