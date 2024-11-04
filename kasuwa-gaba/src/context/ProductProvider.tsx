@@ -38,7 +38,7 @@ export const ProductsProvider = ({ children }: ChildrenType): ReactElement => {
     const fetchproducts = async () => {
         try {
 
-            const response = await api.get('/listproducts');
+            const response = await api.get('/products');
             console.log('api.get')
 
             const data = await response.body;

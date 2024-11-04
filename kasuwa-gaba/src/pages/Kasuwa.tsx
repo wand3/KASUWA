@@ -1,7 +1,7 @@
 import Jiki from "../components/Jiki";
 import NavButtom from "../components/NavButtom";
 import KasuwaItems from "../components/KasuwaItems";
-import { ProductsProvider } from "../context/ProductsProvider";
+import { ProductsProvider } from "../context/ProductProvider";
 
 
 const Kasuwa = () => {
