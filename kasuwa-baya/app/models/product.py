@@ -52,28 +52,30 @@ class Cart(BaseModel):
 
     product_id: Mapped[int] = mapped_column(Integer, ForeignKey('products.id'))
     quantity: Mapped[int] = Column(Integer, default=1)
-    shipping: Mapped[int] = mapped_column(Integer, default=1)
+    shipping_id: Mapped[int] = mapped_column(Integer, ForeignKey('shippings.id'), default=3)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
+
+    product: Mapped['Product'] = relationship("Product")
     user: Mapped['User'] = relationship("User", back_populates="cart")
+    shipping: Mapped['ShippingMethod'] = relationship("ShippingMethod")
 
     def to_dict(self):
-        # Attempt to get the product, if it exists
-        product = Product.query.get(self.product_id)
         return {
             'id': self.id,
-            'product': product.to_dict() if product else None,  # Handle the None case
+            'product': self.product.to_dict(),
             'quantity': self.quantity,
-            'shipping': self.shipping
+            'shipping': self.shipping.to_dict()
         }
 
     def from_dict(self, data):
-        for field in ['product_id', 'quantity', 'shipping', 'user_id']:
+        for field in ['product_id', 'quantity', 'shipping_id', 'user_id']:
             if field in data:
                 setattr(self, field, data[field])
 
     def total_price(self):
-            product = Product.query.get(self.product_id)
-            return self.quantity * product.price if product and product.price is not None else 0
+        product_price = self.quantity * self.product.price if self.product and self.product.price is not None else 0
+        shipping_price = self.shipping.shipping_price if self.shipping else 0
+        return product_price + shipping_price
 
     def __repr__(self):
         return f"<Cart(id={self.id}, user_id={self.user_id}, quantity={self.quantity})>"
@@ -121,6 +123,19 @@ class ShippingMethod(BaseModel):
     shipping_method_name: Mapped[str] = mapped_column(String, nullable=False, unique=True)
     shipping_price: Mapped[float] = mapped_column(Float, nullable=False)
     delivery_time: Mapped[str] = mapped_column(String, nullable=False)
+
+    def from_dict(self, data):
+        for field in ['shipping_method_name', 'shipping_price', 'delivery_time']:
+            if field in data:
+                setattr(self, field, data[field])
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'shipping_method_name': self.shipping_method_name,
+            'shipping_price': self.shipping_price,
+            'delivery_time': self.delivery_time
+        }
 
     def __repr__(self):
         return f"ShippingMethod(id={self.id}, shipping_method_name='{self.shipping_method_name}', shipping_price={self.shipping_price}, delivery_time='{self.delivery_time}')"

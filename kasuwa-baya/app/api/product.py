@@ -2,7 +2,7 @@ from flask import request, jsonify, current_app, abort
 from app import db
 import os
 from app.api.auth import token_auth
-from app.models.product import Product, ProductImage, Cart, Review, ReviewImage
+from app.models.product import Product, ProductImage, Cart, Review, ReviewImage, ShippingMethod
 from app.api import bp
 from werkzeug.utils import secure_filename
 import logging
@@ -81,6 +81,28 @@ def delete_cart_item(product_id):
         # Log the actual exception message for debugging purposes
         print(f"Error deleting product: {str(e)}")
         return {'error': 'Failed to delete product'}, 500
+
+@bp.route('/cart/shipping/<int:product_id>/<int:shipping_id>', methods=['PUT'])
+@token_auth.login_required
+def change_shipping(product_id, shipping_id):
+    user_id = token_auth.current_user().id
+
+    # Query the specific cart item by user_id and product_id
+    cart_item = Cart.query.filter_by(user_id=user_id, product_id=product_id).first()
+
+    if not cart_item:
+        return jsonify({'error': 'Cart item not found.'}), 404
+
+    # Update the shipping_id for the specified cart item
+    cart_item.shipping_id = shipping_id
+    db.session.commit()
+
+    return jsonify({'message': 'Shipping method updated successfully.'}), 200
+
+@bp.route('/shipping', methods=['GET'])
+def get_shipping():
+    shipping_methods = ShippingMethod.query.all()
+    return jsonify([shipping_method.to_dict() for shipping_method in shipping_methods]), 200
 
 
 # ADMIN ROUTES
@@ -218,7 +240,6 @@ def edit_product(product_id):
         return {'error': 'Failed to update product'}, 500
 
 
-
 @bp.route('/product/<int:product_id>', methods=['DELETE'])
 @token_auth.login_required(role=1)
 def delete_product(product_id):
@@ -235,3 +256,53 @@ def delete_product(product_id):
         # Log the actual exception message for debugging purposes
         print(f"Error deleting product: {str(e)}")
         return {'error': 'Failed to delete product'}, 500
+
+
+# SHIPPING ROUTES
+@bp.route('/admin/shipping', methods=['POST'])
+@token_auth.login_required(role=1)
+def add_shipping():
+    data = request.json
+
+    shipping = ShippingMethod()
+    shipping.from_dict(data)
+    db.session.add(shipping)
+    db.session.commit()
+
+    return jsonify({'message': 'Shipping Method Added Successfully'}), 201
+
+@bp.route('/admin/shipping/<int:shipping_id>', methods=['PUT'])
+@token_auth.login_required(role=1)
+def edit_shipping(shipping_id):
+    data = request.json
+
+    shipping_method = ShippingMethod.query.get(shipping_id)
+    if not shipping_method:
+        return jsonify({'error': 'Shipping method not found.'}), 404
+
+    if 'shipping_method_name' in data:
+        shipping_method.shipping_method_name = data['shipping_method_name']
+    if 'shipping_price' in data:
+        shipping_method.shipping_price = data['shipping_price']
+    if 'delivery_time' in data:
+        shipping_method.delivery_time = data['delivery_time']
+
+    db.session.commit()
+
+    return jsonify({'message': 'Shipping method updated successfully.', 'shipping_method': shipping_method.to_dict()}), 200
+
+
+@bp.route('/admin/shipping/<int:shipping_id>', methods=['DELETE'])
+@token_auth.login_required(role=1)
+def delete_shipping(shipping_id):
+    # Find the shipping method by ID
+    shipping_method = ShippingMethod.query.get(shipping_id)
+
+    if not shipping_method:
+        return jsonify({'error': 'Shipping method not found.'}), 404
+
+    # Delete the shipping method
+    db.session.delete(shipping_method)
+    db.session.commit()
+
+    return jsonify({'message': 'Shipping method deleted successfully.'}), 200
