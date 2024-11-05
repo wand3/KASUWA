@@ -172,6 +172,13 @@ def payment_success():
         logging.error(f"Transaction verification failed: {verification_response}")
         return jsonify({'error': 'Transaction verification failed'}), 400
 
+
+@bp.route('/admin/reviews', methods=['DELETE'])
+def delete_reviews():
+    Review.query.delete()
+    db.session.commit()
+    return jsonify({"message": "All Reviews deleted successfully"}), 200
+
 @bp.route('/reviews', methods=['POST'])
 @token_auth.login_required
 def add_review():
@@ -196,21 +203,27 @@ def add_review():
     review = Review(user_id=user_id, product_id=product_id, rating=rating, message=message)
 
     # Process and save each image
-    image_paths = []
+    image_filenames = []
     for file in files:
-        filename = secure_filename(file.filename)
-        file_ext = os.path.splitext(filename)[1]
+        if file:
+            filename = secure_filename(file.filename)  # Secure the filename
+            file_ext = os.path.splitext(filename)[1]
 
-        if file_ext not in current_app.config['UPLOAD_EXTENSIONS']:
-            abort(400, description="Invalid image format.")
+            if file_ext not in current_app.config['UPLOAD_EXTENSIONS']:
+                abort(400, description="Invalid image format.")
 
-        save_path = os.path.join(current_app.config['REVIEW_IMAGE_UPLOAD_PATH'], filename)
-        file.save(save_path)
-        image_paths.append(save_path)
+            # Save the file to the desired path
+            save_path = os.path.join(current_app.config['REVIEW_IMAGE_UPLOAD_PATH'], filename)
+            file.save(save_path)
 
-    # Associate images with review if needed
-    for path in image_paths:
-        review_image = ReviewImage(review=review, image_path=path)  # Assuming ReviewImage model exists
+            # Store only the filename
+            image_filenames.append(filename)
+
+    logging.info(f'Saved image filenames: {image_filenames}')
+
+    # Associate images with the review
+    for filename in image_filenames:
+        review_image = ReviewImage(review=review, image_path=filename)  # Store only the filename
         db.session.add(review_image)
 
     db.session.add(review)
