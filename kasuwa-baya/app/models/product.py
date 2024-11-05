@@ -15,6 +15,7 @@ class Product(BaseModel):
     product_image: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     category: Mapped['Category'] = relationship("Category", back_populates="products")
     product_images: Mapped[List['ProductImage']] = relationship("ProductImage", back_populates="product", cascade="all, delete-orphan")
+    reviews: Mapped[List['Review']]= relationship("Review", back_populates="product", cascade="all, delete-orphan")
 
     def to_dict(self):
         return {
@@ -28,7 +29,8 @@ class Product(BaseModel):
             'created_at': self.created_at,
             'updated_at': self.updated_at,
             'product_image': self.product_image,
-            'product_images': [image.image_path for image in self.product_images]
+            'product_images': [image.image_path for image in self.product_images],
+            'reviews': [review.to_dict() for review in self.reviews]
         }
 
     def __repr__(self):
@@ -92,7 +94,7 @@ class Review(BaseModel):
     def to_dict(self):
         return {
             'id': self.id,
-            'user_id': self.user_id,
+            'user_email': self.user.email,
             'product_id': self.product_id,
             'rating': self.rating,
             'message': self.message,
@@ -114,3 +116,11 @@ class ReviewImage(BaseModel):
         return f"<ReviewImage(image_path={self.image_path}, review_id={self.review_id})>"
 
 class ShippingMethod(BaseModel):
+    __tablename__ = 'shippings'
+
+    shipping_method_name: Mapped[str] = mapped_column(String, nullable=False, unique=True)
+    shipping_price: Mapped[float] = mapped_column(Float, nullable=False)
+    delivery_time: Mapped[str] = mapped_column(String, nullable=False)
+
+    def __repr__(self):
+        return f"ShippingMethod(id={self.id}, shipping_method_name='{self.shipping_method_name}', shipping_price={self.shipping_price}, delivery_time='{self.delivery_time}')"

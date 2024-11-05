@@ -20,7 +20,7 @@ class User(BaseModel):
     shipping_addresses: Mapped[List['UserAddress']] = relationship('UserAddress', back_populates="user", cascade="all, delete-orphan")
 
     cart: Mapped[List['Cart']] = relationship('Cart', back_populates="user", cascade="all, delete-orphan")
-
+    reviews: Mapped[List['Review']] = relationship('Review', back_populates='user')
     orders: Mapped[List['Order']] = relationship('Order', back_populates="user", cascade="all, delete-orphan")
 
     def to_dict(self, include_email=False):

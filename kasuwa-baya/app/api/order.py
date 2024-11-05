@@ -1,11 +1,12 @@
-from flask import request, jsonify, current_app
+from flask import request, jsonify, current_app, abort
 import requests
 from app import db
 import os
 from app.api.auth import token_auth
 from app.models.order import Order, OrderItem
-from app.models.product import Cart, Product
+from app.models.product import Cart, Product,Review, ReviewImage
 from app.api import bp
+from werkzeug.utils import secure_filename
 import uuid
 import logging
 
@@ -23,6 +24,30 @@ def delete_orders():
 def get_orders():
     orders = Order.query.all()
     return jsonify([order.to_dict() for order in orders])
+
+@bp.route('/orders', methods=['GET'])
+@token_auth.login_required()
+def list_orders():
+    user_id = token_auth.current_user().id
+    # Query to fetch orders for the current user, including related order items
+    user_orders = db.session.query(Order).filter(Order.user_id == user_id).all()
+
+    # Format the data to include order details and order items
+    orders_data = []
+    for order in user_orders:
+        order_dict = order.to_dict()  # Using your to_dict method for base details
+        order_dict['items'] = [
+            {
+                'product_id': item.product_id,
+                'quantity': item.quantity,
+                'product_name': item.product.product_name  # Assuming `Product` has a `name` field
+            }
+            for item in order.items
+        ]
+        orders_data.append(order_dict)
+
+    return jsonify(orders_data), 200
+
 
 def verify_transaction(reference):
     secret_key = os.getenv('PAYMENT_KEY')
@@ -146,3 +171,49 @@ def payment_success():
     else:
         logging.error(f"Transaction verification failed: {verification_response}")
         return jsonify({'error': 'Transaction verification failed'}), 400
+
+@bp.route('/reviews', methods=['POST'])
+@token_auth.login_required
+def add_review():
+    user = token_auth.current_user()
+    user_id = user.id
+    product_id = request.form.get('product_id')
+    rating = request.form.get('rating')
+    message = request.form.get('message')
+    files = request.files.getlist('images')
+
+    # Check if user has purchased the product
+    purchased_item = OrderItem.query.join(Order).filter(
+        Order.user_id == user_id,
+        Order.status == 'Completed',
+        OrderItem.product_id == product_id
+    ).first()
+
+    if not purchased_item:
+        return jsonify({'error': 'Only users who have purchased this product can leave a review.'}), 403
+
+    # Create a new review entry
+    review = Review(user_id=user_id, product_id=product_id, rating=rating, message=message)
+
+    # Process and save each image
+    image_paths = []
+    for file in files:
+        filename = secure_filename(file.filename)
+        file_ext = os.path.splitext(filename)[1]
+
+        if file_ext not in current_app.config['UPLOAD_EXTENSIONS']:
+            abort(400, description="Invalid image format.")
+
+        save_path = os.path.join(current_app.config['REVIEW_IMAGE_UPLOAD_PATH'], filename)
+        file.save(save_path)
+        image_paths.append(save_path)
+
+    # Associate images with review if needed
+    for path in image_paths:
+        review_image = ReviewImage(review=review, image_path=path)  # Assuming ReviewImage model exists
+        db.session.add(review_image)
+
+    db.session.add(review)
+    db.session.commit()
+
+    return jsonify({'message': 'Review added successfully'}), 201
