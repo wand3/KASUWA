@@ -6,14 +6,14 @@ import About from './pages/About';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import { FlashProvider } from './context/FlashProvider';
-// import UserProvider from './context/UserProvider';
+import { UserProvider } from './context/UserProvider';
 
 function App() {
   return (
     <>
         <FlashProvider>
           <ApiProvider>
-            {/* <UserProvider> */}
+            <UserProvider>
               <Routes>
                 <Route path='/' element={<Kasuwa />} />
                 <Route path='/About' element={ <About /> } />
@@ -22,7 +22,7 @@ function App() {
                 <Route path="*" element={<Navigate to="/" />} />
 
               </Routes>
-            {/* </UserProvider> */}
+            </UserProvider>
           </ApiProvider>
         </FlashProvider>  
        

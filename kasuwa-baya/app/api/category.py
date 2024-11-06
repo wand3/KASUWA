@@ -27,6 +27,7 @@ def create_category():
 
     return {"message": "Category created", "category_id": new_category.id}, 201
 
+
 @bp.route('/admin/category/<int:category_id>', methods=['DELETE'])
 @token_auth.login_required(role=1)
 def delete_category(category_id):
