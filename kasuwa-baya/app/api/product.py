@@ -63,6 +63,17 @@ def get_cart():
         "total": total_price
     }), 200
 
+@bp.route('/cart/<int:product_id>', methods=['PUT'])
+@token_auth.login_required
+def update_quantity(product_id):
+    user_id = token_auth.current_user().id
+    cart_item = Cart.query.filter_by(user_id, product_id=product_id).first()
+
+    if cart_item is None:
+        return {'error': 'Product not in cart'}
+
+
+
 @bp.route('/cart/<int:product_id>', methods=['DELETE'])
 @token_auth.login_required
 def delete_cart_item(product_id):
