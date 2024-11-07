@@ -5,6 +5,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import useFlash from "../hooks/UseFlash";
 import UseApi from "../hooks/UseApi";
+import useUser from "../hooks/UseUser";
 
 
 type FormErrorType = {
@@ -18,6 +19,7 @@ const LoginPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const flash = useFlash();
+  const {login} = useUser();
 
 
 
@@ -51,7 +53,19 @@ const LoginPage = () => {
     if (Object.keys(errors).length > 0) {
       return;
     }
-
+    // const result = await login(email, password);
+    // console.log(result)
+    // if (result === 'fail') {
+    //   flash('Invalid username or password', 'danger');
+    // }
+    // else if (result === 'ok') {
+    //   let next = '/';
+    //   if (location.state && location.state.next) {
+    //     next = location.state.next;
+    //   }
+    //   flash('login success', 'success')
+    //   navigate(next);
+    // }
     try {
       const response = await fetch("http://127.0.0.1:5000/api/tokens", {
         method: "POST",
@@ -87,6 +101,7 @@ const LoginPage = () => {
       }
      } catch (error) {
       console.error("Login error:", error);
+      flash('check credentials', 'danger')
 
       setLoginError("Login failed. Please try again.");
     }

@@ -5,8 +5,11 @@ import ApiProvider from './context/ApiProvider';
 import About from './pages/About';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import UserPage from './pages/UserPage';
 import { FlashProvider } from './context/FlashProvider';
 import { UserProvider } from './context/UserProvider';
+import PublicRoute from './components/PrivateRoute';
+import PrivateRoute from './components/PrivateRoute';
 
 function App() {
   return (
@@ -15,12 +18,29 @@ function App() {
           <ApiProvider>
             <UserProvider>
               <Routes>
-                <Route path='/' element={<Kasuwa />} />
-                <Route path='/About' element={ <About /> } />
-                <Route path='/LoginPage' element={ <LoginPage /> } />
-                <Route path='/RegisterPage' element={ <RegisterPage /> } />
-                <Route path="*" element={<Navigate to="/" />} />
 
+                {/* <Route path='/' element={
+                  <PublicRoute><Kasuwa /></PublicRoute>
+                } /> */}
+                <Route path='/About' element={ 
+                  <PublicRoute><About /> </PublicRoute>
+                } />
+                <Route path="/login" element={
+                  <PublicRoute><LoginPage /></PublicRoute>
+                } />
+                <Route path="/register" element={
+                  <PublicRoute><RegisterPage /></PublicRoute>
+                } />
+                <Route path="*" element={
+                  <PrivateRoute>
+                    <Routes>
+                      <Route path="/" element={<Kasuwa />} />
+                      {/* <Route path="/explore" element={<ExplorePage />} /> */}
+                      <Route path="/user/:email" element={<UserPage />} />
+                      <Route path="*" element={<Navigate to="/" />} />
+                    </Routes>
+                  </PrivateRoute>
+                } />
               </Routes>
             </UserProvider>
           </ApiProvider>

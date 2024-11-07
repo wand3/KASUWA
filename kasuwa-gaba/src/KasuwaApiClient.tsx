@@ -61,7 +61,7 @@ export default class MicroblogApiClient {
         method: options.method,
         headers: {
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': 'http://127.0.0.1:5000',
+          // 'Access-Control-Allow-Origin': 'http://127.0.0.1:5000',
           'Authorization': 'Bearer ' + localStorage.getItem('token'),
           ...options.headers,
         },
