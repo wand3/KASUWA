@@ -11,3 +11,4 @@ class Config:
     UPLOAD_EXTENSIONS = ['.jpg', '.png', '.img', '.jpeg']
     REVIEW_IMAGE_UPLOAD_PATH = os.path.join(basedir, 'app', 'static', 'images', 'review_images')
     PRODUCT_IMAGES_UPLOAD_PATH = os.path.join(basedir, 'app', 'static', 'images', 'product_images')
+    AVATAR_UPLOAD_PATH = os.path.join(basedir, 'app', 'static', 'images', 'avatars')

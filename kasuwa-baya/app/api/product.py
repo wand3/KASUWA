@@ -35,16 +35,29 @@ def delete_products():
 @token_auth.login_required
 def add_to_cart():
     data = request.json
-
     user_id = token_auth.current_user().id
-    data['user_id'] = user_id
+    product_id = data.get("product_id")
+    default_quantity = data.get("quantity", 1)  # Default to 1 if no quantity is provided
 
-    cart_item = Cart()
-    cart_item.from_dict(data)
-    db.session.add(cart_item)
+    if not product_id:
+        return jsonify({"error": "Product ID is required"}), 400
+
+    # Check if the item already exists in the cart for this user
+    cart_item = Cart.query.filter_by(user_id=user_id, product_id=product_id).first()
+
+    if cart_item:
+        # If item exists, increase the quantity by the default value
+        cart_item.quantity += default_quantity
+    else:
+        # If item doesn't exist, create a new cart entry
+        cart_item = Cart(user_id=user_id, product_id=product_id, quantity=default_quantity)
+        db.session.add(cart_item)
+
+    # Commit changes to the database
     db.session.commit()
 
-    return jsonify({"message": "Product added to cart successfully"}), 201
+    return jsonify({"message": "Product added to cart successfully", "cart": cart_item.to_dict()}), 201
+
 
 @bp.route('/cart', methods=['GET'])
 @token_auth.login_required
@@ -63,15 +76,28 @@ def get_cart():
         "total": total_price
     }), 200
 
+
 @bp.route('/cart/<int:product_id>', methods=['PUT'])
 @token_auth.login_required
 def update_quantity(product_id):
     user_id = token_auth.current_user().id
-    cart_item = Cart.query.filter_by(user_id, product_id=product_id).first()
+    data = request.get_json()
 
+    # Validate the quantity provided in the request body
+    new_quantity = data.get("quantity")
+    if new_quantity is None or new_quantity <= 0:
+        return jsonify({'error': 'Quantity must be a positive integer'}), 400
+
+    # Find the cart item for the current user and specified product
+    cart_item = Cart.query.filter_by(user_id=user_id, product_id=product_id).first()
     if cart_item is None:
-        return {'error': 'Product not in cart'}
+        return jsonify({'error': 'Product not found in cart'}), 404
 
+    # Update the quantity and save to the database
+    cart_item.quantity = new_quantity
+    db.session.commit()
+
+    return jsonify({'message': 'Quantity updated successfully', 'cart': cart_item.to_dict()}), 200
 
 
 @bp.route('/cart/<int:product_id>', methods=['DELETE'])

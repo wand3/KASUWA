@@ -17,6 +17,7 @@ class User(BaseModel):
     phone: Mapped[Optional[str]] = mapped_column(String(20))
     token: Mapped[Optional[str]] = mapped_column(String(32), index=True, unique=True)
     token_expiration: Mapped[Optional[datetime]]
+    avatar: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     shipping_addresses: Mapped[List['UserAddress']] = relationship('UserAddress', back_populates="user", cascade="all, delete-orphan")
 
     cart: Mapped[List['Cart']] = relationship('Cart', back_populates="user", cascade="all, delete-orphan")
@@ -29,7 +30,8 @@ class User(BaseModel):
             'full_name': self.full_name,
             'role': self.role,
             'email': self.email,
-            'shipping_address': [shipping.to_dict() for shipping in self.shipping_addresses]
+            'shipping_address': [shipping.to_dict() for shipping in self.shipping_addresses],
+            'avatar': self.avatar
         }
 
         if include_email:
