@@ -42,18 +42,14 @@ def add_to_cart():
     if not product_id:
         return jsonify({"error": "Product ID is required"}), 400
 
-    # Check if the item already exists in the cart for this user
     cart_item = Cart.query.filter_by(user_id=user_id, product_id=product_id).first()
 
     if cart_item:
-        # If item exists, increase the quantity by the default value
         cart_item.quantity += default_quantity
     else:
-        # If item doesn't exist, create a new cart entry
         cart_item = Cart(user_id=user_id, product_id=product_id, quantity=default_quantity)
         db.session.add(cart_item)
 
-    # Commit changes to the database
     db.session.commit()
 
     return jsonify({"message": "Product added to cart successfully", "cart": cart_item.to_dict()}), 201
@@ -68,7 +64,6 @@ def get_cart():
     if not cart_items:
         return jsonify({"message": "Cart is empty", "total": 0}), 200
 
-    # Calculate total price
     total_price = sum(item.total_price() for item in cart_items)
 
     return jsonify({
@@ -83,17 +78,14 @@ def update_quantity(product_id):
     user_id = token_auth.current_user().id
     data = request.get_json()
 
-    # Validate the quantity provided in the request body
     new_quantity = data.get("quantity")
     if new_quantity is None or new_quantity <= 0:
         return jsonify({'error': 'Quantity must be a positive integer'}), 400
 
-    # Find the cart item for the current user and specified product
     cart_item = Cart.query.filter_by(user_id=user_id, product_id=product_id).first()
     if cart_item is None:
         return jsonify({'error': 'Product not found in cart'}), 404
 
-    # Update the quantity and save to the database
     cart_item.quantity = new_quantity
     db.session.commit()
 
@@ -115,7 +107,6 @@ def delete_cart_item(product_id):
         return {'message': 'Product in Cart deleted successfully'}, 200
     except Exception as e:
         db.session.rollback()
-        # Log the actual exception message for debugging purposes
         print(f"Error deleting product: {str(e)}")
         return {'error': 'Failed to delete product'}, 500
 
@@ -124,13 +115,11 @@ def delete_cart_item(product_id):
 def change_shipping(product_id, shipping_id):
     user_id = token_auth.current_user().id
 
-    # Query the specific cart item by user_id and product_id
     cart_item = Cart.query.filter_by(user_id=user_id, product_id=product_id).first()
 
     if not cart_item:
         return jsonify({'error': 'Cart item not found.'}), 404
 
-    # Update the shipping_id for the specified cart item
     cart_item.shipping_id = shipping_id
     db.session.commit()
 
@@ -148,7 +137,6 @@ def get_shipping():
 def create_product():
     data = request.form
 
-    # Create a new product instance
     new_product = Product(
         product_name=data['product_name'],
         description=data['description'],
@@ -157,44 +145,39 @@ def create_product():
         quantity=data['quantity']
     )
 
-    # Get the uploaded images
     product_images = request.files.getlist('photos')
     image_paths = []
 
-    # Add the new product to the session
     db.session.add(new_product)
 
     try:
-        db.session.commit()  # Commit the session to save the product and get its ID
+        db.session.commit()
 
-        # Now that the product is committed, we can get its ID
         product_id = new_product.id
 
-        # Save the images as ProductImage instances
         for index, image in enumerate(product_images):
             name = secure_filename(image.filename)
             image.save(os.path.join(current_app.config['PRODUCT_IMAGES_UPLOAD_PATH'], name))
             image_paths.append(name)
 
             if index == 0:
-                new_product.product_image = name  # Set the first image as the default image
+                new_product.product_image = name
 
             new_image = ProductImage(
-                product_id=product_id,  # Use the committed product's ID
+                product_id=product_id,
                 image_path=name
             )
             db.session.add(new_image)
 
-        # Commit the session again to save the images
         db.session.commit()
 
         return jsonify({
             "message": "Product added successfully",
             "id": product_id,
-            "image_paths": image_paths  # Return the list of image paths
+            "image_paths": image_paths
         }), 201
     except Exception as e:
-        db.session.rollback()  # Rollback in case of error
+        db.session.rollback()
         return jsonify({'error': f'Failed to add product: {str(e)}'}), 500
 
     return jsonify({'error': 'Invalid image file'}), 400
@@ -202,17 +185,14 @@ def create_product():
 @bp.route('/products/<int:product_id>/default-image/<int:image_id>', methods=['PUT'])
 @token_auth.login_required(role=1)
 def update_default_product_image(product_id, image_id):
-    # Fetch the product
     product = Product.query.get(product_id)
     if not product:
         return jsonify({'error': 'Product not found'}), 404
 
-    # Fetch the product image
     product_image = ProductImage.query.get(image_id)
     if not product_image:
         return jsonify({'error': 'Product image not found'}), 404
 
-    # Update the product's default image
     product.product_image = product_image.image_path
 
     try:
@@ -253,23 +233,20 @@ def edit_product(product_id):
         product.product_image = data['product_image']
 
     try:
-        db.session.commit()  # Commit the session to save the product and get its ID
+        db.session.commit()
 
-        # Now that the product is committed, we can get its ID
         product_id = product.id
 
-        # Save the new images as ProductImage instances
         product_images = request.files.getlist('product_images')
         for image in product_images:
             name = secure_filename(image.filename)
             image.save(os.path.join(current_app.config['PRODUCT_IMAGES_UPLOAD_PATH'], name))
             new_image = ProductImage(
-                product_id=product_id,  # Use the committed product's ID
+                product_id=product_id,
                 image_path=name
             )
             db.session.add(new_image)
 
-        # Commit the session again to save the images
         db.session.commit()
         return product.to_dict()
     except Exception as e:
@@ -290,7 +267,6 @@ def delete_product(product_id):
         return {'message': 'Product deleted successfully'}, 200
     except Exception as e:
         db.session.rollback()
-        # Log the actual exception message for debugging purposes
         print(f"Error deleting product: {str(e)}")
         return {'error': 'Failed to delete product'}, 500
 
@@ -307,6 +283,7 @@ def add_shipping():
     db.session.commit()
 
     return jsonify({'message': 'Shipping Method Added Successfully'}), 201
+
 
 @bp.route('/admin/shipping/<int:shipping_id>', methods=['PUT'])
 @token_auth.login_required(role=1)
@@ -332,13 +309,11 @@ def edit_shipping(shipping_id):
 @bp.route('/admin/shipping/<int:shipping_id>', methods=['DELETE'])
 @token_auth.login_required(role=1)
 def delete_shipping(shipping_id):
-    # Find the shipping method by ID
     shipping_method = ShippingMethod.query.get(shipping_id)
 
     if not shipping_method:
         return jsonify({'error': 'Shipping method not found.'}), 404
 
-    # Delete the shipping method
     db.session.delete(shipping_method)
     db.session.commit()
 

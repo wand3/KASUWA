@@ -57,7 +57,6 @@ def verify_transaction(reference):
         'Content-Type': 'application/json'
     }
     response = requests.get(url, headers=headers)
-    # logging.info(f"Verification response: {response.json()}")
 
     if response.status_code == 200 and response.json().get('data'):
         return response.json()['data']
@@ -73,7 +72,6 @@ def create_order():
     user_email = user.email
 
     try:
-        # Create the order
         address_id = int(request.json.get('address'))
         unique_reference = str(uuid.uuid4())
         unique_transaction_id = str(uuid.uuid4())
@@ -82,7 +80,6 @@ def create_order():
                       reference=unique_reference)
         cart_items = Cart.query.filter_by(user_id=user_id).all()
 
-        # Add items to the order
         for item in cart_items:
             order_item = OrderItem(
                 product_id=item.product_id,
@@ -92,11 +89,9 @@ def create_order():
 
         order.amount = sum(item.quantity * Product.query.get(item.product_id).price for item in cart_items)
 
-        # Save order to the database
         db.session.add(order)
         db.session.commit()
 
-        # Initialize Paystack transaction
         secret_key = os.getenv('PAYMENT_KEY')
         if not secret_key:
             raise ValueError("Payment key is not set.")
@@ -113,16 +108,15 @@ def create_order():
         }
 
         response = requests.post(url, headers=headers, json=payload)
-        response.raise_for_status()  # Raises error for non-200 status codes
+        response.raise_for_status()
 
         data = response.json()
         logging.info(f'data ord: {data.get("data")}')
 
         access_code = data['data']['access_code']
         order.reference = data['data']['reference']
-        db.session.commit()  # Save reference to order
+        db.session.commit()
 
-        # Clear the user's cart after transaction initialization
         for item in cart_items:
             db.session.delete(item)
         db.session.commit()
@@ -150,18 +144,15 @@ def payment_success():
     if verification_response.get('status') == 'success':
         order = Order.query.filter_by(reference=reference).first()
         if order:
-            # Update the order status and transaction ID
             order.status = 'Processing'
             order.transaction_id = verification_response['id']
 
-            # Adjust product quantities
             for item in order.items:
                 product = Product.query.get(item.product_id)
                 if product:
                     product.sold += item.quantity
                     product.quantity -= item.quantity
 
-            # Save changes to the database
             db.session.commit()
             logging.info(f"Order {order.id} updated successfully with adjusted product quantities")
             return jsonify({'message': 'Order updated successfully', 'order_id': order.id})
@@ -189,7 +180,6 @@ def add_review():
     message = request.form.get('message')
     files = request.files.getlist('images')
 
-    # Check if user has purchased the product
     purchased_item = OrderItem.query.join(Order).filter(
         Order.user_id == user_id,
         Order.status == 'Completed',
@@ -199,29 +189,24 @@ def add_review():
     if not purchased_item:
         return jsonify({'error': 'Only users who have purchased this product can leave a review.'}), 403
 
-    # Create a new review entry
     review = Review(user_id=user_id, product_id=product_id, rating=rating, message=message)
 
-    # Process and save each image
     image_filenames = []
     for file in files:
         if file:
-            filename = secure_filename(file.filename)  # Secure the filename
+            filename = secure_filename(file.filename)
             file_ext = os.path.splitext(filename)[1]
 
             if file_ext not in current_app.config['UPLOAD_EXTENSIONS']:
                 abort(400, description="Invalid image format.")
 
-            # Save the file to the desired path
             save_path = os.path.join(current_app.config['REVIEW_IMAGE_UPLOAD_PATH'], filename)
             file.save(save_path)
 
-            # Store only the filename
             image_filenames.append(filename)
 
     logging.info(f'Saved image filenames: {image_filenames}')
 
-    # Associate images with the review
     for filename in image_filenames:
         review_image = ReviewImage(review=review, image_path=filename)  # Store only the filename
         db.session.add(review_image)
