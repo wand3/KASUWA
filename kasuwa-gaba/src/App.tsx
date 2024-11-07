@@ -36,7 +36,7 @@ function App() {
                     <Routes>
                       <Route path="/" element={<Kasuwa />} />
                       {/* <Route path="/explore" element={<ExplorePage />} /> */}
-                      <Route path="/user/:email" element={<UserPage />} />
+                      <Route path="/user" element={<UserPage />} />
                       <Route path="*" element={<Navigate to="/" />} />
                     </Routes>
                   </PrivateRoute>

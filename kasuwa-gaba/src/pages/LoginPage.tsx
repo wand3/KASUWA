@@ -19,7 +19,7 @@ const LoginPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const flash = useFlash();
-  const {login} = useUser();
+  // const {login} = useUser();
 
 
 
@@ -73,7 +73,7 @@ const LoginPage = () => {
           Authorization: "Basic " + btoa(`${email}:${password}`),
         },
       });
-
+      console.log(response)
       if (response.ok) {
         const data = await response.json();
         if (data.token) {
