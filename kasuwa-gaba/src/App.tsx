@@ -6,6 +6,9 @@ import About from './pages/About';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import UserPage from './pages/UserPage';
+import FavouritesPage from './pages/FavouritesPage';
+import OrdersPage from './pages/OrdersPage';
+import ChangePasswordPage from './pages/ChangePassword';
 import { FlashProvider } from './context/FlashProvider';
 import { UserProvider } from './context/UserProvider';
 import PublicRoute from './components/PrivateRoute';
@@ -36,6 +39,9 @@ function App() {
                     <Routes>
                       <Route path="/" element={<Kasuwa />} />
                       {/* <Route path="/explore" element={<ExplorePage />} /> */}
+                      <Route path="/orders" element={<OrdersPage />} />
+                      <Route path="/favs" element={<FavouritesPage />} />
+                      <Route path="/change_password" element={<ChangePasswordPage />} />
                       <Route path="/user" element={<UserPage />} />
                       <Route path="*" element={<Navigate to="/" />} />
                     </Routes>
