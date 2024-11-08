@@ -11,8 +11,11 @@ import OrdersPage from './pages/OrdersPage';
 import ChangePasswordPage from './pages/ChangePassword';
 import { FlashProvider } from './context/FlashProvider';
 import { UserProvider } from './context/UserProvider';
+
+import AdminRoute from './components/AdminRoute';
 import PublicRoute from './components/PrivateRoute';
 import PrivateRoute from './components/PrivateRoute';
+import AdminPage from './pages/AdminPage';
 
 function App() {
   return (
@@ -34,6 +37,11 @@ function App() {
                 <Route path="/register" element={
                   <PublicRoute><RegisterPage /></PublicRoute>
                 } />
+
+                <Route path="/admin" element={
+                  <AdminRoute><AdminPage /></AdminRoute> 
+                }/>
+                
                 <Route path="*" element={
                   <PrivateRoute>
                     <Routes>
@@ -46,7 +54,7 @@ function App() {
                       <Route path="*" element={<Navigate to="/" />} />
                     </Routes>
                   </PrivateRoute>
-                } />
+                } />                  
               </Routes>
             </UserProvider>
           </ApiProvider>
