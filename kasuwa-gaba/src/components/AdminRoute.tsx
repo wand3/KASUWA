@@ -8,17 +8,14 @@ export const AdminRoute = ({children}: React.PropsWithChildren<{}>) => {
 
   const role = user.user?.role;
 
-  if (user === undefined){
-    return null
-  }
-  else if (role !== 0){
+  if (role !== 0){
     console.log('admin route')
     console.log(role)
     return <>{children}</>
   }
-  else{
+  else {
     console.log(role)
-    return <Navigate to='/login' />
+    return <Navigate to='/' />
   }
 
 }

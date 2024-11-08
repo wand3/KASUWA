@@ -12,15 +12,17 @@ type BodyProps = {
 const Jiki: FC<BodyProps> = ({ nav, children }) => {
   return (
     <>
-      {nav && <Nav />}
-      {children}
-      <FlashMessage />
-      {/* <KasuwaItems />
-            <NavButtom /> */}
-      {/* <AddProduct /> */}
-      <Footer />
+      <div className="bg-[#000]/80 transparent)">
+        {nav && <Nav />}
+        {children}
+        <FlashMessage />
+        {/* <KasuwaItems />
+              <NavButtom /> */}
+        {/* <AddProduct /> */}
+        <Footer />
+      </div>
+      
     </>
-  );
-};
+)};
 
 export default Jiki;
