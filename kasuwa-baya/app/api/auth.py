@@ -21,7 +21,6 @@ def verify_token(token):
 
 @token_auth.get_user_roles
 def get_user_roles(user):
-    logging.info(f'user::',user)
     return User.get_role(user) if user else None
 
 @token_auth.error_handler
