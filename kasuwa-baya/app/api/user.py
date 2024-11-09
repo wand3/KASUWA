@@ -4,7 +4,7 @@ import os
 from app.models.user import User, UserAddress
 from app.api import bp
 from app.api.auth import token_auth
-from app.api.errors import bad_request
+from app.api.errors import bad_request, not_found, unauthorized, forbidden
 from sqlalchemy import select
 from werkzeug.utils import secure_filename
 import logging
@@ -13,6 +13,8 @@ import logging
 @token_auth.login_required
 def get_user():
     current_user = token_auth.current_user()
+    if not current_user:
+        return unauthorized('You must be logged in to access this resource')
     data = current_user.to_dict(include_email=True)
     return jsonify(data)
 
@@ -20,7 +22,14 @@ def get_user():
 @bp.route('/address', methods=['GET'])
 @token_auth.login_required
 def get_addresses():
-    addresses = token_auth.current_user().shipping_addresses
+    current_user = token_auth.current_user()
+    if not current_user:
+        return unauthorized('You must be logged in to access this resource')
+
+    addresses = current_user.shipping_addresses
+    if not addresses:
+        return not_found('No addresses found for the user')
+
     formatted_addresses = [address.to_dict() for address in addresses]
     return jsonify(formatted_addresses), 200
 
@@ -33,6 +42,8 @@ def add_address():
     data['user_id'] = user_id
 
     existing_addresses = UserAddress.query.filter_by(user_id=user_id).all()
+    if existing_addresses and len(existing_addresses) >= 5:
+        return bad_request('You cannot have more than 5 addresses')
 
     address = UserAddress()
     address.from_dict(data)
@@ -53,10 +64,9 @@ def set_default_address(address_id):
     address = UserAddress.query.filter_by(id=address_id, user_id=user.id).first()
 
     if not address:
-        return jsonify({"error": "Address not found"}), 404
+        return not_found("Address not found")
 
     UserAddress.query.filter_by(user_id=user.id).update({"is_default": False})
-
     address.is_default = True
     db.session.commit()
 
@@ -64,9 +74,11 @@ def set_default_address(address_id):
 
 
 @bp.route('/users', methods=['GET'])
+@token_auth.login_required
 def all_users():
     users = User.query.all()
-    logging.info(f'tk_auth:', token_auth)
+    if not users:
+        return not_found('No users found')
     users_list = [user.to_dict() for user in users]
     return jsonify({'users': users_list})
 
@@ -91,15 +103,17 @@ def create_user():
 @bp.route('/edit_user/<int:id>', methods=['PUT'])
 @token_auth.login_required
 def update_user(id):
-    current_user = token_auth.current_user().id
+    current_user = token_auth.current_user()
+    if current_user.id != id:
+        return forbidden('You do not have permission to edit this user')
 
-    user = db.get_or_404(User, current_user)
+    user = db.get_or_404(User, id)
     data = request.form.to_dict()
     file = request.files.get('avatar')
 
     if 'email' in data and data['email'] != user.email:
         if db.session.scalar(select(User).where(User.email == data['email'])):
-            return jsonify({'error': 'Please use a different email address'}), 400
+            return bad_request('Please use a different email address')
 
     user.from_dict(data, new_user=False)
 
