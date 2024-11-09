@@ -13,34 +13,20 @@ import logging
 # Configure logging to display messages to the terminal
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[logging.StreamHandler()])
 
-@bp.route('/admin/orders', methods=['DELETE'])
-def delete_orders():
-    Order.query.delete()
-    db.session.commit()
-    return jsonify({"message": "All Orders deleted successfully"}), 200
-
-
-@bp.route('/admin/orders', methods=['GET'])
-def get_orders():
-    orders = Order.query.all()
-    return jsonify([order.to_dict() for order in orders])
-
 @bp.route('/orders', methods=['GET'])
 @token_auth.login_required()
 def list_orders():
     user_id = token_auth.current_user().id
-    # Query to fetch orders for the current user, including related order items
     user_orders = db.session.query(Order).filter(Order.user_id == user_id).all()
 
-    # Format the data to include order details and order items
     orders_data = []
     for order in user_orders:
-        order_dict = order.to_dict()  # Using your to_dict method for base details
+        order_dict = order.to_dict()
         order_dict['items'] = [
             {
                 'product_id': item.product_id,
                 'quantity': item.quantity,
-                'product_name': item.product.product_name  # Assuming `Product` has a `name` field
+                'product_name': item.product.product_name
             }
             for item in order.items
         ]
@@ -164,12 +150,6 @@ def payment_success():
         return jsonify({'error': 'Transaction verification failed'}), 400
 
 
-@bp.route('/admin/reviews', methods=['DELETE'])
-def delete_reviews():
-    Review.query.delete()
-    db.session.commit()
-    return jsonify({"message": "All Reviews deleted successfully"}), 200
-
 @bp.route('/reviews', methods=['POST'])
 @token_auth.login_required
 def add_review():
@@ -215,3 +195,31 @@ def add_review():
     db.session.commit()
 
     return jsonify({'message': 'Review added successfully'}), 201
+
+
+# ADMIN ROUTES
+@bp.route('/admin/orders/<int:order_id>', methods=['DELETE'])
+@token_auth.login_required(role=1)
+def delete_order(order_id):
+    order = Order.query.get(order_id)
+
+    if not order:
+        return jsonify({"error": "Order not found"}), 404
+
+    db.session.delete(order)
+    db.session.commit()
+
+    return jsonify({"message": f"Order {order_id} deleted successfully"}), 200
+
+
+@bp.route('/admin/orders', methods=['GET'])
+def get_orders():
+    orders = Order.query.all()
+    return jsonify([order.to_dict() for order in orders])
+
+
+@bp.route('/admin/reviews', methods=['DELETE'])
+def delete_reviews():
+    Review.query.delete()
+    db.session.commit()
+    return jsonify({"message": "All Reviews deleted successfully"}), 200
