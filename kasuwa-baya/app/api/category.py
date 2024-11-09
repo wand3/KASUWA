@@ -21,7 +21,6 @@ def create_category():
         return bad_request("Category Already Exists! Use a different Name")
 
     new_category = Category(category_name=data['category_name'])
-
     db.session.add(new_category)
     db.session.commit()
 
@@ -39,7 +38,7 @@ def delete_category(category_id):
     db.session.delete(category)
     db.session.commit()
 
-    return {'message': 'category deleted successfully'}, 200
+    return {"message": "Category deleted successfully", "category_id": category_id}, 200
 
 
 @bp.route('/admin/category/<int:category_id>', methods=['PUT'])
@@ -47,20 +46,14 @@ def delete_category(category_id):
 def edit_category(category_id):
     data = request.get_json()
 
-    # Validate that data contains 'category_name'
     if not data or 'category_name' not in data:
         return bad_request("Category name is required")
 
-    # Query the category by ID
     category = db.session.query(Category).filter_by(id=category_id).first()
-
     if category is None:
         return not_found("Category not found")
 
-    # Update the category name
     category.category_name = data['category_name']
-
-    # Commit the changes to the database
     db.session.commit()
 
     return {"message": "Category updated successfully", "category": category.to_dict()}, 200
@@ -70,12 +63,11 @@ def edit_category(category_id):
 def get_categories():
     categories = Category.query.all()
     category_list = [category.to_dict() for category in categories]
-    return {'categories': category_list}
+    return {"categories": category_list}, 200
 
 
 @bp.route('/category/<int:category_id>', methods=['GET'])
 def get_category(category_id):
-    # Query the category by ID
     category = db.session.query(Category).filter_by(id=category_id).first()
 
     if category is None:
@@ -84,5 +76,7 @@ def get_category(category_id):
     products_list = [product.to_dict() for product in category.products]
 
     return {
-        'products': products_list
+        "category": {
+            "products": products_list
+        }
     }, 200
