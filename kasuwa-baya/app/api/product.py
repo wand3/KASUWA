@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 @bp.route('/products', methods=['GET'])
 def get_products():
     products = Product.query.all()
-    return jsonify([product.to_dict() for product in products]), 200
+    return jsonify([product.to_summary_dict() for product in products]), 200
 
 @bp.route('/product/<int:product_id>', methods=['GET'])
 def get_product(product_id):

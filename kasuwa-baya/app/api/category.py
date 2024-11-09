@@ -73,10 +73,6 @@ def get_category(category_id):
     if category is None:
         return not_found("Category not found")
 
-    products_list = [product.to_dict() for product in category.products]
+    products_list = [product.to_summary_dict() for product in category.products]
 
-    return {
-        "category": {
-            "products": products_list
-        }
-    }, 200
+    return {"products": products_list}, 200

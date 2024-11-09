@@ -33,6 +33,16 @@ class Product(BaseModel):
             'reviews': [review.to_dict() for review in self.reviews]
         }
 
+    def to_summary_dict(self):
+        return {
+            'id': self.id,
+            'product_name': self.product_name,
+            'price': self.price,
+            'quantity': self.quantity,
+            'sold': self.sold,
+            'product_image': self.product_image
+        }
+
     def __repr__(self):
             return f"<Product(product_name={self.product_name}, product_image={self.product_image}, price={self.price}, quantity={self.quantity}, sold={self.sold})>"
 
@@ -53,8 +63,7 @@ class Cart(BaseModel):
     product_id: Mapped[int] = mapped_column(Integer, ForeignKey('products.id'))
     quantity: Mapped[int] = Column(Integer, default=1)
     shipping_id: Mapped[int] = mapped_column(Integer, ForeignKey('shippings.id'), default=3)
-    user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
-
+    user_id = mapped_column(Integer, ForeignKey('users.id'), index=True)
     product: Mapped['Product'] = relationship("Product")
     user: Mapped['User'] = relationship("User", back_populates="cart")
     shipping: Mapped['ShippingMethod'] = relationship("ShippingMethod")
@@ -62,9 +71,18 @@ class Cart(BaseModel):
     def to_dict(self):
         return {
             'id': self.id,
-            'product': self.product.to_dict(),
+            'product': {
+                'id': self.product.id,
+                'product_name': self.product.product_name,
+                'price': self.product.price,
+                'product_image':self.product.product_image
+            },
             'quantity': self.quantity,
-            'shipping': self.shipping.to_dict()
+            'shipping': {
+                'id': self.shipping.id,
+                'shipping_price': self.shipping.shipping_price,
+                'shipping_method_name': self.shipping.shipping_method_name
+            }
         }
 
     def from_dict(self, data):
