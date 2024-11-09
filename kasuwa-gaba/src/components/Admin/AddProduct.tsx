@@ -7,17 +7,26 @@ import { Button, Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
 import { Description, Field, Input, Label } from '@headlessui/react'
 import clsx from 'clsx'
 import { ImageUpload } from "../Auth/ImageUploads";
+import Config from "../../config";
 
 
+const baseUrl = Config.baseURL;
 type FormErrorType = {
   product_name?: string;
   description?: string;
   price?: string;
   category?: number | string | undefined;
   quantity?: number | string;
-  product_images?: string[];
 };
 
+type AddProductSchema = {
+  product_name?: string;
+  description?: string;
+  price?: string;
+  category_id?: number | string | undefined;
+  quantity?: number | string;  
+  product_images?: string[];
+}
 // product_name=data['product_name'],
 //         description=data['description'],
 //         price=data['price'],
@@ -28,10 +37,22 @@ type FormErrorType = {
 //     # Get the uploaded images
 //     product_images 
 
-export const AddProduct = () => {
+export const AddProduct = ({} : AddProductSchema) => {
   const [formErrors, setFormErrors] = useState<FormErrorType>({});
   let [isOpen, setIsOpen] = useState(false)
 
+  // image upload 
+  const [images, setImages] = useState<File[] | null>();
+  const [status, setStatus] = useState<'initial'| 'uploading'| 'success' | 'fail'>('initial')
+  const [previewURLs, setPreviewURLs] = useState<string[]>([]);
+
+
+  const api = UseApi();
+  const flash = useFlash();
+
+
+
+  // dialog popup and close 
   function open() {
     setIsOpen(true)
   }
@@ -39,7 +60,40 @@ export const AddProduct = () => {
   function close() {
     setIsOpen(false)
   }
-  const flash = useFlash();
+
+  const formData = new FormData();
+
+  // handle image upload 
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files){
+      const files = event.target.files
+      // setImages(files);
+
+      setStatus('uploading');
+
+      [...files].forEach((file) => {
+        formData.append('files', file);
+      });
+
+
+      const selectedImages = Array.from(files);
+
+      setImages(selectedImages);
+
+      const imagePreviews = selectedImages.map((image) =>
+        URL.createObjectURL(image)
+      );
+      setPreviewURLs(imagePreviews);
+    }
+  };
+
+  // remove image from preview 
+  const handleRemoveImage = (index: number) => {
+    if (images) {
+      setImages(images.filter((_, i) => i !== index));
+      setPreviewURLs(previewURLs.filter((_, i) => i !== index));
+    }
+  };
 
 
   const productNameField = useRef<HTMLInputElement>(null);
@@ -48,12 +102,13 @@ export const AddProduct = () => {
   const categoryIdField = useRef<HTMLInputElement>(null);
   const quantityField = useRef<HTMLInputElement>(null);
 
-  const productImageField = useRef<HTMLInputElement>(null);
+  // const productImageField = useRef<HTMLInputElement>(null);
 
 
 
 
   const handleSubmit = async (ev: React.FormEvent) => {
+
     ev.preventDefault();
     const product_name = productNameField.current ? productNameField.current.value : "";
     const description = descriptionField.current ? descriptionField.current.value : "";
@@ -62,7 +117,8 @@ export const AddProduct = () => {
     const quantity = quantityField.current ? quantityField.current.value : "";
     // const product_image = productImageField.current ? productImageField.current.value : "";
 
-
+    
+  
 
     const errors: FormErrorType = {};
     if (!product_name){
@@ -83,14 +139,36 @@ export const AddProduct = () => {
 
 
     setFormErrors(errors);
-    if (Object.keys(errors).length > 0){
-      return;
+    // if (Object.keys(errors).length > 0) {
+    //   return;
+    // }
+    formData.append('product_name', product_name);
+    formData.append('description', description);
+    formData.append('price', price);
+    formData.append('category_id', category);
+    formData.append('quantity', quantity);
+        console.log('try start')
+
+    console.log('form subit test begin')
+
+    try {
+      console.log('try start')
+      const requestOptions = {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+        'Access-Control-Allow-Origin': 'http://127.0.0.1:5000',
+
+      };
+      
+      const response = await fetch(`${baseUrl}/api/product`, requestOptions, formData);
+      // const response  = api.post('/product', formData)
+
+      console.log(response)
+
+    } catch (error) {
+      return console.log(error)
     }
-    
-    console.log('form subit test')
-
-
-
   }
 
   return (
@@ -136,7 +214,7 @@ export const AddProduct = () => {
                   <InputField
                     name="price"
                     label="Product price"
-                    type="decimal"
+                    type="dec"
                     placeholder="12334"
                     error={formErrors.price}
                     Fieldref={priceField} />
@@ -150,14 +228,28 @@ export const AddProduct = () => {
                     error={formErrors.category?.toString()}
                     Fieldref={categoryIdField} />
 
-                  <ImageUpload />
+                  <ImageUpload  multiple={true} Fieldref={categoryIdField} onChange={handleImageUpload} />
+
+                  <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    {previewURLs.map((url, index) => (
+                      <div key={index} className="relative group p-2">
+                        <img src={url} alt="Preview" className="w-full h-40 object-cover rounded-lg" />
+                        <button
+                          onClick={() => handleRemoveImage(index)}
+                          className="absolute top-1 right-1 px-2 my-3 mr-[7%] text-white bg-red-600 hover:bg-red-700 p-1 rounded-lg lg:opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          &times;
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                   
-                  <Button
-                    className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"
-                    type="submit"
-                  >
-                    Submit
-                  </Button>
+                <Button
+                  className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"
+                  type="submit"
+                >
+                  Submit
+                </Button>
               
               </form>
 
