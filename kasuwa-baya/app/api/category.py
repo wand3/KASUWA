@@ -5,9 +5,7 @@ from app.api import bp
 from app.models.category import Category
 from app.api.errors import bad_request, not_found, unauthorized, forbidden
 from sqlalchemy import select
-import logging
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[logging.StreamHandler()])
 
 @bp.route('/admin/category', methods=['POST'])
 @token_auth.login_required(role=1)
