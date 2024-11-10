@@ -33,6 +33,26 @@ def get_addresses():
     formatted_addresses = [address.to_dict() for address in addresses]
     return jsonify(formatted_addresses), 200
 
+@bp.route('/address/<int:address_id>', methods=['DELETE'])
+@token_auth.login_required
+def delete_address(address_id):
+    user_id = token_auth.current_user().id
+
+    address = UserAddress.query.filter_by(id=address_id, user_id=user_id).first()
+
+    if not address:
+        return not_found('Address not found or does not belong to the current user')
+
+    if address.is_default:
+        another_address = UserAddress.query.filter_by(user_id=user_id).filter(UserAddress.id != address_id).first()
+        if another_address:
+            another_address.is_default = True
+            db.session.commit()
+
+    db.session.delete(address)
+    db.session.commit()
+
+    return {'message': 'Address deleted successfully'}
 
 @bp.route('/address', methods=['POST'])
 @token_auth.login_required
