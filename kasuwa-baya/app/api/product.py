@@ -10,6 +10,7 @@ import logging
 
 # Configure logging to display messages to the terminal
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[logging.StreamHandler()])
+
 @bp.route('/products', methods=['GET'])
 def get_products():
     products = Product.query.all()
@@ -168,8 +169,7 @@ def create_product():
 
         return jsonify({
             "message": "Product added successfully",
-            "id": product_id,
-            "image_paths": image_paths
+            "id": product_id
         }), 201
     except Exception as e:
         db.session.rollback()
