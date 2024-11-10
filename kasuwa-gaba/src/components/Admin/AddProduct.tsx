@@ -42,12 +42,11 @@ export const AddProduct = ({} : AddProductSchema) => {
   let [isOpen, setIsOpen] = useState(false)
 
   // image upload 
-  const [images, setImages] = useState<File[] | null>();
+  const [images, setImages] = useState<File[] | []>([]);
   const [status, setStatus] = useState<'initial'| 'uploading'| 'success' | 'fail'>('initial')
   const [previewURLs, setPreviewURLs] = useState<string[]>([]);
 
 
-  const api = UseApi();
   const flash = useFlash();
 
 
@@ -64,27 +63,36 @@ export const AddProduct = ({} : AddProductSchema) => {
   const formData = new FormData();
 
   // handle image upload 
+  // const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   if (event.target.files){
+  //     const files = event.target.files
+  //     // setImages(files);
+
+  //     setStatus('uploading');
+
+  //     [...files].forEach((file) => {
+  //       formData.append('files', file);
+  //     });
+
+
+  //     const selectedImages = Array.from(files);
+
+  //     setImages(selectedImages);
+
+  //     const imagePreviews = selectedImages.map((image) =>
+  //       URL.createObjectURL(image)
+  //     );
+  //     setPreviewURLs(imagePreviews);
+  //   }
+  // };
+
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files){
-      const files = event.target.files
-      // setImages(files);
-
-      setStatus('uploading');
-
-      [...files].forEach((file) => {
-        formData.append('files', file);
-      });
-
-
-      const selectedImages = Array.from(files);
-
-      setImages(selectedImages);
-
-      const imagePreviews = selectedImages.map((image) =>
-        URL.createObjectURL(image)
-      );
-      setPreviewURLs(imagePreviews);
-    }
+    const files = Array.from(event.target.files || []);
+    setImages((prevFiles) => [...prevFiles, ...files]);
+    setPreviewURLs((prevPreviews) => [
+      ...prevPreviews,
+      ...files.map((file) => URL.createObjectURL(file)),
+    ]);
   };
 
   // remove image from preview 
@@ -102,7 +110,7 @@ export const AddProduct = ({} : AddProductSchema) => {
   const categoryIdField = useRef<HTMLInputElement>(null);
   const quantityField = useRef<HTMLInputElement>(null);
 
-  // const productImageField = useRef<HTMLInputElement>(null);
+  const productImageField = useRef<HTMLInputElement>(null);
 
 
 
@@ -115,7 +123,7 @@ export const AddProduct = ({} : AddProductSchema) => {
     const price = priceField.current ? priceField.current.value : "";
     const category = categoryIdField.current ? categoryIdField.current.value : "";
     const quantity = quantityField.current ? quantityField.current.value : "";
-    // const product_image = productImageField.current ? productImageField.current.value : "";
+    const product_image = productImageField.current ? productImageField.current.value : "";
 
     
   
@@ -147,29 +155,57 @@ export const AddProduct = ({} : AddProductSchema) => {
     formData.append('price', price);
     formData.append('category_id', category);
     formData.append('quantity', quantity);
-        console.log('try start')
+    console.log('try start')
+
+
+    // Append all selected files to the FormData
+    images?.forEach((image) => {
+      formData.append("photos", image);
+    });
+
+    console.log(formData.get('category_id'))
+  
 
     console.log('form subit test begin')
 
     try {
       console.log('try start')
-      const requestOptions = {
+      // const requestOptions = {
+      //   method: "POST",
+      //   body: formData,
+      //   credentials: "include",
+      //   'Access-Control-Allow-Origin': 'http://127.0.0.1:5000',
+
+      // };
+      
+      // const response = await fetch(`${baseUrl}/api/product`, requestOptions);
+      // const response  = api.post('/product', formData)
+      const response = await fetch("http://127.0.0.1:5000/api/product", {
         method: "POST",
         body: formData,
-        credentials: "include",
-        'Access-Control-Allow-Origin': 'http://127.0.0.1:5000',
-
-      };
-      
-      const response = await fetch(`${baseUrl}/api/product`, requestOptions, formData);
-      // const response  = api.post('/product', formData)
-
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // Adjust as needed
+        },
+      });
       console.log(response)
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log("Product added successfully:", data);
+      flash('Success', 'success')
+      resetForm()
 
     } catch (error) {
       return console.log(error)
     }
   }
+
+  const resetForm = () => {
+    setImages([]);
+    setPreviewURLs([]);
+  };
 
   return (
     <>
@@ -214,21 +250,21 @@ export const AddProduct = ({} : AddProductSchema) => {
                   <InputField
                     name="price"
                     label="Product price"
-                    type="dec"
+                    type="decimal"
                     placeholder="12334"
                     error={formErrors.price}
                     Fieldref={priceField} />
 
                   
                   <InputField
-                    name="category"
+                    name="category_id"
                     label="Product category"
                     type="number"
                     placeholder="category number"
                     error={formErrors.category?.toString()}
                     Fieldref={categoryIdField} />
 
-                  <ImageUpload  multiple={true} Fieldref={categoryIdField} onChange={handleImageUpload} />
+                  <ImageUpload  multiple={true} Fieldref={productImageField} onChange={handleImageUpload} />
 
                   <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
                     {previewURLs.map((url, index) => (
