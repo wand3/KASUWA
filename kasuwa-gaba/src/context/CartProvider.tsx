@@ -3,7 +3,7 @@ import UseApi from "../hooks/UseApi";
 
 type CartSchema = {
   id?: number;
-  product?: string;
+  product_id?: number;
   quantity?: number;
   shipping?: number;
 }
@@ -61,8 +61,16 @@ export const CartProvider = ( {children}: ChildrenType) => {
   function getItemQuantity(id: number): number {
     return cartItems?.find(item => item.id === id)?.quantity || 0;
   }
-
+   
+  
   function increaseCartQuantity(id: number): void {
+    console.log('increase begins')
+    const addToCart = async () => {
+      const response = await api.post('/cart', id);
+      console.log(response.body)
+
+    }
+    addToCart()
     setCartItems(currItems => {
       if (!currItems) return [{ id, quantity: 1 }];
 
@@ -76,6 +84,9 @@ export const CartProvider = ( {children}: ChildrenType) => {
       }
     });
   }
+  
+
+  
 
   function decreaseCartQuantity(id: number): void {
     setCartItems(currItems => {
@@ -145,7 +156,7 @@ export const CartProvider = ( {children}: ChildrenType) => {
         increaseCartQuantity,
         removeFromCart,
         decreaseCartQuantity,
-        fetchCartItems
+        fetchCartItems,
     }}>
     
       {children}
