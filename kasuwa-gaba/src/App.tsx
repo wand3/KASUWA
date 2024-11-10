@@ -11,6 +11,7 @@ import OrdersPage from './pages/OrdersPage';
 import ChangePasswordPage from './pages/ChangePassword';
 import { FlashProvider } from './context/FlashProvider';
 import { UserProvider } from './context/UserProvider';
+import CartProvider from './context/CartProvider';
 
 import AdminRoute from './components/AdminRoute';
 import PublicRoute from './components/PrivateRoute';
@@ -23,39 +24,45 @@ function App() {
         <FlashProvider>
           <ApiProvider>
             <UserProvider>
-              <Routes>
+              <CartProvider>
+              
+              
+                <Routes>
 
-                {/* <Route path='/' element={
-                  <PublicRoute><Kasuwa /></PublicRoute>
-                } /> */}
-                <Route path='/About' element={ 
-                  <PublicRoute><About /> </PublicRoute>
-                } />
-                <Route path="/login" element={
-                  <PublicRoute><LoginPage /></PublicRoute>
-                } />
-                <Route path="/register" element={
-                  <PublicRoute><RegisterPage /></PublicRoute>
-                } />
+                  {/* <Route path='/' element={
+                    <PublicRoute><Kasuwa /></PublicRoute>
+                  } /> */}
+                  <Route path='/About' element={ 
+                    <PublicRoute><About /> </PublicRoute>
+                  } />
+                  <Route path="/login" element={
+                    <PublicRoute><LoginPage /></PublicRoute>
+                  } />
+                  <Route path="/register" element={
+                    <PublicRoute><RegisterPage /></PublicRoute>
+                  } />
 
-                <Route path="/admin" element={
-                  <AdminRoute><AdminPage /></AdminRoute> 
-                }/>
-                
-                <Route path="*" element={
-                  <PrivateRoute>
-                    <Routes>
-                      <Route path="/" element={<Kasuwa />} />
-                      {/* <Route path="/explore" element={<ExplorePage />} /> */}
-                      <Route path="/orders" element={<OrdersPage />} />
-                      <Route path="/favs" element={<FavouritesPage />} />
-                      <Route path="/change_password" element={<ChangePasswordPage />} />
-                      <Route path="/user" element={<UserPage />} />
-                      <Route path="*" element={<Navigate to="/" />} />
-                    </Routes>
-                  </PrivateRoute>
-                } />                  
-              </Routes>
+                  <Route path="/admin" element={
+                    <AdminRoute><AdminPage /></AdminRoute> 
+                  }/>
+                  
+                  <Route path="*" element={
+                    <PrivateRoute>
+                      <Routes>
+                        <Route path="/" element={<Kasuwa />} />
+                        {/* <Route path="/explore" element={<ExplorePage />} /> */}
+                        <Route path="/orders" element={<OrdersPage />} />
+                        <Route path="/favs" element={<FavouritesPage />} />
+                        <Route path="/change_password" element={<ChangePasswordPage />} />
+                        <Route path="/user" element={<UserPage />} />
+                        <Route path="*" element={<Navigate to="/" />} />
+                      </Routes>
+                    </PrivateRoute>
+                  } />                  
+                </Routes>
+              
+              </CartProvider>
+
             </UserProvider>
           </ApiProvider>
         </FlashProvider>  

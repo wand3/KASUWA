@@ -5,11 +5,10 @@ import UseApi from "../hooks/UseApi";
 export type ProductType = {
     id: number;
     name: string;
-    regular_price: number;
-    discount: number;
+    price: string;
     description: string;
     product_image: string;
-    quantity: number;
+    product_images: string[];
 };
 
 // Define the context type that includes products and the fetch function

@@ -1,5 +1,5 @@
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems, Description, Field, Input, Label } from '@headlessui/react'
-import { Bars3Icon, BellIcon, XMarkIcon, ShoppingCartIcon } from '@heroicons/react/24/solid'
+import { Bars3Icon, BellIcon, XMarkIcon, ShoppingCartIcon, UsersIcon } from '@heroicons/react/24/solid'
 import clsx from 'clsx'
 
 const navigation = [
@@ -73,11 +73,12 @@ const Nav = () => {
                 <MenuButton className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                   <span className="absolute -inset-1.5" />
                   <span className="sr-only">Open user menu</span>
-                  <img
+                  <UsersIcon aria-hidden="true" className="h-6 w-6 bg-white" />
+                  {/* <img
                     alt=""
                     src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                     className="h-8 w-8 rounded-full"
-                  />
+                  /> */}
                 </MenuButton>
               </div>
               <MenuItems
@@ -107,8 +108,11 @@ const Nav = () => {
             >
               <span className="absolute -inset-1.5" />
               <span className="sr-only">View notifications</span>
+
+              {/* shopping cart */}
               <ShoppingCartIcon aria-hidden="true" className="h-6 w-6" />
-              
+              <div className='flex absolute justify-center text-md text-green-400 mt-[-100%] ml-[50%] rounded-xl ring-white'>3</div>
+
             </button>
           </div>
         </div>

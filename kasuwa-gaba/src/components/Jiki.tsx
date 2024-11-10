@@ -12,7 +12,7 @@ type BodyProps = {
 const Jiki: FC<BodyProps> = ({ nav, children }) => {
   return (
     <>
-      <div className="bg-[#000]/80 transparent)">
+      <div className=" transparent">
         {nav && <Nav />}
         {children}
         <FlashMessage />
