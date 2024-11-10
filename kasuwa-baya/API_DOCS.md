@@ -1,3 +1,9 @@
+password reset
+coupon system
+search/filters
+email notification
+
+
 ### Endpoint: Retrive Product
 **URL**: `/api/products/<product_id>`
 **Method**: `GET`
