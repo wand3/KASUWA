@@ -5,7 +5,7 @@ type CartSchema = {
   id?: number;
   product_id?: number;
   quantity?: number;
-  shipping?: number;
+  shipping_id?: number;
 }
 
 export type CartContextType = {
@@ -68,6 +68,8 @@ export const CartProvider = ( {children}: ChildrenType) => {
     const addToCart = async () => {
       const response = await api.post('/cart', {
         product_id: id,
+        quantity: 1
+
       });
       console.log(response.body)
 

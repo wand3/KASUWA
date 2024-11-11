@@ -86,12 +86,14 @@ export const AddShipping = ({}: AddShippingSchema) => {
 
       console.log(response.body)
       if (!response.ok) {
+        flash('Enter Valid data!', 'danger')
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       console.log("Product added successfully:", response.body);
       flash('New Shipping Added!', 'success')
       clearForm()
+      close()
 
     } catch (error) {
       console.log(error)

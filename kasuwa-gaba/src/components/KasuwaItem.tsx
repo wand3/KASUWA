@@ -30,7 +30,6 @@ const Product = ({ product }: PropsType): ReactElement => {
                 <button className="border-solid bg-red-300" type='button' onClick={() => increaseCartQuantity(product.id)}>Add to Cart</button>
             {/* </div> */}
         </div>
-
     return content
 }
 
