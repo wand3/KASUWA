@@ -4,7 +4,7 @@ import UseApi from "../hooks/UseApi";
 // Define ProductType
 export type ProductType = {
     id: number;
-    price: string;
+    price: number;
     description: string;
     product_image: string;
     product_images: string[];

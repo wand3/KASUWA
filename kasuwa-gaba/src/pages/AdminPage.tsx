@@ -1,14 +1,20 @@
 import Jiki from "../components/Jiki";
 import React from "react";
 import AddProduct from "../components/Admin/AddProduct";
+import AddShipping from "../components/Admin/AddShipping";
+import useProducts from "../hooks/UseProducts";
 
 
 export const AdminPage = () => {
-
+  const products = useProducts();
+  
   return (
     <>
       <Jiki nav>
         <AddProduct />
+        <AddShipping />
+
+
         <h3>AdminPage page</h3>
       </Jiki>
       

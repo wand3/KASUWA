@@ -3,7 +3,7 @@ import { useContext } from "react";
 import KasuwaApiClient from "../KasuwaApiClient";
 import { ApiContext } from "../context/ApiProvider";
 
-export function UseApi() {
+export const UseApi = () => {
     return useContext(ApiContext) as KasuwaApiClient;
 
 }

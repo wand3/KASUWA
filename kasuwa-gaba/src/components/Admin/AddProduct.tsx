@@ -46,16 +46,12 @@ export const AddProduct = ({} : AddProductSchema) => {
   const [status, setStatus] = useState<'initial'| 'uploading'| 'success' | 'fail'>('initial')
   const [previewURLs, setPreviewURLs] = useState<string[]>([]);
 
-
   const flash = useFlash();
-
-
 
   // dialog popup and close 
   function open() {
     setIsOpen(true)
   }
-
   function close() {
     setIsOpen(false)
   }
@@ -103,7 +99,6 @@ export const AddProduct = ({} : AddProductSchema) => {
     }
   };
 
-
   const productNameField = useRef<HTMLInputElement>(null);
   const descriptionField = useRef<HTMLInputElement>(null);
   const priceField = useRef<HTMLInputElement>(null);
@@ -111,9 +106,6 @@ export const AddProduct = ({} : AddProductSchema) => {
   const quantityField = useRef<HTMLInputElement>(null);
 
   const productImageField = useRef<HTMLInputElement>(null);
-
-
-
 
   const handleSubmit = async (ev: React.FormEvent) => {
 
@@ -213,7 +205,7 @@ export const AddProduct = ({} : AddProductSchema) => {
         onClick={open}
         className="rounded-md bg-black/20 py-2 px-4 text-sm font-medium text-white focus:outline-none data-[hover]:bg-black/30 data-[focus]:outline-1 data-[focus]:outline-white"
       >
-        Open dialog
+        Add product
       </Button>
 
       <Dialog open={isOpen} as="div" className="relative z-10 focus:outline-none" onClose={close}>

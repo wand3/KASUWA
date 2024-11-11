@@ -32,7 +32,7 @@ export const CartProvider = ( {children}: ChildrenType) => {
         try {
 
             const response = await api.get('/cart');
-            console.log(response.body)
+            console.log(response)
 
             const data = await response.body;
             // setProducts(data); // Assume data is an array of products
@@ -66,7 +66,9 @@ export const CartProvider = ( {children}: ChildrenType) => {
   function increaseCartQuantity(id: number): void {
     console.log('increase begins')
     const addToCart = async () => {
-      const response = await api.post('/cart', id);
+      const response = await api.post('/cart', {
+        product_id: id,
+      });
       console.log(response.body)
 
     }

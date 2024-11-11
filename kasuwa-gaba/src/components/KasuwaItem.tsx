@@ -23,7 +23,7 @@ const Product = ({ product }: PropsType): ReactElement => {
         <div className="w-full bg-slate-400 mx-2">
             {/* <div  className="group"> //href="#" */}
                 <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
-                    <img src={img} alt={product.name} className="" />
+                    <img src={img} alt={product.product_name} className="" />
                 </div>
                 <h3 className="mt-4 text-lg text-gray-700">{product.product_name}</h3>
                 <p>{new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(product.price)}</p>

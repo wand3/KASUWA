@@ -43,7 +43,15 @@ function App() {
                   } />
 
                   <Route path="/admin" element={
-                    <AdminRoute><AdminPage /></AdminRoute> 
+                    <AdminRoute>
+                      <Routes>
+                        <Route path='/' element={<AdminPage />} />
+                        <Route path='/shipping' />
+
+                      
+                      </Routes>
+                      
+                    </AdminRoute> 
                   }/>
                   
                   <Route path="*" element={

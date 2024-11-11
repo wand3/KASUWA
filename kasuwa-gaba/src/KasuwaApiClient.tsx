@@ -24,7 +24,7 @@ type Token = {
   access_token: string | null;
 }
 
-export default class MicroblogApiClient {
+export default class KasuwaApiClient {
   base_url = BASE_API_URL + '/api';
   onError: (error: any) => void;
 
@@ -41,6 +41,7 @@ export default class MicroblogApiClient {
       if (refreshResponse.ok && refreshResponse.body) {
         localStorage.setItem('token', refreshResponse.body.access_token || '');
         response = await this.requestInternal<TREQ, TRES>(options);
+        console.log(response.body)
       }
     }
     if (response.status >= 500 && this.onError) {
@@ -61,7 +62,8 @@ export default class MicroblogApiClient {
         method: options.method,
         headers: {
           'Content-Type': 'application/json',
-          // 'Access-Control-Allow-Origin': 'http://127.0.0.1:5000',
+          'Access-Control-Allow-Credentials': 'true',
+          'Access-Control-Allow-Origin': 'http://127.0.0.1:5000',
           'Authorization': 'Bearer ' + localStorage.getItem('token'),
           ...options.headers,
         },

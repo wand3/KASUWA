@@ -12,10 +12,10 @@ const Kasuwa = () => {
         <> 
             <ProductsProvider>
                 <Jiki nav>
-                    {
+                    
                         <h1>Welcl {user?.user?.email} Role: {user?.user?.role}</h1>
 
-                    }
+                    
                     <KasuwaItems />
                     <NavButtom />
 
