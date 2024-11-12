@@ -1,13 +1,12 @@
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems, Description, Field, Input, Label } from '@headlessui/react'
-import { Bars3Icon, BellIcon, XMarkIcon, ShoppingCartIcon, UsersIcon } from '@heroicons/react/24/solid'
+import { Bars3Icon, BellIcon, XMarkIcon, ShoppingCartIcon, UserIcon } from '@heroicons/react/24/solid'
 import clsx from 'clsx'
-import { UseCart } from '../hooks/UseCart'
+import { UseCart } from '../hooks/UseCart';
+import useUser from '../hooks/UseUser';
 
 
 const navigation = [
-  { name: 'Dashboard', href: '#', current: true },
-  { name: 'Team', href: '#', current: false },
-  { name: 'Projects', href: '#', current: false },
+  { name: 'Login', href: '/login', current: true },
 ]
 
 function classNames(...classes: string[]) {
@@ -17,7 +16,9 @@ function classNames(...classes: string[]) {
 const Nav = () => {
 
   const { cartQuantity } = UseCart();
-
+  const user = useUser();
+  const userEmail = user.user?.email.slice(0, 6).toString()  
+  // console.log(userEmail);
   return (
     <>
       <Disclosure as="nav" className="hidden md:block bg-gray-800">
@@ -32,32 +33,17 @@ const Nav = () => {
                 <XMarkIcon aria-hidden="true" className="hidden h-6 w-6 group-data-[open]:block" />
               </DisclosureButton>
             </div>
-            <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-              <div className="flex flex-shrink-0 items-center">
-                <img
-                  alt="Your Company"
-                  src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=500"
-                  className="h-8 w-auto"
-                />
-              </div>
-              <div className="hidden sm:ml-6 sm:block">
-                <div className="flex space-x-4">
-                  {navigation.map((item) => (
-                    <a
-                      key={item.name}
-                      href={item.href}
-                      aria-current={item.current ? 'page' : undefined}
-                      className={classNames(
-                        item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                        'rounded-md px-3 py-2 text-sm font-medium',
-                      )}
-                    >
-                      {item.name}
-                    </a>
-                  ))}
-                </div>
-              </div>
+
+            {/* nav brand  */}
+            <div className="flex flex-shrink-0 items-center">
+              <h1 className='text-2xl text-slate-400 font-extrabold'>KASAU<span className='text-red-700'>WA</span></h1>
+              {/* <img
+                alt="Your Company"
+                src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=500"
+                className="h-8 w-auto"
+              /> */}
             </div>
+            
             <div className="flex w-[40%] items-center sm:w-full max-w-md px-4">
               <Field>
                   <Input
@@ -71,55 +57,112 @@ const Nav = () => {
                   />
               </Field>
               </div>
-            <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+            <div className="absolute inset-y-0 gap-x-3 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
               {/* Profile dropdown */}
               <Menu as="div" className="relative ml-3">
-                <div>
-                  <MenuButton className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                <div className='relative flex mt-[5px] mr-[50px] text-white icon-hover-desktop rounded-lg p-1 bg-gray-800 text-sm focus:outline-none focus:ring-1 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-400'>
+                  <MenuButton className="">
                     <span className="absolute -inset-1.5" />
                     <span className="sr-only">Open user menu</span>
-                    <UsersIcon aria-hidden="true" className="h-6 w-6 bg-white" />
+                    <UserIcon aria-hidden="true" className="h-6 w-6 bg-transparent fill-white" />
                     {/* <img
                       alt=""
                       src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                       className="h-8 w-8 rounded-full"
                     /> */}
+                    { user.isAuthenticated === true && (
+                        <span className='flex absolute justify-center text-md mt-[-50%] ml-[85%] rounded-xl bg:ring-white'>{userEmail}</span>
+                      )}
+                    { !user.isAuthenticated && (
+                       <span className='flex absolute justify-center text-md mt-[-50%] ml-[85%] rounded-xl bg:ring-white'>Guest!</span>
+                      )} 
+                      <p className='text-[0.6rem] font-semibold font-mono'>Hi!</p>
                   </MenuButton>
                 </div>
                 <MenuItems
                   transition
                   className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
                 >
-                  <MenuItem>
-                    <a href="#" className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100">
-                      Your Profile
-                    </a>
-                  </MenuItem>
-                  <MenuItem>
-                    <a href="#" className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100">
-                      Settings
-                    </a>
-                  </MenuItem>
-                  <MenuItem>
-                    <a href="#" className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100">
-                      Sign out
-                    </a>
-                  </MenuItem>
+                  { !user.isAuthenticated && (
+                    <>
+                    <MenuItem>
+
+                      <a href="#" className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100">
+                        Sign in
+                      </a>
+                    </MenuItem>
+                    <MenuItem>
+                      <a href="#" className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100">
+                        Sign up
+                      </a>
+                    </MenuItem>
+                    <MenuItem>
+                      <a href="#" className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100">
+                        Sign out
+                      </a>
+                    </MenuItem>
+                    </>
+                  )}
+                  { user.isAuthenticated && (
+                    <>
+                    <MenuItem>
+
+                      <a href="#" className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100">
+                        Profile
+                      </a>
+                    </MenuItem>
+                    <MenuItem>
+                      <a href="#" className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100">
+                        Settings
+                      </a>
+                    </MenuItem>
+                    <MenuItem>
+                      <a href="#" className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100">
+                        Sign out
+                      </a>
+                    </MenuItem>
+                    </>
+                  )}
                 </MenuItems>
               </Menu>
-              <button
-                type="button"
-                className="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
-              >
-                <span className="absolute -inset-1.5" />
-                <span className="sr-only">View notifications</span>
+              <div className='relative rounded-full bg-gray-800 p-1 mt-[5px] text-white hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800'>
+                <button
+                  type="button"
+                  className=""
+                >
+                  {/* shopping cart */}
+                  <ShoppingCartIcon aria-hidden="false" className="h-6 w-6 fill:black" />
+                  {cartQuantity ? cartQuantity > 0 && (
+                    <span className='flex absolute justify-center text-md text-white mt-[-55%] ml-[85%] rounded-xl bg:ring-white'>{cartQuantity}</span>
+                  ): <span className='flex absolute justify-center text-md text-white mt-[-55%] ml-[85%] rounded-xl bg:ring-white'>0</span>}
+                  <p className='text-[0.6rem] font-semibold font-mono'>Cart</p>
+                </button>
+              </div>
+              
 
-                {/* shopping cart */}
-                {cartQuantity ? cartQuantity > 0 && (
-                  <><ShoppingCartIcon aria-hidden="true" className="h-6 w-6" /><div className='flex absolute justify-center text-md text-green-400 mt-[-100%] ml-[50%] rounded-xl ring-white'>{cartQuantity}</div></>
-                ): <div className='flex absolute justify-center text-md text-green-400 mt-[-100%] ml-[50%] rounded-xl ring-white'>0</div>}
-              </button>
+              <div className="flex flex-none items-center justify-center sm:items-stretch sm:justify-start">
+              
+                <div className="hidden sm:ml-6 sm:block">
+                  <div className="flex space-x-4">
+                    {navigation.map((item) => (
+                      <a
+                        key={item.name}
+                        href={item.href}
+                        aria-current={item.current ? 'page' : undefined}
+                        className={classNames(
+                          item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                          'rounded-md px-3 py-2 text-sm font-medium icon-hover-inner-desktop icon-hover-desktop',
+                        )}
+                      >
+                        {item.name}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
             </div>
+            
           </div>
         </div>
 

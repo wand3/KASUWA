@@ -6,14 +6,14 @@ import useUser from "../hooks/UseUser";
 
 
 const Kasuwa = () => {
-    const user = useUser();
+    // const user = useUser();
 
     return (
         <> 
             <ProductsProvider>
                 <Jiki nav>
                     
-                        <h1>Welcl {user?.user?.email} Role: {user?.user?.role}</h1>
+                        {/* <h1>Welcl {user?.user?.email} Role: {user?.user?.role}</h1> */}
 
                     
                     <KasuwaItems />

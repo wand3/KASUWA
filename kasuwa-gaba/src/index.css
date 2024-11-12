@@ -1,3 +1,40 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@tailwind base; /* base styles applied globally accross project */
+@tailwind components;   /* component styles applied to components or reusable UI elements */
+@tailwind utilities;  /* utilities styles atomic styles to individual properties e.g margin, border */
+
+
+/* used for syling components or elements with larger class */
+@layer components {
+    /* .button-submit {
+        @apply justify-between rounded-md bg-[#4158D0] px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600
+    } */
+    /* .blurglass {
+        @apply bg-[linear-gradient( 109.6deg,  rgba(112,246,255,0.33) 11.2%, rgba(221,108,241,0.26) 42%, rgba(229,106,253,0.71) 71.5%, rgba(123,183,253,1) 100.2% )] z-10 lg:p-[10%] sm:p-[5%] m-auto backdrop-blur-[10px] border-[10px] border-blue-600 rounded-md
+    } */
+    .icon-hover-desktop {
+        @apply backdrop-blur-sm rounded-lg p-1 hover:bg-slate-400 bg-gray-800 text-sm hover:outline-none hover:ring-1 hover:ring-white hover:ring-offset-2 hover:ring-offset-gray-400
+    }
+    .icon-hover-inner-desktop {
+        @apply hover:text-black focus:text-black hover:fill-black focus:fill-black 
+    }
+
+    .blurglass-dark {
+        /* @apply bg-gradient-to-b from-black-900 to-black-800 opacity-90 */
+    }
+    .background-light {
+        @apply bg-black/40
+    }
+    .background-dark {
+        @apply dark:bg-transparent
+    }
+    .background-dark-hover{
+        @apply bg-gradient-to-tl from-black/80 via-blue-700/10 to-black
+    }
+    .text-light {
+        @apply text-slate-900
+    }
+    .text-dark {
+        @apply text-[#4158d0]
+    }
+}
+
