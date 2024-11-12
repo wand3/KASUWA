@@ -40,6 +40,7 @@ def add_to_cart():
     product_id = data.get("product_id")
     default_quantity = data.get("quantity", 1)
 
+
     if not product_id:
         return bad_request("Product ID is required")
 

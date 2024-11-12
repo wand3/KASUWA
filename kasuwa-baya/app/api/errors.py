@@ -29,4 +29,4 @@ def handle_http_exception(e):
 @bp.app_errorhandler(Exception)
 def handle_exception(e):
     """Handle generic exceptions and return a 500 error response."""
-    return error_response(500, "An internal server error occurred")
+    return error_response(500, f"{e} An internal server error occurred")

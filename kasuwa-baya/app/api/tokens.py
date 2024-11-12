@@ -1,6 +1,7 @@
 from app import db
 from app.api import bp
 from app.api.auth import basic_auth, token_auth
+import logging
 
 @bp.route('/tokens', methods=['POST'])
 @basic_auth.login_required
@@ -15,3 +16,11 @@ def delete_token():
     token_auth.current_user().revoke_token()
     db.session.commit()
     return "", 204
+
+@bp.route('/tokens', methods=['PUT'])
+@basic_auth.login_required
+def put_token():
+    token = basic_auth.current_user().check_token()
+    logging.error(token)
+    db.session.commit()
+    return {'token': token}

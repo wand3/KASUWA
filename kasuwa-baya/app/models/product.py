@@ -62,12 +62,13 @@ class Cart(BaseModel):
 
     product_id: Mapped[int] = mapped_column(Integer, ForeignKey('products.id'))
     quantity: Mapped[int] = Column(Integer, default=1)
-    shipping_id: Mapped[int] = mapped_column(Integer, ForeignKey('shippings.id'), default=3)
+    shipping_id: Mapped[int] = mapped_column(Integer, ForeignKey('shippings.id'), nullable=False, default=3)
     user_id = mapped_column(Integer, ForeignKey('users.id'), index=True)
     product: Mapped['Product'] = relationship("Product")
     user: Mapped['User'] = relationship("User", back_populates="cart")
     shipping: Mapped['ShippingMethod'] = relationship("ShippingMethod")
 
+    
     def to_dict(self):
         return {
             'id': self.id,
