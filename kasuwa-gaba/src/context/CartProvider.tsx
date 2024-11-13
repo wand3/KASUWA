@@ -25,7 +25,7 @@ export type CartContextType = {
   cartQuantity?: number
   // getItemQuantity: (id: number) => number;
   increaseCartQuantity: (id: number) => void;
-  // decreaseCartQuantity: (id: number) => void;
+  decreaseCartQuantity: (id: number) => void;
   removeFromCart: (id: number) => Promise<void>;
   // getCartItems: () => Promise<[]>;
 }
@@ -107,27 +107,31 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
 
   
 
+  async function decreaseCartQuantity(id: number): Promise<void> {
+    try {
+      const response = await api.put(`/cart/${id}`, {
+      });
+      console.log(response.body)
+      if (response.status > 200) {
+        flash('minimim must be 1', 'error')
+        fetchCartItems()
+      
+      }
+      flash('Item decreased!', 'success')
+      fetchCartItems()
+    } catch(error) {
+      return console.log(error)
+    }
   
-
-  // function decreaseCartQuantity(id: number): void {
-  //   setCartItems(currItems => {
-  //     if (!currItems) return null;
-
-  //     const item = currItems.find(item => item.id === id);
-  //     if (!item || item.quantity === 1) {
-  //       return currItems.filter(item => item.id !== id);
-  //     } else {
-  //       return currItems.map(item =>
-  //         item.id === id ? { ...item, quantity: item.quantity! - 1 } : item
-  //       );
-  //     }
-  //   });
-  // }
+  
+  }
 
   async function removeFromCart(id: number) : Promise<void> {
     try {
       const response = await api.delete(`/cart/${id}`)
       console.log(response.body)
+      flash('Item removed!', 'success')
+      fetchCartItems()
     } catch(error) {
       return console.log(error)
     }
@@ -192,7 +196,7 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
         // getItemQuantity, 
         increaseCartQuantity,
         removeFromCart,
-        // decreaseCartQuantity,
+        decreaseCartQuantity,
     }}>
     
       {children}

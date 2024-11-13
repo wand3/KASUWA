@@ -11,7 +11,7 @@ export type PropsType = {
 
 
 const Cartitem = () => {
-const { cartItems, removeFromCart, increaseCartQuantity } = useCart();
+const { cartItems, removeFromCart, increaseCartQuantity, decreaseCartQuantity } = useCart();
 // const cart = useCart();
 
 //   if (isLoading) {
@@ -37,22 +37,24 @@ const { cartItems, removeFromCart, increaseCartQuantity } = useCart();
 
                 </div>
                 <div className="mt-4 flex justify-between sm:space-y-6 sm:mt-0 sm:block sm:space-x-6">
-                <div className="flex items-center border-gray-100">
-                    <button onClick={() => {increaseCartQuantity(item.product.id)}} className="cursor-pointer rounded-l bg-gray-100 py-1 px-3.5 duration-100 hover:bg-blue-500 hover:text-blue-50"> - </button>
-                    <input className="h-8 w-8 border bg-white text-center text-xs outline-none" type="number" value={item.quantity} min="1" />
-                    <button onClick={() => {removeFromCart(item.product.id)}} className="cursor-pointer rounded-r bg-gray-100 py-1 px-3 duration-100 hover:bg-blue-500 hover:text-blue-50"> + </button>
+                  <div className="flex flex-1 items-center border-gray-100">
+                      <button onClick={() => {decreaseCartQuantity(item.product.id)}} className="cursor-pointer rounded-l bg-gray-100 py-1 px-3.5 duration-100 hover:bg-blue-500 hover:text-blue-50"> - </button>
+                      <input className="h-8 w-8 border bg-white text-center text-xs outline-none" type="number" value={item.quantity} min="1" />
+                      <button onClick={() => {increaseCartQuantity(item.product.id)}} className="cursor-pointer rounded-r bg-gray-100 py-1 px-3 duration-100 hover:bg-blue-500 hover:text-blue-50"> + </button>
+                  </div>
+
+                  {/* shipping  */}
+                  <p className="mt-1 text-xs text-gray-700">{item.shipping?.shipping_method_name}</p>
+                  <p className="mt-1 text-xs text-gray-700">Shipping cost {item.shipping?.shipping_price} days</p>
+
+                  
                 </div>
-
-                {/* shipping  */}
-                <p className="mt-1 text-xs text-gray-700">{item.shipping?.shipping_method_name}</p>
-                <p className="mt-1 text-xs text-gray-700">Shipping cost {item.shipping?.shipping_price} days</p>
-
-                <div className="flex items-center space-x-4">
-                    <p className="text-sm">{item.quantity * item.product.price}</p>
+                <div className="flex flex-col items-center space-x-4">
+                  <button onClick={() => {removeFromCart(item.product.id)}}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
-                </div>
+                  </button>
                 </div>
             </div>
         </div>

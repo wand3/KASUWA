@@ -77,7 +77,7 @@ def get_cart():
 def update_quantity(product_id):
     user_id = token_auth.current_user().id
     data = request.get_json()
-    new_quantity = data.get("quantity")
+    new_quantity = data.get("quantity", 1)
 
     if new_quantity is None or new_quantity <= 0:
         return bad_request("Quantity must be a positive integer")

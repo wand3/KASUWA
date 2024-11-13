@@ -41,15 +41,16 @@ const Nav = () => {
             </div>
 
             {/* nav brand  */}
-            <div className="flex flex-shrink-0 items-center">
-              <h1 className='text-2xl text-slate-400 font-extrabold'>KASAU<span className='text-red-700'>WA</span></h1>
-              {/* <img
-                alt="Your Company"
-                src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=500"
-                className="h-8 w-auto"
-              /> */}
-            </div>
-            
+            <a href="/">
+              <div className="flex flex-shrink-0 items-center">
+                <h1 className='text-2xl text-slate-400 font-extrabold'>KASAU<span className='text-red-700'>WA</span></h1>
+                {/* <img
+                  alt="Your Company"
+                  src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=500"
+                  className="h-8 w-auto"
+                /> */}
+              </div>
+            </a>
             <div className="flex w-[40%] items-center sm:w-full max-w-md px-4">
               <Field>
                   <Input
