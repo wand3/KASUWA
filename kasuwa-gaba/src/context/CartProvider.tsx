@@ -28,7 +28,7 @@ export type CartContextType = {
   increaseCartQuantity: (id: number) => void;
   // decreaseCartQuantity: (id: number) => void;
   removeFromCart: (id: number) => Promise<void>;
-  // fetchCartItems: () => {}
+  // getCartItems: () => Promise<[]>;
 }
 
 export const CartContext = createContext({} as CartContextType);
@@ -144,6 +144,10 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
   
   
   }
+
+
+
+
   // function removeFromCart(id: number): void {
   //   setCartItems(currItems => currItems?.filter(item => item.id !== id) || null);
   // }
@@ -192,7 +196,8 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
     <CartContext.Provider
       value={{
         cartItems,
-        cartQuantity, 
+        cartQuantity,
+        // getCartItems, 
         // getItemQuantity, 
         increaseCartQuantity,
         removeFromCart,

@@ -4,14 +4,14 @@ import Config from "../config"
 import { useCart } from "../hooks/UseCart"
 import CartItems from "./CartItems"
 
-type PropsType = {
-    cart: CartItemSchema,
+export type PropsType = {
+    cart: CartSchema,
 }
 
 
 
-const Cartitem = ({ cart }:  PropsType) => {
-// const { cartItems } = useCart();
+const Cartitem = () => {
+const { cartItems, removeFromCart, increaseCartQuantity } = useCart();
 // const cart = useCart();
 
 //   if (isLoading) {
@@ -26,17 +26,39 @@ const Cartitem = ({ cart }:  PropsType) => {
     <>
         <div>
         <h1>Shopping Cart</h1>
-        {cart.product.map((item) => (
-            <div key={item.id} style={{ border: '1px solid #ccc', margin: '10px', padding: '10px' }}>
-            <img src={item.product.product_image} alt={item?.product?.product_name} style={{ width: '100px' }} />
-            <h2>{item.product.product_name}</h2>
-            <p>Price: ${item.product.price}</p>
-            <p>Quantity: {item.quantity}</p>
-            <p>Shipping Method: {item.shipping.shipping_method_name}</p>
-            <p>Shipping Price: ${item.shipping.shipping_price}</p>
+        {cartItems?.items.map((item) => (
+            <div className="justify-between mb-6 rounded-md bg-white p-6 shadow-md md:w-full sm:flex sm:justify-start">
+            <img src={`${Config.baseURL}/static/images/product_images/${item.product.product_image}`} alt={item.product.product_name} className="w-full rounded-lg sm:w-40" />
+            <div className="sm:ml-4 sm:flimgex sm:w-full sm:justify-between">
+                <div className="mt-5 sm:mt-0">
+                <h2 className="text-lg font-bold text-gray-900">{item.product?.product_name}</h2>
+                
+
+                <p className="mt-1 text-xs text-gray-700">{item.product?.price}</p>
+
+                </div>
+                <div className="mt-4 flex justify-between sm:space-y-6 sm:mt-0 sm:block sm:space-x-6">
+                <div className="flex items-center border-gray-100">
+                    <button onClick={() => {increaseCartQuantity(item.product.id)}} className="cursor-pointer rounded-l bg-gray-100 py-1 px-3.5 duration-100 hover:bg-blue-500 hover:text-blue-50"> - </button>
+                    <input className="h-8 w-8 border bg-white text-center text-xs outline-none" type="number" value={item.quantity} min="1" />
+                    <button onClick={() => {removeFromCart(item.product.id)}} className="cursor-pointer rounded-r bg-gray-100 py-1 px-3 duration-100 hover:bg-blue-500 hover:text-blue-50"> + </button>
+                </div>
+
+                {/* shipping  */}
+                <p className="mt-1 text-xs text-gray-700">{item.shipping?.shipping_method_name}</p>
+                <p className="mt-1 text-xs text-gray-700">Shipping cost N{item.shipping?.shipping_price}</p>
+
+                <div className="flex items-center space-x-4">
+                    <p className="text-sm">{item.quantity * item.product.price}</p>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="h-5 w-5 cursor-pointer duration-150 hover:text-red-500">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </div>
+                </div>
             </div>
+        </div>
         ))}
-        {/* <h2>Total: ${total}</h2> */}
+        <h2>Total: ${cartItems?.total}</h2>
         </div>
     </>
   );

@@ -1,11 +1,14 @@
 import CartItem from "../components/CartItem";
-import Cartitem from "../components/CartItem";
+// import Cartitem from "../components/CartItem";
 import CartItems from "../components/CartItems";
+import { useCart } from "../hooks/UseCart";
+import { PropsType } from "../components/CartItem";
+import Config from "../config";
 
 
-export const CartPage = () => {
+export const CartPage = (cart: PropsType ) => {
 
-
+  // const { cartItems } = useCart();
 
   return (
     <>
@@ -14,8 +17,15 @@ export const CartPage = () => {
         <div className="mx-auto max-w-5xl justify-center px-6 md:flex md:space-x-6 xl:px-0">
             <div className="rounded-lg md:w-2/3">
                 <div className="justify-between mb-6 rounded-lg bg-white p-6 shadow-md sm:flex sm:justify-start">
-                    <CartItems
-                          />
+                  <div>
+                    <h1>Shopping Cart</h1>
+                      <CartItem />
+                    
+                    </div>
+                    {/* <CartItem cart={{
+                items: [],
+                total: 0
+              }}                          /> */}
                 </div>
             </div>
         {/* <!-- Sub total --> */}
