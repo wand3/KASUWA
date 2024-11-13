@@ -1,6 +1,5 @@
 .env
 venv
 app.db
-static
 __pycache__
 .DS_Store
