@@ -1,9 +1,8 @@
 import { createContext, ReactElement, useState, useEffect } from "react";
 import UseApi from "../hooks/UseApi";
+import useFlash from "../hooks/UseFlash";
 import { ProductType } from "./ProductProvider";
 import { AddShippingSchema } from "../components/Admin/AddShipping";
-import CartItems from "../components/CartItems";
-import CartItem from "../components/CartItem";
 import Config from "../config";
 
 
@@ -43,6 +42,7 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
   const [ cartQuantity, setcartQuantity] = useState<number>();
 
   const api = UseApi();
+  const flash = useFlash();
 
   // Fetch products function
   const fetchCartItems = async () => {
@@ -99,20 +99,11 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
 
     });
     console.log( response.body)
+    flash('Added', 'success')
+    fetchCartItems()
 
   }
-    // setCartItems(currItems => {
-    //   if (!currItems) return [{ id, quantity: 1 }];
-
-    //   const item = currItems.find(item => item.id === id);
-    //   if (!item) {
-    //     return [...currItems, { id, quantity: 1 }];
-    //   } else {
-    //     return currItems.map(item =>
-    //       item.id === id ? { ...item, quantity: (item.quantity || 0) + 1 } : item
-    //     );
-    //   }
-    // });
+    
 
   
 
@@ -205,7 +196,6 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
     }}>
     
       {children}
-      <CartItems />
     </CartContext.Provider>
   )
 }

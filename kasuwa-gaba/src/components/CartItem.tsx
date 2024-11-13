@@ -18,16 +18,15 @@ const { cartItems, removeFromCart, increaseCartQuantity } = useCart();
 //     return <p>Loading...</p>;
 //   }
   // console.log(cart.product.description)
-  // if (!cart.cartItems) {
-  //   return <p>Cart is empty.</p>;
-  // }
+  if (!cartItems) {
+    return <p>Cart is empty.</p>;
+  }
 
   return (
     <>
         <div>
-        <h1>Shopping Cart</h1>
         {cartItems?.items.map((item) => (
-            <div className="justify-between mb-6 rounded-md bg-white p-6 shadow-md md:w-full sm:flex sm:justify-start">
+            <div className="justify-between mb-6 rounded-md bg-white p-6 shadow-md min-w-[content] md:w-full sm:flex sm:justify-start">
             <img src={`${Config.baseURL}/static/images/product_images/${item.product.product_image}`} alt={item.product.product_name} className="w-full rounded-lg sm:w-40" />
             <div className="sm:ml-4 sm:flimgex sm:w-full sm:justify-between">
                 <div className="mt-5 sm:mt-0">
@@ -46,7 +45,7 @@ const { cartItems, removeFromCart, increaseCartQuantity } = useCart();
 
                 {/* shipping  */}
                 <p className="mt-1 text-xs text-gray-700">{item.shipping?.shipping_method_name}</p>
-                <p className="mt-1 text-xs text-gray-700">Shipping cost N{item.shipping?.shipping_price}</p>
+                <p className="mt-1 text-xs text-gray-700">Shipping cost {item.shipping?.shipping_price} days</p>
 
                 <div className="flex items-center space-x-4">
                     <p className="text-sm">{item.quantity * item.product.price}</p>
