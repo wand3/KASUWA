@@ -86,7 +86,7 @@ def update_quantity(product_id):
     if cart_item is None:
         return not_found("Product not found in cart")
 
-    cart_item.quantity = new_quantity
+    cart_item.quantity -= new_quantity
     db.session.commit()
 
     return jsonify({'message': 'Quantity updated successfully', 'cart': cart_item.to_dict()}), 200

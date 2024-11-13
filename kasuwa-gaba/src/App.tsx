@@ -66,7 +66,10 @@ function App() {
                         <Route path="/" element={<Kasuwa />} />
                         {/* <Route path="/explore" element={<ExplorePage />} /> */}
                         <Route path="/orders" element={<OrdersPage />} />
-                        <Route path="/cart" element={<CartPage />} />
+                        <Route path="/cart" element={<CartPage cart={{
+                        items: [],
+                        total: 0
+                      }} />} />
 
                         <Route path="/favs" element={<FavouritesPage />} />
                         <Route path="/change_password" element={<ChangePasswordPage />} />

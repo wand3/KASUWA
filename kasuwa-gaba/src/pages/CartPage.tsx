@@ -1,13 +1,12 @@
 import CartItem from "../components/CartItem";
-// import Cartitem from "../components/CartItem";
 import { useCart } from "../hooks/UseCart";
 import { PropsType } from "../components/CartItem";
-import Config from "../config";
 import Jiki from "../components/Jiki";
 import NavButtom from "../components/NavButtom";
+import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 
 
-export const CartPage = (cart: PropsType ) => {
+export const CartPage = ( ) => {
 
   const { cartItems } = useCart();
 
@@ -16,10 +15,11 @@ export const CartPage = (cart: PropsType ) => {
     <>
       <div className="h-screen bg-gray-100">
         <Jiki nav>
-            <h1 className="py-10 text-center text-2xl font-bold">Cart Items</h1>
+            <h1 className="md:hidden py-5 text-center text-1xl font-mono ">My Cart</h1>
+            <a href="/"><span className="md:hidden absolute m-6 top-0 hover:text-red-600"><ArrowLeftIcon className="w-5 h-5"/></span></a>
             <div className="mx-auto max-w-5xl justify-center px-6 md:flex md:space-x-6 xl:px-0">
-                <div className="rounded-lg md:w-2/3">
-                    <div className="justify-between mb-6 rounded-lg bg-white p-6 shadow-md sm:flex sm:justify-start">
+                <div className="rounded-lg">
+                    <div className="justify-between mb-6 rounded-lg bg:transparent p-6 sm:flex sm:justify-center">
                       <div>
                           <CartItem />
                         
@@ -27,7 +27,8 @@ export const CartPage = (cart: PropsType ) => {
                     </div>
                 </div>
             {/* <!-- Sub total --> */}
-            <div className="mt-6 h-full rounded-lg border bg-white p-6 shadow-md md:mt-0 md:w-1/3">
+
+            <div className="mt-6 h-full rounded-lg border bg-white p-6 shadow-md md:mt-6 md:w-2/3">
                 <div className="mb-2 flex justify-between">
                 <p className="text-gray-700">Subtotal</p>
                 <p className="text-gray-700">${cartItems?.total}</p>
@@ -40,7 +41,7 @@ export const CartPage = (cart: PropsType ) => {
                 <div className="flex justify-between">
                 <p className="text-lg font-bold">Total</p>
                 <div className="">
-                    <p className="mb-1 text-lg font-bold">$134.98 USD</p>
+                    <p className="mb-1 text-lg font-bold">{new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(cartItems?.total)}</p>
                     <p className="text-sm text-gray-700">including VAT</p>
                 </div>
                 </div>

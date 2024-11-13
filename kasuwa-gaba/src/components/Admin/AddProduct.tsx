@@ -2,10 +2,7 @@ import useFlash from "../../hooks/UseFlash";
 import UseApi from "../../hooks/UseApi";
 import InputField from "../Auth/FormInput";
 import React, { useRef, useState, useEffect } from "react";
-import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Button, Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
-import { Description, Field, Input, Label } from '@headlessui/react'
-import clsx from 'clsx'
 import { ImageUpload } from "../Auth/ImageUploads";
 import Config from "../../config";
 

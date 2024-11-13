@@ -56,14 +56,6 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
           setCartItems(data)
           setcartQuantity(count)
           console.log(count)
-          // Type assertion: assert that data is an array of ProductType
-          // if (Array.isArray(data)) {
-          //     setCartItems(data) as unknown as CartSchema; // Type assertion
-
-          //     // return data
-          // } else {
-          //     throw new Error("Invalid data format");
-          // }
       } catch (error) {
           setCartItems(null); // Handle error state
       }
@@ -112,7 +104,7 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
       const response = await api.put(`/cart/${id}`, {
       });
       console.log(response.body)
-      if (response.status > 200) {
+      if (!response.ok) {
         flash('minimim must be 1', 'error')
         fetchCartItems()
       
@@ -139,53 +131,10 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
   
   
   }
-
-
-
-
-  // function removeFromCart(id: number): void {
-  //   setCartItems(currItems => currItems?.filter(item => item.id !== id) || null);
-  // }
   
-//   function getItemQuantity(id: number){
-//     return cartItems.find(item => item.id === id)?.quantity || 0
-//   }
-//   function increaseCartQuantity(id: number) {
-//     setCartItems(currItems => {
-//       if (currItems.find(item => item.id === id) == null) {
-//         return [...currItems, { id, quantity: 1 }]
-//       } else {
-//         return currItems.map(item => {
-//           if (item.id === id) {
-//             return { ...item, quantity: item.quantity + 1 }
-//           } else {
-//             return item
-//           }
-//         })
-//       }
-//     })
-//   }
-//   function decreaseCartQuantity(id: number) {
-//     setCartItems(currItems => {
-//       if (currItems.find(item => item.id === id)?.quantity === 1) {
-//         return currItems.filter(item => item.id !== id)
-//       } else {
-//         return currItems.map(item => {
-//           if (item.id === id) {
-//             return { ...item, quantity: item.quantity - 1 }
-//           } else {
-//             return item
-//           }
-//         })
-//       }
-//     })
-//   }
-//   function removeFromCart(id: number) {
-//     setCartItems(currItems => {
-//       return currItems.filter(item => item.id !== id)
-//     })
-//   }
-
+  // async function getItemQuantity(id: number){
+  //   return cartItems.find(item => item.id === id)?.quantity || 0
+  // }
   
   return (
     <CartContext.Provider
