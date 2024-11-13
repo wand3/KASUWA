@@ -6,6 +6,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import useFlash from "../hooks/UseFlash";
 import UseApi from "../hooks/UseApi";
 import useUser from "../hooks/UseUser";
+import { UserSchema } from "../context/UserProvider";
 
 
 type FormErrorType = {
@@ -16,10 +17,14 @@ type FormErrorType = {
 const LoginPage = () => {
   const [formErrors, setFormErrors] = useState<FormErrorType>({});
   const [loginError, setLoginError] = useState<string | null>(null);
+  // const [ user, setUser ] = useState<UserSchema | null | undefined >();
+
   const location = useLocation();
   const navigate = useNavigate();
   const flash = useFlash();
   // const {login} = useUser();
+
+  // const updateUser = useUser();
 
 
 
@@ -84,6 +89,7 @@ const LoginPage = () => {
                 next = location.state.next;
             }
             flash('login success', 'success')
+            // setUser(updateUser.user);
             navigate(next);
             
         } else {

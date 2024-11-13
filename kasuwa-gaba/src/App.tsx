@@ -3,11 +3,14 @@ import { Routes, Route, Navigate } from "react-router-dom"
 import Kasuwa from './pages/Kasuwa';
 import ApiProvider from './context/ApiProvider';
 import About from './pages/About';
+
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import UserPage from './pages/UserPage';
 import FavouritesPage from './pages/FavouritesPage';
 import OrdersPage from './pages/OrdersPage';
+import CartPage from './pages/CartPage';
+
 import ChangePasswordPage from './pages/ChangePassword';
 import { FlashProvider } from './context/FlashProvider';
 import { UserProvider } from './context/UserProvider';
@@ -38,6 +41,9 @@ function App() {
                   <Route path="/login" element={
                     <PublicRoute><LoginPage /></PublicRoute>
                   } />
+                  <Route path="/logout" element={
+                    <PublicRoute><Kasuwa /></PublicRoute>
+                  } />
                   <Route path="/register" element={
                     <PublicRoute><RegisterPage /></PublicRoute>
                   } />
@@ -60,6 +66,8 @@ function App() {
                         <Route path="/" element={<Kasuwa />} />
                         {/* <Route path="/explore" element={<ExplorePage />} /> */}
                         <Route path="/orders" element={<OrdersPage />} />
+                        <Route path="/cart" element={<CartPage />} />
+
                         <Route path="/favs" element={<FavouritesPage />} />
                         <Route path="/change_password" element={<ChangePasswordPage />} />
                         <Route path="/user" element={<UserPage />} />

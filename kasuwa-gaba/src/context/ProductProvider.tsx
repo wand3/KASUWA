@@ -3,6 +3,7 @@ import UseApi from "../hooks/UseApi";
 
 // Define ProductType
 export type ProductType = {
+    map(arg0: (item: any) => import("react/jsx-runtime").JSX.Element): import("react").ReactNode;
     id: number;
     price: number;
     description: string;

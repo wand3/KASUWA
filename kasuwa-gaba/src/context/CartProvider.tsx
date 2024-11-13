@@ -1,55 +1,83 @@
 import { createContext, ReactElement, useState, useEffect } from "react";
 import UseApi from "../hooks/UseApi";
+import { ProductType } from "./ProductProvider";
+import { AddShippingSchema } from "../components/Admin/AddShipping";
+import CartItems from "../components/CartItems";
+import CartItem from "../components/CartItem";
+import Config from "../config";
 
-type CartSchema = {
-  id?: number;
-  product_id?: number;
-  quantity?: number;
-  shipping_id?: number;
+
+export type CartItemSchema = {
+  id: number;
+  product: ProductType;
+  quantity: number;
+  shipping: AddShippingSchema;
 }
 
+export type CartSchema = {
+  items: CartItemSchema[];
+  total: number;
+}
+
+
+
 export type CartContextType = {
-  cartItems: CartSchema[] | null;
-  cartQuantity: number
-  getItemQuantity: (id: number) => number;
+  cartItems: CartSchema| null;
+  cartQuantity?: number
+  // getItemQuantity: (id: number) => number;
   increaseCartQuantity: (id: number) => void;
-  decreaseCartQuantity: (id: number) => void;
-  removeFromCart: (id: number) => void;
-  fetchCartItems: () => {}
+  // decreaseCartQuantity: (id: number) => void;
+  removeFromCart: (id: number) => Promise<void>;
+  // fetchCartItems: () => {}
 }
 
 export const CartContext = createContext({} as CartContextType);
 
-type ChildrenType = { children?: ReactElement | ReactElement[] };
+// type ChildrenType = { children?: ReactElement | ReactElement[] };
 
-export const CartProvider = ( {children}: ChildrenType) => {
-  const [ cartItems, setCartItems] = useState<CartSchema[] | null>([]);
+export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
+  const [ cartItems, setCartItems] = useState<CartSchema | null>({
+    items: [],
+    total: 0,
+  });
+  const [ cartQuantity, setcartQuantity] = useState<number>();
 
   const api = UseApi();
 
   // Fetch products function
-    const fetchCartItems = async () => {
-        try {
+  const fetchCartItems = async () => {
+      try {
 
-            const response = await api.get('/cart');
-            console.log(response)
+          const response = await api.get<CartSchema>('/cart');
+          console.log(response)
+          const count = response.body?.items.length
+          const data = response.body;
+          console.log(data)
+          setCartItems(data)
+          setcartQuantity(count)
+          console.log(count)
+          // Type assertion: assert that data is an array of ProductType
+          // if (Array.isArray(data)) {
+          //     setCartItems(data) as unknown as CartSchema; // Type assertion
 
-            const data = await response.body;
-            // setProducts(data); // Assume data is an array of products
-            // Type assertion: assert that data is an array of ProductType
-            if (Array.isArray(data)) {
-                setCartItems(data as CartSchema[]); // Type assertion
-            } else {
-                throw new Error("Invalid data format");
-            }
-        } catch (error) {
-            setCartItems(null); // Handle error state
-        }
-    };
+          //     // return data
+          // } else {
+          //     throw new Error("Invalid data format");
+          // }
+      } catch (error) {
+          setCartItems(null); // Handle error state
+      }
+  };
 
-    useEffect(() => {
-        fetchCartItems(); // Fetch products on component mount
-    }, []);
+  useEffect(() => {
+      fetchCartItems(); // Fetch products on component mount
+      cartItemsCount();
+  }, []);
+
+  const cartItemsCount = () => {
+      return cartItemsCount
+  
+  }
 
 
 //   const cartQuantity = cartItems.reduce(
@@ -57,59 +85,68 @@ export const CartProvider = ( {children}: ChildrenType) => {
 //     0
 //   )
 
-  const cartQuantity = cartItems ? cartItems.reduce((quantity, item) => item.quantity! + quantity, 0) : 0;
-  function getItemQuantity(id: number): number {
-    return cartItems?.find(item => item.id === id)?.quantity || 0;
-  }
+  // const cartQuantity = cartItems ? cartItems.reduce((quantity, item) => item.quantity! + quantity, 0) : 0;
+  // function getItemQuantity(id: number): number {
+  //   return cartItems?.find(item => item?.id === id)?.quantity || 0;
+  // }
    
   
-  function increaseCartQuantity(id: number): void {
+  async function increaseCartQuantity(id: number): Promise<void> {
     console.log('increase begins')
-    const addToCart = async () => {
-      const response = await api.post('/cart', {
-        product_id: id,
-        quantity: 1
+    const response = await api.post('/cart', {
+      product_id: id,
+      quantity: 1
 
-      });
+    });
+    console.log( response.body)
+
+  }
+    // setCartItems(currItems => {
+    //   if (!currItems) return [{ id, quantity: 1 }];
+
+    //   const item = currItems.find(item => item.id === id);
+    //   if (!item) {
+    //     return [...currItems, { id, quantity: 1 }];
+    //   } else {
+    //     return currItems.map(item =>
+    //       item.id === id ? { ...item, quantity: (item.quantity || 0) + 1 } : item
+    //     );
+    //   }
+    // });
+
+  
+
+  
+
+  // function decreaseCartQuantity(id: number): void {
+  //   setCartItems(currItems => {
+  //     if (!currItems) return null;
+
+  //     const item = currItems.find(item => item.id === id);
+  //     if (!item || item.quantity === 1) {
+  //       return currItems.filter(item => item.id !== id);
+  //     } else {
+  //       return currItems.map(item =>
+  //         item.id === id ? { ...item, quantity: item.quantity! - 1 } : item
+  //       );
+  //     }
+  //   });
+  // }
+
+  async function removeFromCart(id: number) : Promise<void> {
+    try {
+      const response = await api.delete(`/cart/${id}`)
       console.log(response.body)
-
+    } catch(error) {
+      return console.log(error)
     }
-    addToCart()
-    setCartItems(currItems => {
-      if (!currItems) return [{ id, quantity: 1 }];
-
-      const item = currItems.find(item => item.id === id);
-      if (!item) {
-        return [...currItems, { id, quantity: 1 }];
-      } else {
-        return currItems.map(item =>
-          item.id === id ? { ...item, quantity: (item.quantity || 0) + 1 } : item
-        );
-      }
-    });
-  }
   
-
   
-
-  function decreaseCartQuantity(id: number): void {
-    setCartItems(currItems => {
-      if (!currItems) return null;
-
-      const item = currItems.find(item => item.id === id);
-      if (!item || item.quantity === 1) {
-        return currItems.filter(item => item.id !== id);
-      } else {
-        return currItems.map(item =>
-          item.id === id ? { ...item, quantity: item.quantity! - 1 } : item
-        );
-      }
-    });
+  
   }
-
-  function removeFromCart(id: number): void {
-    setCartItems(currItems => currItems?.filter(item => item.id !== id) || null);
-  }
+  // function removeFromCart(id: number): void {
+  //   setCartItems(currItems => currItems?.filter(item => item.id !== id) || null);
+  // }
   
 //   function getItemQuantity(id: number){
 //     return cartItems.find(item => item.id === id)?.quantity || 0
@@ -156,14 +193,14 @@ export const CartProvider = ( {children}: ChildrenType) => {
       value={{
         cartItems,
         cartQuantity, 
-        getItemQuantity, 
+        // getItemQuantity, 
         increaseCartQuantity,
         removeFromCart,
-        decreaseCartQuantity,
-        fetchCartItems,
+        // decreaseCartQuantity,
     }}>
     
       {children}
+      <CartItems />
     </CartContext.Provider>
   )
 }

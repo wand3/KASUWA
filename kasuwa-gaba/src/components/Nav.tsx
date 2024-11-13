@@ -1,12 +1,16 @@
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems, Description, Field, Input, Label } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon, ShoppingCartIcon, UserIcon } from '@heroicons/react/24/solid'
 import clsx from 'clsx'
-import { UseCart } from '../hooks/UseCart';
+import { useCart } from '../hooks/UseCart';
 import useUser from '../hooks/UseUser';
 
 
 const navigation = [
   { name: 'Login', href: '/login', current: true },
+]
+
+const notUser = [
+ {name: 'Logout', href: '/logout', current: true},
 ]
 
 function classNames(...classes: string[]) {
@@ -15,10 +19,12 @@ function classNames(...classes: string[]) {
 
 const Nav = () => {
 
-  const { cartQuantity } = UseCart();
+  const {cartItems, cartQuantity} = useCart();
+
+  console.log(cartQuantity)
   const user = useUser();
-  const userEmail = user.user?.email.slice(0, 6).toString()  
-  // console.log(userEmail);
+  const userEmail = user.user?.email.slice(0, 6).toString()
+
   return (
     <>
       <Disclosure as="nav" className="hidden md:block bg-gray-800">
@@ -60,7 +66,7 @@ const Nav = () => {
             <div className="absolute inset-y-0 gap-x-3 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
               {/* Profile dropdown */}
               <Menu as="div" className="relative ml-3">
-                <div className='relative flex mt-[5px] mr-[50px] text-white icon-hover-desktop rounded-lg p-1 bg-gray-800 text-sm focus:outline-none focus:ring-1 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-400'>
+                <div className='relative flex mt-[5px] mr-[50px] text-white rounded-lg p-1 bg-gray-800 text-sm focus:outline-none focus:ring-1 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-400'>
                   <MenuButton className="">
                     <span className="absolute -inset-1.5" />
                     <span className="sr-only">Open user menu</span>
@@ -76,7 +82,7 @@ const Nav = () => {
                     { !user.isAuthenticated && (
                        <span className='flex absolute justify-center text-md mt-[-50%] ml-[85%] rounded-xl bg:ring-white'>Guest!</span>
                       )} 
-                      <p className='text-[0.6rem] font-semibold font-mono'>Hi!</p>
+                    <p className='text-[0.6rem] font-semibold font-mono'>Hi!</p>
                   </MenuButton>
                 </div>
                 <MenuItems
@@ -126,38 +132,65 @@ const Nav = () => {
                 </MenuItems>
               </Menu>
               <div className='relative rounded-full bg-gray-800 p-1 mt-[5px] text-white hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800'>
-                <button
-                  type="button"
-                  className=""
-                >
-                  {/* shopping cart */}
-                  <ShoppingCartIcon aria-hidden="false" className="h-6 w-6 fill:black" />
-                  {cartQuantity ? cartQuantity > 0 && (
-                    <span className='flex absolute justify-center text-md text-white mt-[-55%] ml-[85%] rounded-xl bg:ring-white'>{cartQuantity}</span>
-                  ): <span className='flex absolute justify-center text-md text-white mt-[-55%] ml-[85%] rounded-xl bg:ring-white'>0</span>}
-                  <p className='text-[0.6rem] font-semibold font-mono'>Cart</p>
-                </button>
+                <a href="/cart">
+                  <button
+                    type="button"
+                    className=""
+                  >
+                    {/* shopping cart */}
+                    <ShoppingCartIcon aria-hidden="false" className="h-6 w-6 fill:black" />
+                    {cartItems ? cartItems && (
+                      <span className='flex absolute justify-center text-md text-white mt-[-55%] ml-[85%] rounded-xl bg:ring-white'>{cartQuantity}</span>
+                    ): <span className='flex absolute justify-center text-md text-white mt-[-55%] ml-[85%] rounded-xl bg:ring-white'>0</span>}
+                    <p className='text-[0.6rem] font-semibold font-mono'>Cart</p>
+                  </button>
+                </a>
+                
               </div>
               
 
               <div className="flex flex-none items-center justify-center sm:items-stretch sm:justify-start">
               
                 <div className="hidden sm:ml-6 sm:block">
-                  <div className="flex space-x-4">
-                    {navigation.map((item) => (
-                      <a
-                        key={item.name}
-                        href={item.href}
-                        aria-current={item.current ? 'page' : undefined}
-                        className={classNames(
-                          item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                          'rounded-md px-3 py-2 text-sm font-medium icon-hover-inner-desktop icon-hover-desktop',
-                        )}
-                      >
-                        {item.name}
-                      </a>
-                    ))}
-                  </div>
+                  { user.isAuthenticated === true && (
+                    <div className="flex space-x-4">
+                      
+                      {notUser.map((item) => (
+                        <a
+                          key={item.name}
+                          href={item.href}
+                          onClick={user.logout}
+                          aria-current={item.current ? 'page' : undefined}
+                          className={classNames(
+                            item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                            'rounded-md px-3 py-2 text-sm font-medium icon-hover-inner-desktop icon-hover-desktop',
+                          )}
+                        >
+                          {item.name}
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                  { !user.isAuthenticated && (
+                    <div className="flex space-x-4">
+                      
+                      {navigation.map((item) => (
+                        <a
+                          key={item.name}
+                          href={item.href}
+                          aria-current={item.current ? 'page' : undefined}
+                          className={classNames(
+                            item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                            'rounded-md px-3 py-2 text-sm font-medium icon-hover-inner-desktop icon-hover-desktop',
+                          )}
+                        >
+                          {item.name}
+                        </a>
+                      ))}
+                    </div>
+
+                  )} 
+                  
                 </div>
               </div>
 
@@ -167,23 +200,47 @@ const Nav = () => {
         </div>
 
         <DisclosurePanel className="sm:hidden">
-          <div className="space-y-1 px-2 pb-3 pt-2">
-            {navigation.map((item) => (
-              <DisclosureButton
-                key={item.name}
-                as="a"
-                href={item.href}
-                aria-current={item.current ? 'page' : undefined}
-                className={classNames(
-                  item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
-                  'block rounded-md px-3 py-2 text-base font-medium',
-                )}
-              >
-                {item.name}
-              </DisclosureButton>
-            ))}
-          </div>
+
+          { user.isAuthenticated === true && (
+            <div className="space-y-1 px-2 pb-3 pt-2">
+              {notUser.map((item) => (
+                <DisclosureButton
+                  key={item.name}
+                  as="a"
+                  href={item.href}
+                  aria-current={item.current ? 'page' : undefined}
+                  className={classNames(
+                    item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                    'block rounded-md px-3 py-2 text-base font-medium',
+                  )}
+                >
+                  {item.name}
+                </DisclosureButton>
+              ))}
+            </div>
+          )}
+          { !user.isAuthenticated && (
+            <div className="space-y-1 px-2 pb-3 pt-2">
+              {navigation.map((item) => (
+                <DisclosureButton
+                  key={item.name}
+                  as="a"
+                  href={item.href}
+                  aria-current={item.current ? 'page' : undefined}
+                  className={classNames(
+                    item.current ? 'bg-gray-900 text-white' : 'text-gray-300 hover:bg-gray-700 hover:text-white',
+                    'block rounded-md px-3 py-2 text-base font-medium',
+                  )}
+                >
+                  {item.name}
+                </DisclosureButton>
+              ))}
+            </div>
+          )} 
+          
         </DisclosurePanel>
+
+        
       </Disclosure>
     </>
   )

@@ -3,7 +3,7 @@ import { CartContext } from "../context/CartProvider";
 import { CartContextType } from "../context/CartProvider";
 
 
-export const UseCart = (): CartContextType => {
+export const useCart = (): CartContextType => {
   return useContext(CartContext)
 
 }
