@@ -71,6 +71,9 @@ function App() {
                         total: 0
                       }} />} />
 
+
+                        <Route path='/shipping' />
+
                         <Route path="/favs" element={<FavouritesPage />} />
                         <Route path="/change_password" element={<ChangePasswordPage />} />
                         <Route path="/user" element={<UserPage />} />

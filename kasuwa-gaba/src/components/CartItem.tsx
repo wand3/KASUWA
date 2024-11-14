@@ -25,9 +25,9 @@ const { cartItems, removeFromCart, increaseCartQuantity, decreaseCartQuantity } 
 
   return (
     <>
-        <div>
+      <div>
         {cartItems?.items.map((item) => (
-            <div className="justify-between mb-6 rounded-md bg-white p-6 shadow-lg sm:flex sm:justify-start">
+            <div key={item.id} className="justify-between mb-6 rounded-md bg-white p-6 shadow-lg sm:flex sm:justify-start">
             <img src={`${Config.baseURL}/static/images/product_images/${item.product.product_image}`} alt={item.product.product_name} className="rounded-lg sm:max-w-[17%] sm:max-h-[30%]" />
             <div className="sm:ml-4 sm:flex sm:w-full sm:justify-between">
                 <div className="mt-5  sm:mt-2 mr-auto">
@@ -62,7 +62,7 @@ const { cartItems, removeFromCart, increaseCartQuantity, decreaseCartQuantity } 
             </div>
         </div>
         ))}
-        </div>
+      </div>
     </>
   );
 };

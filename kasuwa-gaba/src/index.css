@@ -18,10 +18,10 @@
         @apply hover:text-black focus:text-black hover:fill-black focus:fill-black 
     }
 
-    .blurglass-dark {
-        /* @apply bg-gradient-to-b from-black-900 to-black-800 opacity-90 */
+    .inside-dialog-text-div-heading {
+        @apply text-base/7 font-medium text-slate-800 outline-offset-1 rounded-md backdrop:blur-sm bg-slate-200/50 px-2
     }
-    .background-light {
+    .inside-dialog-text-div-pagraph {
         @apply bg-black/40
     }
     .background-dark {

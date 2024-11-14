@@ -13,7 +13,6 @@ export const CartPage = ( ) => {
 
   return (
     <>
-      <div className="h-screen bg-gray-100">
         <Jiki nav>
             <h1 className="md:hidden py-5 text-center text-1xl font-mono ">My Cart</h1>
             <a href="/"><span className="md:hidden absolute m-6 top-0 hover:text-red-600"><ArrowLeftIcon className="w-5 h-5"/></span></a>
@@ -49,7 +48,6 @@ export const CartPage = ( ) => {
             </div>
             </div>
         </Jiki>
-      </div>
     </>
   )
 }

@@ -14,6 +14,8 @@ export type FormShippingErrorType = {
 }
 
 export type AddShippingSchema = {
+  [x: string]: any;
+  id?: number;
   shipping_method_name?: string;
   shipping_price?: number | string;
   delivery_time?: string;
