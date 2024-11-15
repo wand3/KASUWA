@@ -2,6 +2,7 @@ password reset
 coupon system
 search/filters
 email notification
+product spec
 
 
 # API Documentation
