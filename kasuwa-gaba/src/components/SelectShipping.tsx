@@ -27,23 +27,20 @@ export const SelectShipping = ( {id, shippingId}:productId ) => {
   const closeDialog = () => setIsOpen(false);
 
   useEffect(() => {
-    // onLoad;
+    onLoad;
     setShippingId(shippingId)
-    console.log(`shipping onload ${id}`)
+    // console.log(`shipping onload ${id}`)
     // console.log(`shipping id ${shippingId}`)
 
     setProductId(id);
     console.log(`shipping id ---------after set`)
     // console.log(`shipping id ${id}`)
     // console.log(`shipping id ${shippingId}`)
-
-  
   })
 
   const onSubmit = (ev: React.FormEvent) => {
     ev.preventDefault();
 
-  
   }
 
   const onLoad = async (shipping: AddShippingSchema) => {

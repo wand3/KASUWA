@@ -4,6 +4,7 @@ import { useCart } from "../hooks/UseCart"
 import {  TrashIcon } from "@heroicons/react/24/solid"
 import {  TruckIcon } from "@heroicons/react/24/outline"
 import SelectShipping from "./SelectShipping"
+import { formatCurrency } from "../utilities/formatCurrency"
 
 export type PropsType = {
     cart: CartSchema,
@@ -38,27 +39,24 @@ const { cartItems, removeFromCart, increaseCartQuantity, decreaseCartQuantity } 
                     <span className="inline-block font-thin">Update shipping<SelectShipping id={item.product.id}  shippingId={item.shipping.id} /></span>
                     <p className="mt-1 pt-4 text-xs text-gray-700">{item.shipping?.shipping_method_name} </p>
                   </span>
-                  <p className="mt-1 text-xs text-gray-700">Shipping cost {item.shipping?.shipping_price} days</p>
-
-
-
+                  <p className="mt-1 text-xs text-gray-700">Shipping cost {formatCurrency(item.shipping?.shipping_price)} days</p>
                 </div>
+
                 <div className="mt-5 flex justify-between sm:space-y-6 sm:mt-0 sm:block sm:space-x-6 pr-[10%]">
                   <div className="flex items-center border-gray-100">
                       <button onClick={() => {decreaseCartQuantity(item.product.id)}} className="cursor-pointer rounded-l bg-gray-100 py-1 px-3.5 duration-100 hover:bg-gray-800 hover:text-blue-50"> - </button>
                       <input className="h-8 w-8 border bg-white text-center text-xs outline-none" type="number" value={item.quantity} min="1" />
                       <button onClick={() => {increaseCartQuantity(item.product.id)}} className="cursor-pointer rounded-r bg-gray-100 py-1 px-3 duration-100 hover:bg-gray-800 hover:text-blue-50"> + </button>
                   </div>
-                  <p className="mt-1 text-sm text-gray-700">{new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(item.product?.price)}</p>
-
-                 
-                  
+                  <p className="mt-1 text-sm text-gray-700">{formatCurrency(item.product?.price)}</p>
                 </div>
+
                 <div className="flex p-2 items-center space-x-4 md:mb-[30%] sm:mb-[0] sm:flex-row-reverse">
                   <button className="" onClick={() => {removeFromCart(item.product.id)}}>
                     <TrashIcon className="h-6 w-6 cursor-pointer hover:text-red-500" />
                   </button>
                 </div>
+
             </div>
         </div>
         ))}
@@ -66,6 +64,7 @@ const { cartItems, removeFromCart, increaseCartQuantity, decreaseCartQuantity } 
     </>
   );
 };
+
     // const {
     //     getItemQuantity,
     //     increaseCartQuantity,

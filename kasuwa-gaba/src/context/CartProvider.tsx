@@ -76,18 +76,6 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
   
   }
 
-
-//   const cartQuantity = cartItems.reduce(
-//     (quantity, item) => item.quantity + quantity,
-//     0
-//   )
-
-  // const cartQuantity = cartItems ? cartItems.reduce((quantity, item) => item.quantity! + quantity, 0) : 0;
-  // function getItemQuantity(id: number): number {
-  //   return cartItems?.find(item => item?.id === id)?.quantity || 0;
-  // }
-   
-  
   async function increaseCartQuantity(id: number): Promise<void> {
     console.log('increase begins')
     const response = await api.post('/cart', {
@@ -98,11 +86,7 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
     console.log( response.body)
     flash('Added', 'success')
     fetchCartItems()
-
   }
-    
-
-  
 
   async function decreaseCartQuantity(id: number): Promise<void> {
     try {
@@ -120,7 +104,6 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
       return console.log(error)
     }
   
-  
   }
 
   async function removeFromCart(id: number) : Promise<void> {
@@ -132,9 +115,6 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
     } catch(error) {
       return console.log(error)
     }
-  
-  
-  
   }
 
   async function getShipping() {
@@ -155,7 +135,6 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
   
   }
 
-
   // Function to update shipping method for a product
   async function updateShippingMethod(id: number, shippingId: number) {
     try {
@@ -163,25 +142,13 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
       const updatedShipping = response.data;
       console.log(updatedShipping)
       fetchCartItems()
-
-      // Update cartItems with the new shipping method for the given product
-    //   setCartItems((prevItems) =>
-    //     prevItems.map((item) =>
-    //       item.product.id === id
-    //         ? { ...item, shipping: updatedShipping }
-    //         : item
-    //     )
-    //   );
     } catch (error) {
       console.error("Failed to update shipping method:", error);
       // Optionally, handle the error (e.g., show a notification)
     }
   };
   
-  // async function getItemQuantity(id: number){
-  //   return cartItems.find(item => item.id === id)?.quantity || 0
-  // }
-  
+
   return (
     <CartContext.Provider
       value={{

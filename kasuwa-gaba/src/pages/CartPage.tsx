@@ -2,8 +2,8 @@ import CartItem from "../components/CartItem";
 import { useCart } from "../hooks/UseCart";
 import { PropsType } from "../components/CartItem";
 import Jiki from "../components/Jiki";
-import NavButtom from "../components/NavButtom";
 import { ArrowLeftIcon } from "@heroicons/react/24/solid";
+import { formatCurrency } from "../utilities/formatCurrency"
 
 
 export const CartPage = ( ) => {
@@ -30,17 +30,33 @@ export const CartPage = ( ) => {
             <div className="mt-6 h-full rounded-lg border bg-white p-6 shadow-md md:mt-6 md:w-2/3">
                 <div className="mb-2 flex justify-between">
                 <p className="text-gray-700">Subtotal</p>
-                <p className="text-gray-700">${cartItems?.total}</p>
+
+                { cartItems ? cartItems && (
+                    <p className="text-gray-700">{formatCurrency(cartItems.total)}</p>)
+
+                    : (<p className="text-gray-700">{formatCurrency(0)}</p>
+                )}
+                {/* <p className="text-gray-700">${cartItems.total}</p> */}
                 </div>
                 <div className="flex justify-between">
                 <p className="text-gray-700">Shipping</p>
-                <p className="text-gray-700">$4.99</p>
+                { cartItems ? cartItems && (
+                    <p className="text-gray-700">{formatCurrency(0)}</p>
+
+                    ): (<p className="text-gray-700">{formatCurrency(0)}</p>
+                )}
+
                 </div>
                 <hr className="my-4" />
                 <div className="flex justify-between">
                 <p className="text-lg font-bold">Total</p>
                 <div className="">
-                    <p className="mb-1 text-lg font-bold">{new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(cartItems?.total)}</p>
+                    { cartItems ? cartItems && (
+                        <p className="mb-1 text-lg font-bold">{new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(cartItems?.total)}</p>
+
+                        ): (<p className="mb-1 text-lg font-bold">{new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(0)}</p>
+
+                    )} 
                     <p className="text-sm text-gray-700">including VAT</p>
                 </div>
                 </div>
