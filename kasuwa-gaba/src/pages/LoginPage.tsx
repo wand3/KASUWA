@@ -17,16 +17,10 @@ type FormErrorType = {
 const LoginPage = () => {
   const [formErrors, setFormErrors] = useState<FormErrorType>({});
   const [loginError, setLoginError] = useState<string | null>(null);
-  // const [ user, setUser ] = useState<UserSchema | null | undefined >();
-
   const location = useLocation();
   const navigate = useNavigate();
   const flash = useFlash();
-  // const {login} = useUser();
-
-  // const updateUser = useUser();
-
-
+  // const {setUser, user, fetchUser} = useUser();
 
   const emailField = useRef<HTMLInputElement>(null);
   const passwordField = useRef<HTMLInputElement>(null);
@@ -84,13 +78,17 @@ const LoginPage = () => {
         if (data.token) {
           localStorage.setItem("token", data.token);
           console.log("Login successful:", data.token);
+          
           let next = '/';
             if (location.state && location.state.next) {
                 next = location.state.next;
             }
             flash('login success', 'success')
-            // setUser(updateUser.user);
             navigate(next);
+            // fetchUser();
+            // setUser(user);
+
+
             
         } else {
           flash('check credentials', 'danger')

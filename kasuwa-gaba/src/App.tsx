@@ -73,6 +73,7 @@ function App() {
 
 
                         <Route path='/shipping' />
+                        
 
                         <Route path="/favs" element={<FavouritesPage />} />
                         <Route path="/change_password" element={<ChangePasswordPage />} />

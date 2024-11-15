@@ -35,7 +35,7 @@ const { cartItems, removeFromCart, increaseCartQuantity, decreaseCartQuantity } 
                    {/* shipping  */}
                   <span className="">
                     <TruckIcon className="h-5 w-5 text-gray-700"/>
-                    <span className="inline-block font-thin">Update shipping<SelectShipping /></span>
+                    <span className="inline-block font-thin">Update shipping<SelectShipping id={item.product.id}  shippingId={item.shipping.id} /></span>
                     <p className="mt-1 pt-4 text-xs text-gray-700">{item.shipping?.shipping_method_name} </p>
                   </span>
                   <p className="mt-1 text-xs text-gray-700">Shipping cost {item.shipping?.shipping_price} days</p>

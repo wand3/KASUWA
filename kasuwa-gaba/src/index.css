@@ -12,21 +12,22 @@
         @apply bg-[linear-gradient( 109.6deg,  rgba(112,246,255,0.33) 11.2%, rgba(221,108,241,0.26) 42%, rgba(229,106,253,0.71) 71.5%, rgba(123,183,253,1) 100.2% )] z-10 lg:p-[10%] sm:p-[5%] m-auto backdrop-blur-[10px] border-[10px] border-blue-600 rounded-md
     } */
     .icon-hover-desktop {
-        @apply backdrop-blur-sm rounded-lg p-1 hover:bg-slate-400 bg-gray-800 text-sm hover:outline-none hover:ring-1 hover:ring-white hover:ring-offset-2 hover:ring-offset-gray-400
+        @apply backdrop-blur-sm rounded-lg p-1 hover:bg-slate-400 bg-gray-800 text-4xl hover:outline-none hover:ring-1 hover:ring-white hover:ring-offset-2 hover:ring-offset-gray-400
     }
     .icon-hover-inner-desktop {
         @apply hover:text-black focus:text-black hover:fill-black focus:fill-black 
     }
 
     .inside-dialog-text-div-heading {
-        @apply text-base/7 font-medium text-slate-800 outline-offset-1 rounded-md backdrop:blur-sm bg-slate-200/50 px-2
+        @apply  font-extrabold text-slate-800 outline-offset-1 rounded-md backdrop:blur-sm px-1
     }
     .inside-dialog-text-div-pagraph {
         @apply bg-black/40
     }
-    .background-dark {
-        @apply dark:bg-transparent
+    .select-radio-background {
+        @apply bg-white/50 dark:bg-slate-300
     }
+   
     .background-dark-hover{
         @apply bg-gradient-to-tl from-black/80 via-blue-700/10 to-black
     }

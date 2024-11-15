@@ -28,9 +28,9 @@ export type CartContextType = {
   decreaseCartQuantity: (id: number) => void;
   removeFromCart: (id: number) => Promise<void>;
   shippings?: AddShippingSchema | null;
+  updateShippingMethod: (id: number, shippingId: number) => Promise<void>;
 
   // getCartItems: () => Promise<[]>;
-  // '/cart/shipping/<int:product_id>/<int:shipping_id
 }
 
 export const CartContext = createContext({} as CartContextType);
@@ -153,9 +153,30 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
       return console.log(error)
     }
   
-  
-  
   }
+
+
+  // Function to update shipping method for a product
+  async function updateShippingMethod(id: number, shippingId: number) {
+    try {
+      const response = await api.put(`/cart/shipping/${id}/${shippingId}`);
+      const updatedShipping = response.data;
+      console.log(updatedShipping)
+      fetchCartItems()
+
+      // Update cartItems with the new shipping method for the given product
+    //   setCartItems((prevItems) =>
+    //     prevItems.map((item) =>
+    //       item.product.id === id
+    //         ? { ...item, shipping: updatedShipping }
+    //         : item
+    //     )
+    //   );
+    } catch (error) {
+      console.error("Failed to update shipping method:", error);
+      // Optionally, handle the error (e.g., show a notification)
+    }
+  };
   
   // async function getItemQuantity(id: number){
   //   return cartItems.find(item => item.id === id)?.quantity || 0
@@ -167,6 +188,7 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
         cartItems,
         cartQuantity,
         shippings,
+        updateShippingMethod,
 
         // getCartItems, 
         // getItemQuantity, 

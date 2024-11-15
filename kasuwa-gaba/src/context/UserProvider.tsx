@@ -15,6 +15,7 @@ export type UserContextType = {
   login: (email: string, password: string) => Promise<"ok" | "fail" | "error">
   logout: () => void;
   setUser: (user: UserSchema | null | undefined) => void;
+  fetchUser: () => void;
 }
 
 const UserContext = createContext<UserContextType | null>(null);
@@ -52,8 +53,24 @@ export const UserProvider = ({children}: React.PropsWithChildren<{}>) => {
     }, [api]);
 
 
+    // Fetch products function
+    const fetchUser = async () => {
+        try {
+
+            const response = await api.get<UserSchema>('/user');
+            console.log(response)
+            const data = response.body;
+            console.log(data)
+            setUser(data)
+        } catch (error) {
+            setUser(null); // Handle error state
+        }
+    };
+
+
     useEffect(() => {
       (async () => {
+        await fetchUser();
         if (api.isAuthenticated()) {
           setIsAuthenticated(true);
           console.log('authentication state updated')
@@ -104,7 +121,7 @@ export const UserProvider = ({children}: React.PropsWithChildren<{}>) => {
     // logout()
   return (
     <>
-      <UserContext.Provider value={{ user, setUser, isAuthenticated, login, logout }}>
+      <UserContext.Provider value={{ user, fetchUser, setUser, isAuthenticated, login, logout }}>
         {children}
       </UserContext.Provider>
     
