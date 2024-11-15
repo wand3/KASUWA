@@ -14,7 +14,7 @@ export const CartPage = ( ) => {
   return (
     <>
         <Jiki nav>
-            <h1 className="md:hidden py-5 text-center text-1xl font-mono ">My Cart</h1>
+            <h1 className="md:hidden py-5 text-center text-1xl font-mono">My Cart</h1>
             <a href="/"><span className="md:hidden absolute m-6 top-0 hover:text-red-600"><ArrowLeftIcon className="w-5 h-5"/></span></a>
             <div className="mx-auto max-w-5xl justify-center px-6 md:flex md:space-x-6 xl:px-0">
                 <div className="rounded-lg">

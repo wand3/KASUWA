@@ -21,7 +21,7 @@ const { cartItems, removeFromCart, increaseCartQuantity, decreaseCartQuantity } 
 //   }
   // console.log(cart.product.description)
   if (!cartItems) {
-    return <p>Cart is empty.</p>;
+    return <p className="py-5 text-center text-2xl font-mono">Cart is empty.</p>;
   }
 
   return (

@@ -10,6 +10,7 @@ import UserPage from './pages/UserPage';
 import FavouritesPage from './pages/FavouritesPage';
 import OrdersPage from './pages/OrdersPage';
 import CartPage from './pages/CartPage';
+import { ProductPage } from './pages/ProductPage';
 
 import ChangePasswordPage from './pages/ChangePassword';
 import { FlashProvider } from './context/FlashProvider';
@@ -32,9 +33,9 @@ function App() {
               
                 <Routes>
 
-                  {/* <Route path='/' element={
-                    <PublicRoute><Kasuwa /></PublicRoute>
-                  } /> */}
+                  <Route path='/product/:id' element={
+                    <PublicRoute><ProductPage /></PublicRoute>
+                  } />
                   <Route path='/About' element={ 
                     <PublicRoute><About /> </PublicRoute>
                   } />
@@ -53,8 +54,6 @@ function App() {
                       <Routes>
                         <Route path='/' element={<AdminPage />} />
                         <Route path='/shipping' />
-
-                      
                       </Routes>
                       
                     </AdminRoute> 
