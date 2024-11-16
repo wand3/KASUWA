@@ -1,5 +1,6 @@
 import { createContext, ReactElement, useEffect, useState } from "react";
 import UseApi from "../hooks/UseApi";
+import useFlash from "../hooks/UseFlash";
 
 // Define ProductType
 export type ProductType = {
@@ -18,7 +19,7 @@ export type ProductType = {
 export type UseProductsContextType = {
   products: ProductType[] | null;
   fetchproducts: () => void;
-  getProduct: (id: number) => void,
+  deleteProduct: (id: number) => void,
 
 };
 
@@ -26,7 +27,7 @@ export type UseProductsContextType = {
 const initContextState: UseProductsContextType = {
   products: null,
   fetchproducts: () => {},
-  getProduct: (id: number) => Promise<void>,
+  deleteProduct: () => Promise<void>,
 };
 
 const ProductsContext = createContext<UseProductsContextType>(initContextState);
@@ -36,9 +37,9 @@ type ChildrenType = { children?: ReactElement | ReactElement[] };
 export const ProductsProvider = ({ children }: ChildrenType): ReactElement => {
   // Correctly type the state as an array of products or null
   const [products, setProducts] = useState<ProductType[] | null>(null);
-  const [product, setProduct] = useState<ProductType | null>(null);
 
   const api = UseApi();
+  const flash = useFlash();
 
   // Fetch products function
   const fetchproducts = async () => {
@@ -63,32 +64,24 @@ export const ProductsProvider = ({ children }: ChildrenType): ReactElement => {
     fetchproducts(); // Fetch products on component mount
   }, []);
 
-  // get product
-  const getProduct = async (id: number) => {
+  // delete product
+  const deleteProduct = async (id: number): Promise<void> => {
     try {
-      const response = await api.get<ProductType>(`/product/${id}`);
-      console.log("api.get");
+      const response = await api.delete(`/product/${id}`)
+      console.log(response.body)
+      flash('Product deleted!', 'success')
+      fetchproducts()
+    } catch(error) {
+      flash('Delete failed', 'error')
 
-      const data = response.body;
-      if (response.ok){
-        setProduct(data); // Assume data is an array of products
-        console.log(product)
-      }
-      // Type assertion: assert that data is an array of ProductType
-      // if (Array.isArray(data)) {
-      //   setProduct(data as ProductType); // Type assertion
-      // } else {
-      //   throw new Error("Invalid data format");
-      // }
-    } catch (error) {
-      setProduct(null); // Handle error state
+      return console.log(error)
     }
-  
-
   }
 
+  
+
   return (
-    <ProductsContext.Provider value={{ products, fetchproducts, getProduct }}>
+    <ProductsContext.Provider value={{ products, fetchproducts, deleteProduct }}>
       {children}
     </ProductsContext.Provider>
   );
