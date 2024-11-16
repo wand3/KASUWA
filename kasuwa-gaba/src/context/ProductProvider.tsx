@@ -1,9 +1,11 @@
 import { createContext, ReactElement, useEffect, useState } from "react";
 import UseApi from "../hooks/UseApi";
 import useFlash from "../hooks/UseFlash";
+import { useParams } from "react-router-dom";
 
 // Define ProductType
 export type ProductType = {
+    category_id: number;
     map(arg0: (item: any) => import("react/jsx-runtime").JSX.Element): import("react").ReactNode;
     id: number;
     price: number;
@@ -20,8 +22,7 @@ export type UseProductsContextType = {
   products: ProductType[] | null;
   fetchproducts: () => void;
   deleteProduct: (id: number) => void,
-  editProduct: (id: number) => void
-
+  editProduct: (id: number) => void,
 };
 
 // Initialize the context with default values
@@ -30,7 +31,7 @@ const initContextState: UseProductsContextType = {
   fetchproducts: () => {},
   deleteProduct: () => Promise<void>,
   editProduct: () => Promise<void>,
-};
+  }
 
 const ProductsContext = createContext<UseProductsContextType>(initContextState);
 
@@ -39,6 +40,7 @@ type ChildrenType = { children?: ReactElement | ReactElement[] };
 export const ProductsProvider = ({ children }: ChildrenType): ReactElement => {
   // Correctly type the state as an array of products or null
   const [products, setProducts] = useState<ProductType[] | null>(null);
+
 
 
   const api = UseApi();
@@ -63,9 +65,11 @@ export const ProductsProvider = ({ children }: ChildrenType): ReactElement => {
     }
   };
 
+
   useEffect(() => {
     fetchproducts(); // Fetch products on component mount
   }, []);
+
 
   // delete product
   const deleteProduct = async (id: number): Promise<void> => {
@@ -105,10 +109,10 @@ export const ProductsProvider = ({ children }: ChildrenType): ReactElement => {
 
   return (
     <ProductsContext.Provider value={{ 
-    products, 
+    products,
     fetchproducts, 
     deleteProduct,
-    editProduct
+    editProduct,
      }}>
       {children}
     </ProductsContext.Provider>
