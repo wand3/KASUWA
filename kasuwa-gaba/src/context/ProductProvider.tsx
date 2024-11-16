@@ -20,6 +20,7 @@ export type UseProductsContextType = {
   products: ProductType[] | null;
   fetchproducts: () => void;
   deleteProduct: (id: number) => void,
+  editProduct: (id: number) => void
 
 };
 
@@ -28,6 +29,7 @@ const initContextState: UseProductsContextType = {
   products: null,
   fetchproducts: () => {},
   deleteProduct: () => Promise<void>,
+  editProduct: () => Promise<void>,
 };
 
 const ProductsContext = createContext<UseProductsContextType>(initContextState);
@@ -37,6 +39,7 @@ type ChildrenType = { children?: ReactElement | ReactElement[] };
 export const ProductsProvider = ({ children }: ChildrenType): ReactElement => {
   // Correctly type the state as an array of products or null
   const [products, setProducts] = useState<ProductType[] | null>(null);
+
 
   const api = UseApi();
   const flash = useFlash();
@@ -78,10 +81,35 @@ export const ProductsProvider = ({ children }: ChildrenType): ReactElement => {
     }
   }
 
+  // edit product 
+  async function editProduct(id: number): Promise<void> {
+    console.log('edit product start')
+    try {
+      const response = await api.put(`/product/${id}`, {
+      });
+      console.log(`Success respinse ${response.body}`)
+      if (!response.ok) {
+        flash('Update failed', 'error')
+      
+      }
+      
+      flash('Product Updated!', 'success')
+      fetchproducts()
+    } catch(error) {
+      return console.log(error)
+    }
   
+  }
+
+
 
   return (
-    <ProductsContext.Provider value={{ products, fetchproducts, deleteProduct }}>
+    <ProductsContext.Provider value={{ 
+    products, 
+    fetchproducts, 
+    deleteProduct,
+    editProduct
+     }}>
       {children}
     </ProductsContext.Provider>
   );

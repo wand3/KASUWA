@@ -3,9 +3,15 @@ import useProducts from "../../hooks/UseProducts";
 import Config from "../../config";
 import { formatCurrency } from "../../utilities/formatCurrency";
 import { TrashIcon } from "@heroicons/react/24/solid";
+import { useNavigate } from "react-router-dom";
 
 export const AllProducts = () => {
   const {products, deleteProduct} = useProducts();
+  const navigate = useNavigate();
+
+  const edit = (id: number) => {
+    return navigate(`/admin/edit/${id}`);
+  };
 
   return (
     <>
@@ -135,7 +141,7 @@ export const AllProducts = () => {
                             <td className="p-4 border-b border-slate-200">
                                 <button
                                 className="relative h-10 max-h-[40px] w-10 max-w-[40px] select-none rounded-lg text-center align-middle font-sans text-xs font-medium uppercase text-slate-900 transition-all hover:bg-slate-900/10 active:bg-slate-900/20 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-                                type="button">
+                                type="button" onClick={() => {edit(product.id)}}>
                                 <span className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"
                                     className="w-4 h-4">

@@ -21,6 +21,8 @@ import AdminRoute from './components/AdminRoute';
 import PublicRoute from './components/PrivateRoute';
 import PrivateRoute from './components/PrivateRoute';
 import AdminPage from './pages/AdminPage';
+import AdminEditProductPage from './pages/AdminEditProductPage';
+
 
 function App() {
   return (
@@ -49,16 +51,20 @@ function App() {
                     <PublicRoute><RegisterPage /></PublicRoute>
                   } />
 
-                  <Route path="/admin" element={
+
+                  <Route path="/admin/*" element={
                     <AdminRoute>
                       <Routes>
                         <Route path='/' element={<AdminPage />} />
-                        <Route path='/shipping' />
+                        <Route path='/shipping' />                      
+                        <Route path='/edit/:id' element={<AdminEditProductPage />} />
+                        {/* <Route path='/edit/:id' element={<EditProductPage />} /> */}
+
+
                       </Routes>
-                      
                     </AdminRoute> 
                   }/>
-                  
+          
                   <Route path="*" element={
                     <PrivateRoute>
                       <Routes>
