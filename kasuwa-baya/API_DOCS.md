@@ -1,6 +1,6 @@
 password reset
 coupon system
-search/filters
+filter
 email notification
 product spec
 
