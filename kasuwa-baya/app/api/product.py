@@ -6,10 +6,29 @@ from app.models.product import Product, ProductImage, Cart, Review, ReviewImage,
 from app.api.errors import bad_request, not_found, unauthorized, forbidden
 from app.api import bp
 from werkzeug.utils import secure_filename
+from sqlalchemy import or_
 import logging
 
 # Configure logging to display messages to the terminal
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[logging.StreamHandler()])
+
+@bp.route('/search', methods=["POST"])
+def search():
+    data = request.json
+    search_input = data.get('query')
+
+    if not search_input:
+        return bad_request("No search query provided")
+
+    products = db.session.query(Product).filter(
+        or_(Product.product_name.ilike(f"%{search_input}%"),
+            Product.description.ilike(f"%{search_input}%"))
+    ).all()
+
+    if not products:
+        return not_found('Product not found')
+
+    return jsonify([product.to_summary_dict() for product in products]), 200
 
 @bp.route('/products', methods=['GET'])
 def get_products():
