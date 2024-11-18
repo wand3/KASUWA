@@ -1,7 +1,9 @@
+import datetime
+from re import Match
 from app import db
 from .base_model import BaseModel
-from typing import Optional, List
-from sqlalchemy import Column, Integer, String, Table, Boolean, ForeignKey, Float
+from typing import Optional, List, Dict
+from sqlalchemy import Column, Integer, String, Table, Boolean, ForeignKey, Float, Enum, DateTime, JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 class Product(BaseModel):
@@ -13,6 +15,7 @@ class Product(BaseModel):
     quantity: Mapped[Optional[int]] = mapped_column(Integer)
     sold: Mapped[int] = mapped_column(Integer, default=0)
     product_image: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    specifications: Mapped[Dict[str, str]] = mapped_column(JSON)
     category: Mapped['Category'] = relationship("Category", back_populates="products")
     product_images: Mapped[List['ProductImage']] = relationship("ProductImage", back_populates="product", cascade="all, delete-orphan")
     reviews: Mapped[List['Review']]= relationship("Review", back_populates="product", cascade="all, delete-orphan")
@@ -30,7 +33,8 @@ class Product(BaseModel):
             'updated_at': self.updated_at,
             'product_image': self.product_image,
             'product_images': [image.image_path for image in self.product_images],
-            'reviews': [review.to_dict() for review in self.reviews]
+            'reviews': [review.to_dict() for review in self.reviews],
+            'specifications': self.specifications
         }
 
     def to_summary_dict(self):
@@ -67,8 +71,10 @@ class Cart(BaseModel):
     product: Mapped['Product'] = relationship("Product")
     user: Mapped['User'] = relationship("User", back_populates="cart")
     shipping: Mapped['ShippingMethod'] = relationship("ShippingMethod")
+    coupon_code = Column(String(50), ForeignKey('coupons.code'), nullable=True)
+    coupon = relationship("Coupon", backref="carts")
 
-    
+
     def to_dict(self):
         return {
             'id': self.id,
@@ -76,7 +82,7 @@ class Cart(BaseModel):
                 'id': self.product.id,
                 'product_name': self.product.product_name,
                 'price': self.product.price,
-                'product_image':self.product.product_image
+                'product_image': self.product.product_image
             },
             'quantity': self.quantity,
             'shipping': {
@@ -86,15 +92,39 @@ class Cart(BaseModel):
             }
         }
 
+
     def from_dict(self, data):
         for field in ['product_id', 'quantity', 'shipping_id', 'user_id']:
             if field in data:
                 setattr(self, field, data[field])
 
+
     def total_price(self):
         product_price = self.quantity * self.product.price if self.product and self.product.price is not None else 0
         shipping_price = self.shipping.shipping_price if self.shipping else 0
-        return product_price + shipping_price
+        subtotal = product_price + shipping_price
+
+        if self.coupon and self.coupon.is_valid():
+            # Apply the coupon discount to the product total price
+            subtotal = self.coupon.apply_discount(subtotal)
+
+            if self.coupon.discount_type == 'free':
+                # Set shipping price to 0 if the coupon is for free shipping
+                shipping_price = 0
+
+        return subtotal + shipping_price
+
+    def apply_coupon(self, coupon_code):
+        coupon = db.session.query(Coupon).filter_by(code=coupon_code).first()
+        if coupon and coupon.is_valid():
+            self.coupon_code = coupon_code
+            db.session.commit()
+            return True, f"Coupon {coupon_code} applied successfully!"
+        return False, "Invalid or expired coupon."
+
+    def remove_coupon(self):
+        self.coupon_code = None
+        db.session.commit()
 
     def __repr__(self):
         return f"<Cart(id={self.id}, user_id={self.user_id}, quantity={self.quantity})>"
@@ -158,3 +188,25 @@ class ShippingMethod(BaseModel):
 
     def __repr__(self):
         return f"ShippingMethod(id={self.id}, shipping_method_name='{self.shipping_method_name}', shipping_price={self.shipping_price}, delivery_time='{self.delivery_time}')"
+
+class Coupon(BaseModel):
+    __tablename__ = 'coupons'
+
+    code: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+    discount_type: Mapped[str] = mapped_column(Enum('percentage', 'fixed', 'free', name='discount_type'), nullable=False)
+    discount_value: Mapped[int] = mapped_column(Integer, nullable=False)
+    end_date: Mapped[datetime] = mapped_column(DateTime)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    min_order_value: Mapped[int] = mapped_column(Integer, default=0)
+
+    def is_valid(self):
+        return self.is_active and (self.end_date >= datetime.utcnow())
+
+    def apply_discount(self, total_price, shipping_price=0):
+        if self.discount_type == 'percentage':
+            return total_price * (1 - self.discount_value / 100)
+        elif self.discount_type == 'fixed':
+            return max(0, total_price - self.discount_value)
+        elif self.discount_type == 'free':
+            return total_price
+        return total_price

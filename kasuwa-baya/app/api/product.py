@@ -2,11 +2,12 @@ from flask import request, jsonify, current_app, abort
 from app import db
 import os
 from app.api.auth import token_auth
-from app.models.product import Product, ProductImage, Cart, Review, ReviewImage, ShippingMethod
+from app.models.product import Product, ProductImage, Cart, Review, ReviewImage, ShippingMethod, Coupon
 from app.api.errors import bad_request, not_found, unauthorized, forbidden
 from app.api import bp
 from werkzeug.utils import secure_filename
 from sqlalchemy import or_
+import json
 import logging
 
 # Configure logging to display messages to the terminal
@@ -142,6 +143,31 @@ def change_shipping(product_id, shipping_id):
 
     return jsonify({'message': 'Shipping method updated successfully.'}), 200
 
+
+@bp.route('/cart/apply_coupon', methods=["POST"])
+@token_auth.login_required
+def apply_coupon():
+    data = request.json
+    coupon_code = data.get('coupon_code')
+    user_id = token_auth.current_user().id
+
+    cart = Cart.query.filter_by(user_id=user_id).first()
+
+    if not coupon_code:
+        return bad_request("Coupon code is required")
+
+    coupon = Coupon.query.filter_by(code=coupon_code).first()
+
+    if not coupon or not coupon.is_valid():
+        return bad_request("Invalid or expired coupon")
+
+    success, message = cart.apply_coupon(coupon_code)
+    if not success:
+        return bad_request(message)
+
+    return jsonify({"message": message, "total_price": cart.total_price()}), 200
+
+
 @bp.route('/shipping', methods=['GET'])
 def get_shipping():
     shipping_methods = ShippingMethod.query.all()
@@ -153,20 +179,23 @@ def get_shipping():
 def create_product():
     data = request.form
 
-    new_product = Product(
-        product_name=data['product_name'],
-        description=data['description'],
-        price=data['price'],
-        category_id=data['category_id'],
-        quantity=data['quantity']
-    )
-
-    product_images = request.files.getlist('photos')
-    image_paths = []
-
-    db.session.add(new_product)
-
     try:
+        # Parse specifications from the form data
+        specifications = json.loads(data.get('specifications', '{}'))  # Expecting a JSON string in the form data
+
+        new_product = Product(
+            product_name=data['product_name'],
+            description=data['description'],
+            price=float(data['price']),
+            category_id=int(data['category_id']),
+            quantity=int(data['quantity']),
+            specifications=specifications  # Add specifications
+        )
+
+        product_images = request.files.getlist('photos')
+        image_paths = []
+
+        db.session.add(new_product)
         db.session.commit()
 
         product_id = new_product.id
