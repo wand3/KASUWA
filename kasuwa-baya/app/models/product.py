@@ -15,6 +15,7 @@ class Product(BaseModel):
     quantity: Mapped[Optional[int]] = mapped_column(Integer)
     sold: Mapped[int] = mapped_column(Integer, default=0)
     product_image: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
+    colors: Mapped[List[str]] = mapped_column(JSON, default=[])
     specifications: Mapped[Dict[str, str]] = mapped_column(JSON)
     category: Mapped['Category'] = relationship("Category", back_populates="products")
     product_images: Mapped[List['ProductImage']] = relationship("ProductImage", back_populates="product", cascade="all, delete-orphan")
@@ -34,7 +35,8 @@ class Product(BaseModel):
             'product_image': self.product_image,
             'product_images': [image.image_path for image in self.product_images],
             'reviews': [review.to_dict() for review in self.reviews],
-            'specifications': self.specifications
+            'specifications': self.specifications,
+            'colors': self.colors
         }
 
     def to_summary_dict(self):

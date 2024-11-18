@@ -181,7 +181,8 @@ def create_product():
 
     try:
         # Parse specifications from the form data
-        specifications = json.loads(data.get('specifications', '{}'))  # Expecting a JSON string in the form data
+        specifications = json.loads(data.get('specifications', '{}'))
+        colors = json.loads(data.get('colors', '[]'))
 
         new_product = Product(
             product_name=data['product_name'],
@@ -189,7 +190,8 @@ def create_product():
             price=float(data['price']),
             category_id=int(data['category_id']),
             quantity=int(data['quantity']),
-            specifications=specifications  # Add specifications
+            specifications=specifications,
+            colors=colors  # Add colors
         )
 
         product_images = request.files.getlist('photos')

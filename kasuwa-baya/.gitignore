@@ -1,6 +1,4 @@
 .env
 venv
-app.db
-static/images
 __pycache__
 .DS_Store
