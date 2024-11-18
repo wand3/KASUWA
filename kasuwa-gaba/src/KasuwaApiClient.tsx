@@ -14,7 +14,6 @@ type Options<TREQ> = {
 }
   
 type Response<TRES> = {
-  data: any;
   ok: boolean;
   status: number;
   body: TRES | null;

@@ -3,8 +3,9 @@ import React from "react";
 import AddShipping from "../components/Admin/AddShipping";
 import useProducts from "../hooks/UseProducts";
 import AllProducts from "../components/Admin/AdminProducts";
-import AllShipping from "../components/Admin/Shippings";
+// import AllShipping from "../components/Admin/Shippings";
 import { ProductsProvider } from "../context/ProductProvider";
+import AllShippings from "../components/Admin/AdminShippings";
 
 
 export const AdminPage = () => {
@@ -17,7 +18,8 @@ export const AdminPage = () => {
           <AddShipping />
 
           <AllProducts />
-          <AddShipping />
+          {/* <AddShipping /> */}
+          <AllShippings />
 
 
         </Jiki>

@@ -4,6 +4,8 @@ import Config from "../../config";
 import useFlash from "../../hooks/UseFlash";
 import UseApi from "../../hooks/UseApi";
 import InputField from "../Auth/FormInput";
+import { ImageUpload } from "../Auth/ImageUploads";
+
 
 const baseUrl = Config.baseURL;
 

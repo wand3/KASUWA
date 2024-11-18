@@ -8,7 +8,7 @@ import Config from "../../config";
 
 
 const baseUrl = Config.baseURL;
-type FormErrorType = {
+export type FormErrorType = {
   product_name?: string;
   description?: string;
   price?: string;
