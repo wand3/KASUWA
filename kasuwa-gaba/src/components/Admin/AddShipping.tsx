@@ -4,8 +4,7 @@ import Config from "../../config";
 import useFlash from "../../hooks/UseFlash";
 import UseApi from "../../hooks/UseApi";
 import InputField from "../Auth/FormInput";
-import { ImageUpload } from "../Auth/ImageUploads";
-
+import Jiki from "../Jiki";
 
 const baseUrl = Config.baseURL;
 
@@ -115,70 +114,70 @@ export const AddShipping = ({}: AddShippingSchema) => {
 
   return (
     <>
-      <Button
-        onClick={open}
-        className="rounded-md ml-auto mr-3 bg-black/20 py-2 px-4 text-sm font-medium text-white focus:outline-none data-[hover]:bg-black/30 data-[focus]:outline-1 data-[focus]:outline-white"
-      >
-        Create Shipping
-      </Button>
+        <Button
+          onClick={open}
+          className="rounded-md ml-auto mr-3 bg-black/20 py-2 px-4 text-sm font-medium text-slate-800 focus:outline-none data-[hover]:bg-black/30 data-[focus]:outline-1 data-[focus]:outline-white"
+        >
+          Create Shipping
+        </Button>
 
-      <Dialog open={isOpen} as="div" className="relative z-10 focus:outline-none" onClose={close}>
-        <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center p-4">
-            <DialogPanel
-                transition
-                className="w-full max-w-md rounded-xl bg-white/5 p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0">
-                <DialogTitle as="h2" className="text-base/10 font-medium text-white justify-center">
-                    Add Shipping Methods
-                </DialogTitle>
+        <Dialog open={isOpen} as="div" className="relative z-10 focus:outline-none" onClose={close}>
+          <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+              <div className="flex min-h-full items-center justify-center p-4 backdrop-blur-xl">
+              <DialogPanel
+                  transition
+                  className="w-full max-w-md rounded-xl bg-[#F7F7F7] p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0">
+                  <DialogTitle as="h2" className="text-base/10 pb-4 font-medium text-slate-800 justify-center">
+                      Add Shipping Methods
+                  </DialogTitle>
+                  
+                  <form onSubmit={handleSubmit} className="text-slate-800">
+                  
+                  {/* <Field> */}
+                      <InputField
+                      name="shipping_method_name"
+                      label="Shipping name"
+                      type="name"
+                      placeholder="Enter Shipping method name"
+                      error={formErrors.shipping_method_name}
+                      Fieldref={shippingNameField} />
+
+
+                      <InputField
+                      name="shipping_price"
+                      label="Shipping price"
+                      type="decimal"
+                      placeholder="1 2 3 4 .."
+                      error={formErrors.shipping_price?.toString()}
+                      Fieldref={priceField} />
+
+                      
+                      <InputField
+                      name="delivery_time"
+                      label="Delivery Time"
+                      type="number"
+                      placeholder="number of day(s) before arrival"
+                      error={formErrors.delivery_time}
+                      Fieldref={deliveryTimeField} />
+
+
+                      
+                      <Button
+                          className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"
+                          type="submit"
+                      >
+                          Submit
+                      </Button>
                 
-                <form onSubmit={handleSubmit}>
-                
-                {/* <Field> */}
-                    <InputField
-                    name="shipping_method_name"
-                    label="Shipping name"
-                    type="name"
-                    placeholder="Enter Product name"
-                    error={formErrors.shipping_method_name}
-                    Fieldref={shippingNameField} />
-
-
-                    <InputField
-                    name="shipping_price"
-                    label="Shipping price"
-                    type="decimal"
-                    placeholder="1 2 3 4 .."
-                    error={formErrors.shipping_price?.toString()}
-                    Fieldref={priceField} />
-
-                    
-                    <InputField
-                    name="delivery_time"
-                    label="Delivery Time"
-                    type="number"
-                    placeholder="number of day(s) before arrival"
-                    error={formErrors.delivery_time}
-                    Fieldref={deliveryTimeField} />
-
-
-                    
-                    <Button
-                        className="inline-flex items-center gap-2 rounded-md bg-gray-700 py-1.5 px-5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"
-                        type="submit"
-                    >
-                        Submit
-                    </Button>
+                  </form>
+                  
+                  </DialogPanel>
               
-                </form>
-                
-                </DialogPanel>
-            
-            </div>
-        </div>
+              </div>
+          </div>
 
-        
-      </Dialog>
+          
+        </Dialog>
     </>
   )
 }

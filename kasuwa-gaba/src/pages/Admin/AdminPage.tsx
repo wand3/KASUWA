@@ -6,6 +6,7 @@ import AllProducts from "../../components/Admin/AdminProducts";
 // import AllShipping from "../components/Admin/Shippings";
 import { ProductsProvider } from "../../context/ProductProvider";
 import AllShippings from "../../components/Admin/AdminShippings";
+import AllCategories from "../../components/Admin/AdminCategories";
 
 
 export const AdminPage = () => {
@@ -20,6 +21,8 @@ export const AdminPage = () => {
           <AllProducts />
           {/* <AddShipping /> */}
           <AllShippings />
+
+          <AllCategories />
 
 
         </Jiki>
