@@ -1,16 +1,16 @@
-import useFlash from "../hooks/UseFlash";
-import UseApi from "../hooks/UseApi";
-import InputField from "../components/Auth/FormInput";
+import useFlash from "../../hooks/UseFlash";
+import UseApi from "../../hooks/UseApi";
+import InputField from "../../components/Auth/FormInput";
 import React, { useRef, useState, useEffect } from "react";
 import { Button, Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
-import { ImageUpload } from "../components/Auth/ImageUploads";
-import Config from "../config";
-import Jiki from "../components/Jiki";
+import { ImageUpload } from "../../components/Auth/ImageUploads";
+import Config from "../../config";
+import Jiki from "../../components/Jiki";
 import { useParams } from "react-router-dom";
-import useProducts from "../hooks/UseProducts";
-import { ProductType } from "../context/ProductProvider";
-import { FormErrorType } from "../components/Admin/AddProduct";
-import ProductImageSelector from "../components/Admin/UpdateDefaultImage";
+// import useProducts from "../../hooks/UseProducts";
+import { ProductType } from "../../context/ProductProvider";
+import { FormErrorType } from "../../components/Admin/AddProduct";
+// import ProductImageSelector from "../components/Admin/UpdateDefaultImage";
 
 
 export const AdminEditProductPage = () => {

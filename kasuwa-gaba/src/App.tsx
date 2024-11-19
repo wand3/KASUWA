@@ -20,8 +20,9 @@ import CartProvider from './context/CartProvider';
 import AdminRoute from './components/AdminRoute';
 import PublicRoute from './components/PrivateRoute';
 import PrivateRoute from './components/PrivateRoute';
-import AdminPage from './pages/AdminPage';
-import AdminEditProductPage from './pages/AdminEditProductPage';
+import AdminPage from './pages/Admin/AdminPage';
+import AdminEditProductPage from './pages/Admin/AdminEditProductPage';
+import AdminEditShippingPage from './pages/Admin/AdminEditShippingPage';
 
 
 function App() {
@@ -56,7 +57,8 @@ function App() {
                     <AdminRoute>
                       <Routes>
                         <Route path='/' element={<AdminPage />} />
-                        <Route path='/shipping' />                      
+                        <Route path='/shipping' /> 
+                        <Route path='/shipping/:id' element={<AdminEditShippingPage />} />       
                         <Route path='/edit/:id' element={<AdminEditProductPage />} />
                         {/* <Route path='/edit/:id' element={<EditProductPage />} /> */}
 

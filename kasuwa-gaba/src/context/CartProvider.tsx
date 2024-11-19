@@ -29,6 +29,7 @@ export type CartContextType = {
   removeFromCart: (id: number) => Promise<void>;
   shippings?: AddShippingSchema | null;
   updateShippingMethod: (id: number, shippingId: number) => Promise<void>;
+  getShipping: () => {};
 
   // getCartItems: () => Promise<[]>;
 }
@@ -156,6 +157,7 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
         cartQuantity,
         shippings,
         updateShippingMethod,
+        getShipping,
 
         // getCartItems, 
         // getItemQuantity, 
