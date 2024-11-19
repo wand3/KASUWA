@@ -5,7 +5,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { Button, Dialog, DialogPanel, DialogTitle } from '@headlessui/react'
 import Config from "../../config";
 import Jiki from "../../components/Jiki";
-import { Link, Navigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { AddShippingSchema, FormShippingErrorType } from "../../components/Admin/AddShipping";
 import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 import AdminPage from "./AdminPage";
@@ -22,12 +22,12 @@ export const AdminEditShippingPage = () => {
   
   const flash = useFlash();
   const api = UseApi();
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
 
   // back button 
   const goBack = () => {
-    return <Navigate to={'/'}/>
+    return navigate(-1);
   }
 
 

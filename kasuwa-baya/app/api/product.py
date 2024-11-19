@@ -256,7 +256,7 @@ def edit_product(product_id):
     if product is None:
         return not_found("Product not found")
 
-    data = request.get_json()
+    data = request.form
     if 'product_name' not in data or not data['product_name']:
         return bad_request("Product name is required")
     if 'description' not in data or not data['description']:
@@ -276,14 +276,20 @@ def edit_product(product_id):
         product.product_image = data['product_image']
 
     try:
-        db.session.commit()
 
         product_id = product.id
+        product_images = request.files.getlist('photos')
+        image_paths = []
 
-        product_images = request.files.getlist('product_images')
-        for image in product_images:
+
+        for index, image in enumerate(product_images):
             name = secure_filename(image.filename)
             image.save(os.path.join(current_app.config['PRODUCT_IMAGES_UPLOAD_PATH'], name))
+            image_paths.append(name)
+
+            if index == 0:
+                product.product_image = name
+
             new_image = ProductImage(
                 product_id=product_id,
                 image_path=name
@@ -291,10 +297,11 @@ def edit_product(product_id):
             db.session.add(new_image)
 
         db.session.commit()
+        
         return product.to_dict()
     except Exception as e:
         db.session.rollback()
-        return bad_request("Failed to update product")
+        return bad_request(f"Failed to update product {e}")
 
 @bp.route('/product/<int:product_id>', methods=['DELETE'])
 @token_auth.login_required(role=1)
@@ -323,11 +330,21 @@ def add_shipping():
     return jsonify({'message': 'Shipping Method Added Successfully'}), 201
 
 
+@bp.route('/admin/shipping/<int:shipping_id>', methods=['GET'])
+@token_auth.login_required(role=1)
+def get_shipping_id(shipping_id):
+    shipping_method = ShippingMethod.query.get(shipping_id)
+    
+    return jsonify(shipping_method.to_dict()), 200
+
+
 @bp.route('/admin/shipping/<int:shipping_id>', methods=['PUT'])
 @token_auth.login_required(role=1)
 def edit_shipping(shipping_id):
+        
     data = request.json
     shipping_method = ShippingMethod.query.get(shipping_id)
+   
     if not shipping_method:
         return not_found("Shipping method not found")
 
@@ -340,7 +357,7 @@ def edit_shipping(shipping_id):
 
     db.session.commit()
 
-    return jsonify({'message': 'Shipping method updated successfully.', 'shipping_method': shipping_method.to_dict()}), 200
+    return jsonify({'message': 'Shipping method updated successfully.', 'shipping_method': shipping_method.to_dict()}), 201
 
 
 @bp.route('/admin/shipping/<int:shipping_id>', methods=['DELETE'])
