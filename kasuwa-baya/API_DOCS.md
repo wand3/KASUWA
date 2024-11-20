@@ -1,9 +1,5 @@
 password reset
-coupon system
-filter
 email notification
-spec now key:value
-
 
 # API Documentation
 
