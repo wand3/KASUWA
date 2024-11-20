@@ -102,32 +102,29 @@ class Cart(BaseModel):
 
 
     def total_price(self):
-        product_price = self.quantity * self.product.price if self.product and self.product.price is not None else 0
-        shipping_price = self.shipping.shipping_price if self.shipping else 0
-        subtotal = product_price + shipping_price
+        product_price = self.quantity * self.product.price
+        shipping_price = self.shipping.shipping_price * self.quantity
+        return product_price + shipping_price
 
-        if self.coupon and self.coupon.is_valid():
-            subtotal = self.coupon.apply_discount(subtotal)
+    def products_price(self):
+        product_price = self.quantity * self.product.price
+        return product_price
 
-            if self.coupon.discount_type == 'free':
-                shipping_price = 0
-
-        return subtotal + shipping_price
+    def ship_cost(self):
+        shipping_price = self.shipping.shipping_price * self.quantity
+        return shipping_price
 
     def apply_coupon(self, coupon_code):
         coupon = db.session.query(Coupon).filter_by(code=coupon_code).first()
         if not coupon or not coupon.is_valid():
             return False, "Invalid or expired coupon."
-        if self.total_price() < coupon.min_order_value:
-            return False, f"This coupon requires a minimum order value of {coupon.min_order_value}."
+
+        if self.products_price() < coupon.min_order_value:
+            return False, f"Coupon requires a minimum order value of {coupon.min_order_value}."
 
         self.coupon_code = coupon_code
         db.session.commit()
         return True, f"Coupon {coupon_code} applied successfully!"
-
-    def remove_coupon(self):
-        self.coupon_code = None
-        db.session.commit()
 
     def __repr__(self):
         return f"<Cart(id={self.id}, user_id={self.user_id}, quantity={self.quantity})>"
@@ -223,12 +220,3 @@ class Coupon(BaseModel):
 
     def is_valid(self):
         return self.is_active and (self.end_date >= datetime.utcnow())
-
-    def apply_discount(self, total_price, shipping_price=0):
-        if self.discount_type == 'percentage':
-            return total_price * (1 - self.discount_value / 100)
-        elif self.discount_type == 'fixed':
-            return max(0, total_price - self.discount_value)
-        elif self.discount_type == 'free':
-            return total_price
-        return total_price

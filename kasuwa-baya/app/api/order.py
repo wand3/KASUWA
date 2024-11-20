@@ -9,6 +9,7 @@ from app.api import bp
 from app.api.errors import bad_request, not_found, unauthorized, forbidden
 from werkzeug.utils import secure_filename
 import uuid
+from app.utils.cart_utils import apply_coupon_to_cart
 import logging
 
 # Configure logging to display messages to the terminal
@@ -63,26 +64,48 @@ def create_order():
         unique_reference = str(uuid.uuid4())
         unique_transaction_id = str(uuid.uuid4())
 
-        order = Order(user_id=user_id, address_id=address_id, transaction_id=unique_transaction_id, reference=unique_reference)
         cart_items = Cart.query.filter_by(user_id=user_id).all()
-
         if not cart_items:
             return bad_request("Cart is empty")
+
+        # Check if any coupon is applied
+        coupon_code = cart_items[0].coupon_code if cart_items else None
+        if coupon_code:
+            success, message, discounted_price, updated_shipping = apply_coupon_to_cart(cart_items, coupon_code)
+            if not success:
+                return bad_request(message)
+        else:
+            discounted_price = sum(item.products_price() for item in cart_items)
+            updated_shipping = sum(item.ship_cost() for item in cart_items)
+
+        # Create the order
+        order = Order(
+            user_id=user_id,
+            address_id=address_id,
+            transaction_id=unique_transaction_id,
+            reference=unique_reference,
+            amount=discounted_price,  # Total is correctly calculated here
+            coupon_code=coupon_code,
+        )
 
         for item in cart_items:
             order.items.append(OrderItem(product_id=item.product_id, quantity=item.quantity))
 
-        order.amount = sum(item.quantity * item.product.price for item in cart_items)
         db.session.add(order)
         db.session.commit()
 
+        # Initialize payment
         secret_key = os.getenv('PAYMENT_KEY')
         if not secret_key:
             raise ValueError("Payment key is not set.")
 
         url = 'https://api.paystack.co/transaction/initialize'
         headers = {'Authorization': f'Bearer {secret_key}'}
-        payload = {'email': user_email, 'amount': int(order.amount * 100), 'callback_url': 'http://127.0.0.1:5000/api/payment-success'}
+        payload = {
+            'email': user_email,
+            'amount': int(order.amount * 100),
+            'callback_url': 'http://127.0.0.1:5000/api/payment-success'
+        }
         response = requests.post(url, headers=headers, json=payload)
         response.raise_for_status()
 
@@ -91,6 +114,7 @@ def create_order():
         order.reference = data['data']['reference']
         db.session.commit()
 
+        # Clear the cart
         for item in cart_items:
             db.session.delete(item)
         db.session.commit()
@@ -103,6 +127,140 @@ def create_order():
     except Exception as e:
         db.session.rollback()
         return bad_request(str(e))
+
+# @bp.route('/checkout', methods=['POST'])
+# @token_auth.login_required
+# def create_order():
+#     user = token_auth.current_user()
+#     user_id = user.id
+#     user_email = user.email
+
+#     try:
+#         address_id = request.json.get('address')
+#         if not address_id:
+#             return bad_request("Address is required")
+
+#         unique_reference = str(uuid.uuid4())
+#         unique_transaction_id = str(uuid.uuid4())
+
+#         cart_items = Cart.query.filter_by(user_id=user_id).all()
+#         if not cart_items:
+#             return bad_request("Cart is empty")
+
+#         # Check if any coupon is applied
+#         coupon_code = cart_items[0].coupon_code if cart_items else None
+#         if coupon_code:
+#             success, message, discounted_price, updated_shipping = apply_coupon_to_cart(cart_items, coupon_code)
+#             if not success:
+#                 return bad_request(message)
+#         else:
+#             discounted_price = sum(item.products_price() for item in cart_items)
+#             updated_shipping = sum(item.ship_cost() for item in cart_items)
+
+#         # Create the order
+#         order = Order(
+#             user_id=user_id,
+#             address_id=address_id,
+#             transaction_id=unique_transaction_id,
+#             reference=unique_reference,
+#             amount=discounted_price + updated_shipping,
+#             coupon_code=coupon_code,
+#         )
+
+#         for item in cart_items:
+#             order.items.append(OrderItem(product_id=item.product_id, quantity=item.quantity))
+
+#         db.session.add(order)
+#         db.session.commit()
+
+#         # Initialize payment
+#         secret_key = os.getenv('PAYMENT_KEY')
+#         if not secret_key:
+#             raise ValueError("Payment key is not set.")
+
+#         url = 'https://api.paystack.co/transaction/initialize'
+#         headers = {'Authorization': f'Bearer {secret_key}'}
+#         payload = {
+#             'email': user_email,
+#             'amount': int(order.amount * 100),
+#             'callback_url': 'http://127.0.0.1:5000/api/payment-success'
+#         }
+#         response = requests.post(url, headers=headers, json=payload)
+#         response.raise_for_status()
+
+#         data = response.json()
+#         access_code = data['data']['access_code']
+#         order.reference = data['data']['reference']
+#         db.session.commit()
+
+#         # Clear the cart
+#         for item in cart_items:
+#             db.session.delete(item)
+#         db.session.commit()
+
+#         return jsonify({'order_id': order.id, 'total_cost': order.amount, 'access_code': access_code})
+
+#     except requests.exceptions.RequestException as e:
+#         db.session.rollback()
+#         return bad_request(f"Failed to initialize transaction: {str(e)}")
+#     except Exception as e:
+#         db.session.rollback()
+#         return bad_request(str(e))
+# @bp.route('/checkout', methods=['POST'])
+# @token_auth.login_required
+# def create_order():
+#     user = token_auth.current_user()
+#     user_id = user.id
+#     user_email = user.email
+
+#     try:
+#         address_id = request.json.get('address')
+#         if not address_id:
+#             return bad_request("Address is required")
+
+#         unique_reference = str(uuid.uuid4())
+#         unique_transaction_id = str(uuid.uuid4())
+
+#         order = Order(user_id=user_id, address_id=address_id, transaction_id=unique_transaction_id, reference=unique_reference)
+#         cart_items = Cart.query.filter_by(user_id=user_id).all()
+
+#         if not cart_items:
+#             return bad_request("Cart is empty")
+
+#         for item in cart_items:
+#             order.items.append(OrderItem(product_id=item.product_id, quantity=item.quantity))
+
+#         order.amount = sum(item.quantity * item.product.price for item in cart_items)
+#         db.session.add(order)
+#         db.session.commit()
+
+#         secret_key = os.getenv('PAYMENT_KEY')
+#         if not secret_key:
+#             raise ValueError("Payment key is not set.")
+
+#         url = 'https://api.paystack.co/transaction/initialize'
+#         headers = {'Authorization': f'Bearer {secret_key}'}
+#         payload = {'email': user_email, 'amount': int(order.amount * 100), 'callback_url': 'http://127.0.0.1:5000/api/payment-success'}
+#         response = requests.post(url, headers=headers, json=payload)
+#         response.raise_for_status()
+
+#         data = response.json()
+#         access_code = data['data']['access_code']
+#         order.reference = data['data']['reference']
+#         db.session.commit()
+
+#         for item in cart_items:
+#             db.session.delete(item)
+#         db.session.commit()
+
+#         return jsonify({'order_id': order.id, 'total_cost': order.amount, 'access_code': access_code})
+
+#     except requests.exceptions.RequestException as e:
+#         db.session.rollback()
+#         return bad_request(f"Failed to initialize transaction: {str(e)}")
+#     except Exception as e:
+#         db.session.rollback()
+#         return bad_request(str(e))
 
 @bp.route('/payment-success', methods=['GET'])
 def payment_success():

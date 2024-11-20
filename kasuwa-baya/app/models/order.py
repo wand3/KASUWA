@@ -23,6 +23,7 @@ class Order(BaseModel):
     address: Mapped['UserAddress'] = relationship("UserAddress")
     status: Mapped[str] = mapped_column(String(20), default="Pending")
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'))
+    coupon_code: Mapped[str] = mapped_column(String(50), nullable=True)
     user: Mapped['User'] = relationship("User", back_populates="orders")
     reference: Mapped[str] = mapped_column(String(64), unique=True)
     items: Mapped[List['OrderItem']] = relationship("OrderItem", back_populates="order")

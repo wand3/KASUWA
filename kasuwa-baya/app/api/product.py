@@ -8,6 +8,7 @@ from app.api import bp
 from werkzeug.utils import secure_filename
 from sqlalchemy import or_
 import json
+from app.utils.cart_utils import apply_coupon_to_cart
 import logging
 
 # Configure logging to display messages to the terminal
@@ -90,6 +91,7 @@ def add_to_cart():
 
     return jsonify({"message": "Product added to cart successfully", "cart": cart_item.to_dict()}), 201
 
+
 @bp.route('/cart', methods=['GET'])
 @token_auth.login_required
 def get_cart():
@@ -103,7 +105,7 @@ def get_cart():
 
     return jsonify({
         "items": [cart_item.to_dict() for cart_item in cart_items],
-        "total": total_price
+        "total": total_price,
     }), 200
 
 @bp.route('/cart/<int:product_id>', methods=['PUT'])
@@ -157,7 +159,6 @@ def change_shipping(product_id, shipping_id):
 
     return jsonify({'message': 'Shipping method updated successfully.'}), 200
 
-
 @bp.route('/cart/apply_coupon', methods=["POST"])
 @token_auth.login_required
 def apply_coupon():
@@ -165,19 +166,55 @@ def apply_coupon():
     coupon_code = data.get('coupon_code')
     user_id = token_auth.current_user().id
 
-    cart = Cart.query.filter_by(user_id=user_id).first()
+    cart_items = Cart.query.filter_by(user_id=user_id).all()
 
-    if not cart:
-        return bad_request("Cart not found.")
+    if not cart_items:
+        return bad_request("Cart is empty.")
 
-    if not coupon_code:
-        return bad_request("Coupon code is required.")
-
-    success, message = cart.apply_coupon(coupon_code)
+    # Apply coupon to the cart
+    success, message, discounted_price, updated_shipping = apply_coupon_to_cart(cart_items, coupon_code)
     if not success:
         return bad_request(message)
 
-    return jsonify({"message": message, "total_price": cart.total_price()}), 200
+    # Update the cart with the applied coupon
+    for item in cart_items:
+        item.coupon_code = coupon_code
+    db.session.commit()
+
+    return jsonify({
+        "message": message,
+        # "total": discounted_price + updated_shipping,  # No double shipping addition
+        "total": discounted_price,
+        "shipping_total": updated_shipping,
+    }), 200
+# @bp.route('/cart/apply_coupon', methods=["POST"])
+# @token_auth.login_required
+# def apply_coupon():
+#     data = request.json
+#     coupon_code = data.get('coupon_code')
+#     user_id = token_auth.current_user().id
+
+#     cart_items = Cart.query.filter_by(user_id=user_id).all()
+
+#     if not cart_items:
+#         return bad_request("Cart is empty.")
+
+#     # Apply coupon to the cart
+#     success, message, discounted_price, updated_shipping = apply_coupon_to_cart(cart_items, coupon_code)
+#     if not success:
+#         return bad_request(message)
+
+#     # Update the cart with the applied coupon
+#     for item in cart_items:
+#         item.coupon_code = coupon_code
+#     db.session.commit()
+
+#     return jsonify({
+#         "message": message,
+#         "total": discounted_price + updated_shipping,
+#         "products_total": discounted_price,
+#         "shipping_total": updated_shipping,
+#     }), 200
 
 
 @bp.route('/shipping', methods=['GET'])
