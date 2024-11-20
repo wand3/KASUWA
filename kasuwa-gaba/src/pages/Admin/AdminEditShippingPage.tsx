@@ -16,7 +16,6 @@ export const AdminEditShippingPage = () => {
   const [formErrors, setFormErrors] = useState<FormShippingErrorType>({});
   const [ shipping, setShipping ] = useState<AddShippingSchema | null >();
 
-  // image upload 
   const [status, setStatus] = useState<'initial'| 'uploading'| 'success' | 'fail'>('initial')
 
   
@@ -130,64 +129,66 @@ export const AdminEditShippingPage = () => {
       <Jiki nav={true}>
         
 
-        <div className="p-6 backdrop-opacity-30 duration-300 ease-out h-screen flex justify-center py-7">
-          <button onClick={() => {goBack()}}>
-            <span className="absolute m-2 top-[5%] md:top-[10%] md:ml-[-40px] hover:text-red-600"><ArrowLeftIcon className="w-6 h-6 font-extrabold"/>
-            </span>
-          </button>
-          <div className="w-full max-w-md rounded-xl bg-[#F7F7F7] h-fit mt-[20%] md:mt-[10%]">
-              <div className="min-w-[50%] min-h-[50%] items-center justify-between p-4">
-                
-                <h3 className="flex text-base/10 pb-4 font-medium text-slate-800 justify-center">
-                    Add Shipping Methods
-                </h3>
-                  <div className="">
-                    <form onSubmit={handleSubmit} className="text-slate-800">
-                    
-                    {/* <Field> */}
-                        <InputField
-                        name="shipping_method_name"
-                        label="Shipping name"
-                        type="name"
-                        placeholder="Enter Product name"
-                        error={formErrors.shipping_method_name}
-                        Fieldref={shippingNameField} />
-
-
-                        <InputField
-                        name="shipping_price"
-                        label="Shipping price"
-                        type="decimal"
-                        placeholder="1 2 3 4 .."
-                        error={formErrors.shipping_price?.toString()}
-                        Fieldref={shippingPriceField} />
-
-                        
-                        <InputField
-                        name="delivery_time"
-                        label="Delivery Time"
-                        type="number"
-                        placeholder="number of day(s) before arrival"
-                        error={formErrors.delivery_time}
-                        Fieldref={deliveryTimeField} />
-
-
-                        
-                        <div className="flex justify-end pr-3 pt-3">
-                          <Button
-                              className="gap-2 rounded-md bg-gray-700 py-2 px-5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"
-                              type="submit"
-                          >
-                              Submit
-                          </Button>
-                        </div>
+        <div className="bg-[#eeeeeb] pb-20">
+          <div className="p-6 backdrop-opacity-30 duration-300 ease-out flex justify-center">
+            <button onClick={() => {goBack()}}>
+              <span className="absolute m-2 top-[5%] md:top-[10%] md:ml-[-40px] hover:text-red-600"><ArrowLeftIcon className="w-6 h-6 font-extrabold"/>
+              </span>
+            </button>
+            <div className="w-full max-w-md rounded-xl bg-[#F7F7F7] h-fit mt-[20%] md:mt-[10%]">
+                <div className="min-w-[50%] min-h-[50%] items-center justify-between p-4">
                   
-                    </form>
-                  </div>
-                                
-              </div>
-          </div>
+                  <h3 className="flex text-base/10 pb-4 font-medium text-slate-800 justify-center">
+                      Update Shipping Method
+                  </h3>
+                    
+                      <form onSubmit={handleSubmit} className="text-slate-800">
+                      
+                      {/* <Field> */}
+                          <InputField
+                          name="shipping_method_name"
+                          label="Shipping name"
+                          type="name"
+                          placeholder="Enter Product name"
+                          error={formErrors.shipping_method_name}
+                          Fieldref={shippingNameField} />
+
+
+                          <InputField
+                          name="shipping_price"
+                          label="Shipping price"
+                          type="decimal"
+                          placeholder="1 2 3 4 .."
+                          error={formErrors.shipping_price?.toString()}
+                          Fieldref={shippingPriceField} />
+
+                          
+                          <InputField
+                          name="delivery_time"
+                          label="Delivery Time"
+                          type="number"
+                          placeholder="number of day(s) before arrival"
+                          error={formErrors.delivery_time}
+                          Fieldref={deliveryTimeField} />
+
+
+                          
+                          <div className="flex justify-end pr-3 pt-3">
+                            <Button
+                                className="gap-2 rounded-md bg-gray-700 py-2 px-5 text-sm/6 font-semibold text-white shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-gray-600 data-[focus]:outline-1 data-[focus]:outline-white data-[open]:bg-gray-700"
+                                type="submit"
+                            >
+                                Submit
+                            </Button>
+                          </div>
+                    
+                      </form>
+                                  
+                </div>
+            </div>
+          </div>             
         </div>
+
 
       </Jiki>
     </>

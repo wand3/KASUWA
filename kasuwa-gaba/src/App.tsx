@@ -23,6 +23,7 @@ import PrivateRoute from './components/PrivateRoute';
 import AdminPage from './pages/Admin/AdminPage';
 import AdminEditProductPage from './pages/Admin/AdminEditProductPage';
 import AdminEditShippingPage from './pages/Admin/AdminEditShippingPage';
+import AdminEditCategoryPage from './pages/Admin/AdminEditCategoryPage';
 
 
 function App() {
@@ -58,7 +59,8 @@ function App() {
                       <Routes>
                         <Route path='/' element={<AdminPage />} />
                         <Route path='/shipping' /> 
-                        <Route path='/shipping/:id' element={<AdminEditShippingPage />} />       
+                        <Route path='/shipping/:id' element={<AdminEditShippingPage />} />
+                        <Route path='/category/:id' element={<AdminEditCategoryPage />} />       
                         <Route path='/edit/:id' element={<AdminEditProductPage />} />
                         {/* <Route path='/edit/:id' element={<EditProductPage />} /> */}
 
@@ -73,6 +75,7 @@ function App() {
                         <Route path="/" element={<Kasuwa />} />
                         {/* <Route path="/explore" element={<ExplorePage />} /> */}
                         <Route path="/orders" element={<OrdersPage />} />
+
                         <Route path="/cart" element={<CartPage cart={{
                         items: [],
                         total: 0

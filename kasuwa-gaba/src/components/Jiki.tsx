@@ -12,7 +12,7 @@ type BodyProps = {
 const Jiki: FC<BodyProps> = ({ nav, children }) => {
   return (
     <>
-      <div className="bg-[#eeeeeb] ">
+      <div className="bg-[#eeeeeb] h-[100vh] ">
         {nav && <Nav />}
         {children}
         <FlashMessage />

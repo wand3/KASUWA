@@ -21,6 +21,7 @@ export type ProductType = {
 export type UseProductsContextType = {
   products: ProductType[] | null;
   fetchproducts: () => void;
+  fetchproduct: (id: number) => void;
   deleteProduct: (id: number) => void,
   editProduct: (id: number) => void,
 };
@@ -29,6 +30,8 @@ export type UseProductsContextType = {
 const initContextState: UseProductsContextType = {
   products: null,
   fetchproducts: () => {},
+  fetchproduct: () => {},
+
   deleteProduct: () => Promise<void>,
   editProduct: () => Promise<void>,
   }
@@ -40,6 +43,8 @@ type ChildrenType = { children?: ReactElement | ReactElement[] };
 export const ProductsProvider = ({ children }: ChildrenType): ReactElement => {
   // Correctly type the state as an array of products or null
   const [products, setProducts] = useState<ProductType[] | null>(null);
+  const [product, setProduct] = useState<ProductType[] | null>(null);
+
 
 
 
@@ -65,6 +70,27 @@ export const ProductsProvider = ({ children }: ChildrenType): ReactElement => {
     }
   };
 
+
+  // Fetch single product function
+  const fetchproduct = async (id: number) => {
+    try {
+      const response = await api.get(`/product/${id}`);
+      console.log("api.get");
+
+      const data = await response.body;
+      console.log(response.body)
+
+      // setProducts(data); // Assume data is an array of products
+      // Type assertion: assert that data is an array of ProductType
+      if (Array.isArray(data)) {
+        setProduct(data as ProductType[]); // Type assertion
+      } else {
+        throw new Error("Invalid data format");
+      }
+    } catch (error) {
+      setProduct(null); // Handle error state
+    }
+  };
 
   useEffect(() => {
     fetchproducts(); // Fetch products on component mount
@@ -113,6 +139,7 @@ export const ProductsProvider = ({ children }: ChildrenType): ReactElement => {
     <ProductsContext.Provider value={{ 
     products,
     fetchproducts, 
+    fetchproduct,
     deleteProduct,
     editProduct,
      }}>
