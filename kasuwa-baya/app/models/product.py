@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from re import Match
 from app import db
 from .base_model import BaseModel
@@ -68,7 +68,7 @@ class Cart(BaseModel):
 
     product_id: Mapped[int] = mapped_column(Integer, ForeignKey('products.id'))
     quantity: Mapped[int] = Column(Integer, default=1)
-    shipping_id: Mapped[int] = mapped_column(Integer, ForeignKey('shippings.id'), nullable=False, default=3)
+    shipping_id: Mapped[int] = mapped_column(Integer, ForeignKey('shippings.id'), nullable=False)
     user_id = mapped_column(Integer, ForeignKey('users.id'), index=True)
     product: Mapped['Product'] = relationship("Product")
     user: Mapped['User'] = relationship("User", back_populates="cart")
@@ -107,22 +107,23 @@ class Cart(BaseModel):
         subtotal = product_price + shipping_price
 
         if self.coupon and self.coupon.is_valid():
-            # Apply the coupon discount to the product total price
             subtotal = self.coupon.apply_discount(subtotal)
 
             if self.coupon.discount_type == 'free':
-                # Set shipping price to 0 if the coupon is for free shipping
                 shipping_price = 0
 
         return subtotal + shipping_price
 
     def apply_coupon(self, coupon_code):
         coupon = db.session.query(Coupon).filter_by(code=coupon_code).first()
-        if coupon and coupon.is_valid():
-            self.coupon_code = coupon_code
-            db.session.commit()
-            return True, f"Coupon {coupon_code} applied successfully!"
-        return False, "Invalid or expired coupon."
+        if not coupon or not coupon.is_valid():
+            return False, "Invalid or expired coupon."
+        if self.total_price() < coupon.min_order_value:
+            return False, f"This coupon requires a minimum order value of {coupon.min_order_value}."
+
+        self.coupon_code = coupon_code
+        db.session.commit()
+        return True, f"Coupon {coupon_code} applied successfully!"
 
     def remove_coupon(self):
         self.coupon_code = None
@@ -200,6 +201,25 @@ class Coupon(BaseModel):
     end_date: Mapped[datetime] = mapped_column(DateTime)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     min_order_value: Mapped[int] = mapped_column(Integer, default=0)
+
+    def from_dict(self, data):
+        for field in ['code', 'discount_type', 'discount_value', 'end_date', 'min_order_value']:
+            if field in data:
+                if field == 'end_date':
+                    self.end_date = datetime.strptime(data[field], '%d-%m-%Y')
+                else:
+                    setattr(self, field, data[field])
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'code': self.code,
+            'discount_type': self.discount_type,
+            'discount_value': self.discount_value,
+            'end_date': self.end_date,
+            'is_active': self.is_active,
+            'min_order_value': self.min_order_value
+        }
 
     def is_valid(self):
         return self.is_active and (self.end_date >= datetime.utcnow())

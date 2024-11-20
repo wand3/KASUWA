@@ -52,6 +52,7 @@ def delete_products():
     db.session.commit()
     return jsonify({"message": "All products deleted successfully"}), 200
 
+
 @bp.route('/cart', methods=['POST'])
 @token_auth.login_required
 def add_to_cart():
@@ -59,17 +60,30 @@ def add_to_cart():
     user_id = token_auth.current_user().id
     product_id = data.get("product_id")
     default_quantity = data.get("quantity", 1)
-
+    shipping_id = data.get("shipping", 1)
 
     if not product_id:
         return bad_request("Product ID is required")
+
+    if not shipping_id:
+        return bad_request("Shipping method is required")
+
+    shipping_method = ShippingMethod.query.get(shipping_id)
+    if not shipping_method:
+        return bad_request("Invalid shipping method")
 
     cart_item = Cart.query.filter_by(user_id=user_id, product_id=product_id).first()
 
     if cart_item:
         cart_item.quantity += default_quantity
+        cart_item.shipping_id = shipping_id
     else:
-        cart_item = Cart(user_id=user_id, product_id=product_id, quantity=default_quantity)
+        cart_item = Cart(
+            user_id=user_id,
+            product_id=product_id,
+            quantity=default_quantity,
+            shipping_id=shipping_id,
+        )
         db.session.add(cart_item)
 
     db.session.commit()
@@ -153,13 +167,11 @@ def apply_coupon():
 
     cart = Cart.query.filter_by(user_id=user_id).first()
 
+    if not cart:
+        return bad_request("Cart not found.")
+
     if not coupon_code:
-        return bad_request("Coupon code is required")
-
-    coupon = Coupon.query.filter_by(code=coupon_code).first()
-
-    if not coupon or not coupon.is_valid():
-        return bad_request("Invalid or expired coupon")
+        return bad_request("Coupon code is required.")
 
     success, message = cart.apply_coupon(coupon_code)
     if not success:
@@ -180,7 +192,6 @@ def create_product():
     data = request.form
 
     try:
-        # Parse specifications from the form data
         specifications = json.loads(data.get('specifications', '{}'))
         colors = json.loads(data.get('colors', '[]'))
 
@@ -191,7 +202,7 @@ def create_product():
             category_id=int(data['category_id']),
             quantity=int(data['quantity']),
             specifications=specifications,
-            colors=colors  # Add colors
+            colors=colors
         )
 
         product_images = request.files.getlist('photos')
@@ -297,7 +308,7 @@ def edit_product(product_id):
             db.session.add(new_image)
 
         db.session.commit()
-        
+
         return product.to_dict()
     except Exception as e:
         db.session.rollback()
@@ -334,17 +345,17 @@ def add_shipping():
 @token_auth.login_required(role=1)
 def get_shipping_id(shipping_id):
     shipping_method = ShippingMethod.query.get(shipping_id)
-    
+
     return jsonify(shipping_method.to_dict()), 200
 
 
 @bp.route('/admin/shipping/<int:shipping_id>', methods=['PUT'])
 @token_auth.login_required(role=1)
 def edit_shipping(shipping_id):
-        
+
     data = request.json
     shipping_method = ShippingMethod.query.get(shipping_id)
-   
+
     if not shipping_method:
         return not_found("Shipping method not found")
 
@@ -372,3 +383,46 @@ def delete_shipping(shipping_id):
     db.session.commit()
 
     return jsonify({'message': 'Shipping method deleted successfully.'}), 200
+
+@bp.route('/admin/coupon', methods=['POST'])
+@token_auth.login_required(role=1)
+def create_coupon():
+    data = request.json
+    coupon = Coupon()
+    coupon.from_dict(data)
+    db.session.add(coupon)
+    db.session.commit()
+    return jsonify({'message': 'Coupon Created Successfully'}), 201
+
+@bp.route('/admin/coupons', methods=['GET'])
+@token_auth.login_required(role=1)
+def get_coupons():
+    coupons = Coupon.query.all()
+    return jsonify([coupon.to_dict() for coupon in coupons]), 200
+
+@bp.route('/admin/coupon/<int:coupon_id>', methods=['DELETE'])
+@token_auth.login_required(role=1)
+def delete_coupon(coupon_id):
+    coupon = Coupon.query.get(coupon_id)
+
+    if not coupon:
+        return not_found("Coupon not Found.")
+
+    db.session.delete(coupon)
+    db.session.commit()
+
+    return {'message': 'Coupon deleted successfully'}, 200
+
+@bp.route('/admin/coupon/<int:coupon_id>', methods=['PUT'])
+@token_auth.login_required(role=1)
+def edit_coupon(coupon_id):
+    data = request.json
+    coupon = Coupon.query.get(coupon_id)
+
+    if not coupon:
+        return not_found("Coupon not found.")
+
+    coupon.from_dict(data)
+    db.session.commit()
+
+    return {'message': 'Coupon Updated Successfully'}, 200
