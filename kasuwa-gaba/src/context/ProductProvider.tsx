@@ -10,11 +10,15 @@ export type ProductType = {
     id: number;
     price: number;
     description: string;
+    colors: string[];
     product_image: string;
     product_images: string[];
     product_name: string;
     sold: number;
     quantity: number;
+    specifications: { [key: string]: string};
+    reviews: { id: number; rating: number; message: string; images: string[]; }[]
+
 };
 
 // Define the context type that includes products and the fetch function

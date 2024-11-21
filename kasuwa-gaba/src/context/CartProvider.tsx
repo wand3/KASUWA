@@ -79,7 +79,7 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
 
   async function increaseCartQuantity(id: number): Promise<void> {
     console.log('increase begins')
-    const response = await api.post('/cart', {
+    const response = await api.put('/cart', {
       product_id: id,
       quantity: 1
 

@@ -29,61 +29,61 @@ export const UserProvider = ({children}: React.PropsWithChildren<{}>) => {
     
     
   
-    const login = useCallback(async (email: string, password: string) => {
-      const result = await api.login(email, password);
-      console.log(result)
-      if (result === 'ok') {
-        const response = await api.get<UserSchema>('/user');
-        console.log(response)
-        setUser(response.ok ? response.body : null);
-        console.log('login callback success')
-      }
-      return result;
-    }, [api]);
-
-    const logout = useCallback(async () => {
-      await api.logout();
-      setUser(null);
-      console.log('logout success')
+  const login = useCallback(async (email: string, password: string) => {
+    const result = await api.login(email, password);
+    console.log(result)
+    if (result === 'ok') {
       const response = await api.get<UserSchema>('/user');
-      setUser(response.ok ? response.body : null);
-      console.log('logout success')
       console.log(response)
+      setUser(response.ok ? response.body : null);
+      console.log('login callback success')
+    }
+    return result;
+  }, [api]);
 
-    }, [api]);
+  const logout = useCallback(async () => {
+    await api.logout();
+    setUser(null);
+    console.log('logout success')
+    const response = await api.get<UserSchema>('/user');
+    setUser(response.ok ? response.body : null);
+    console.log('logout success')
+    console.log(response)
+
+  }, [api]);
 
 
-    // Fetch products function
-    const fetchUser = async () => {
-        try {
+  // Fetch products function
+  const fetchUser = async () => {
+      try {
 
-            const response = await api.get<UserSchema>('/user');
-            console.log(response)
-            const data = response.body;
-            console.log(data)
-            setUser(data)
-        } catch (error) {
-            setUser(null); // Handle error state
-        }
-    };
-
-
-    useEffect(() => {
-      (async () => {
-        await fetchUser();
-        if (api.isAuthenticated()) {
-          setIsAuthenticated(true);
-          console.log('authentication state updated')
           const response = await api.get<UserSchema>('/user');
           console.log(response)
-          setUser(response.body);
-        }
-        else {
-          setUser(null);
-        }
-      })();
-    }, [api]);
-    
+          const data = response.body;
+          console.log(data)
+          setUser(data)
+      } catch (error) {
+          setUser(null); // Handle error state
+      }
+  };
+
+
+  useEffect(() => {
+    (async () => {
+      await fetchUser();
+      if (api.isAuthenticated()) {
+        setIsAuthenticated(true);
+        console.log('authentication state updated')
+        const response = await api.get<UserSchema>('/user');
+        console.log(response)
+        setUser(response.body);
+      }
+      else {
+        setUser(null);
+      }
+    })();
+  }, [api]);
+  
 
     // alternative method 
 
