@@ -21,12 +21,12 @@ def forbidden(message="Forbidden access"):
 def not_found(message="Resource not found"):
     return error_response(404, message)
 
-@bp.app_errorhandler(HTTPException)
-def handle_http_exception(e):
-    """Handle specific HTTP exceptions raised by Werkzeug."""
-    return error_response(e.code, e.description)
+# @bp.app_errorhandler(HTTPException)
+# def handle_http_exception(e):
+#     """Handle specific HTTP exceptions raised by Werkzeug."""
+#     return error_response(e.code, e.description)
 
-@bp.app_errorhandler(Exception)
-def handle_exception(e):
-    """Handle generic exceptions and return a 500 error response."""
-    return error_response(500, f"{e} An internal server error occurred")
+# @bp.app_errorhandler(Exception)
+# def handle_exception(e):
+#     """Handle generic exceptions and return a 500 error response."""
+#     return error_response(500, f"{e} An internal server error occurred")
