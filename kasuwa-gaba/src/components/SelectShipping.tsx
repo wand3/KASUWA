@@ -75,7 +75,8 @@ export const SelectShipping = ( {id, shippingId}:productId ) => {
               className="w-full max-w-md rounded-xl bg-[#eeeeeb] p-6 backdrop-blur-2xl drop-shadow-lg duration-300 ease-out"
             >
               <div className="inside-dialog-text-div-heading">
-                <DialogTitle as="h2">Shipping Methods <span className="flex absolute top-0 right-0 p-4 justify-end "><Button
+                <DialogTitle as="h2">Shipping Methods <span className="flex absolute top-0 right-0 p-4 justify-end ">
+                <Button
                   className=" items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm font-semibold text-white shadow-inner shadow-white/10 focus:outline-none hover:bg-gray-600"
                   onClick={closeDialog}
                 >

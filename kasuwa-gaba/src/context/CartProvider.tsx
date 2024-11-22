@@ -11,6 +11,7 @@ export type CartItemSchema = {
   product: ProductType;
   quantity: number;
   shipping: AddShippingSchema;
+  color: string;
 }
 
 export type CartSchema = {
@@ -29,7 +30,7 @@ export type CartContextType = {
   removeFromCart: (id: number) => Promise<void>;
   shippings?: AddShippingSchema | null;
   updateShippingMethod: (id: number, shippingId: number) => Promise<void>;
-  updateProductColor: (id: number, colorIndent: number) => Promise<void>;
+  // updateProductColor: (id: number, colorIndent: number) => Promise<void>;
   getShipping: () => {};
 
   // getCartItems: () => Promise<[]>;
@@ -75,7 +76,6 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
 
   const cartItemsCount = () => {
       return cartItemsCount
-  
   }
   async function addToCart(id: number): Promise<void> {
       console.log('increase begins')
@@ -99,14 +99,15 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
   }
 
   async function decreaseCartQuantity(id: number): Promise<void> {
+    
     try {
       const response = await api.put(`/cart/${id}`, {
         product_id: id,
-        quantity: 1
+        quantity: -1
       });
       console.log(response.body)
       if (!response.ok) {
-        flash('minimim must be 1', 'error')
+        flash('Minimim must be 1', 'error')
         fetchCartItems()
       
       }
@@ -160,18 +161,7 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
     }
   };
 
-   // Function to update Color for a selected product
-  async function updateProductColor(id: number, colorIndent: number) {
-    try {
-      const response = await api.put(`/cart/color/${id}/${colorIndent}`);
-      const updatedColor = response.data;
-      console.log(updatedColor)
-      // fetchCartItems()
-    } catch (error) {
-      console.error("Failed to update product color", error);
-      // Optionally, handle the error (e.g., show a notification)
-    }
-  };
+  
   
 
   return (
@@ -182,7 +172,7 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
         shippings,
         updateShippingMethod,
         getShipping,
-        updateProductColor,
+        // updateProductColor,
 
         // getCartItems, 
         addToCart,

@@ -10,6 +10,7 @@ export type ProductType = {
     id: number;
     price: number;
     description: string;
+    color: string;
     colors: string[];
     product_image: string;
     product_images: string[];

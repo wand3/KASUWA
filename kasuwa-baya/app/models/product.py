@@ -75,6 +75,7 @@ class Cart(BaseModel):
     shipping: Mapped['ShippingMethod'] = relationship("ShippingMethod")
     coupon_code = Column(String(50), ForeignKey('coupons.code'), nullable=True)
     coupon = relationship("Coupon", backref="carts")
+    color: Mapped[str] = Column(String, default='')
 
 
     def to_dict(self):
@@ -85,8 +86,8 @@ class Cart(BaseModel):
                 'product_name': self.product.product_name,
                 'price': self.product.price,
                 'product_image': self.product.product_image,
-                'color': self.product.colors[0]
             },
+            'color': self.color,
             'quantity': self.quantity,
             'shipping': {
                 'id': self.shipping.id,

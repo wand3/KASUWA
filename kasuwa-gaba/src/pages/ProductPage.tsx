@@ -58,33 +58,47 @@ export const ProductPage = () => {
     }
   useEffect( () => {
     loadProduct()
-
   }, [])
+
+   // Function to update Color for a selected product
+  async function updateProductColor(id: number, colorIndent: number, color: string) {
+    setSelectedColor(color)
+    try {
+      const response = await api.put(`/cart/color/${id}/${colorIndent}`);
+      const updatedColor = response.data;
+      console.log(updatedColor)
+      // fetchCartItems()
+    } catch (error) {
+      console.error("Failed to update product color", error);
+      // Optionally, handle the error (e.g., show a notification)
+    }
+  };
   
   return (
     <>
       <Jiki nav>
-        <div className="font-sans">
+        <div className="">
               <div className="px-0 py-5 lg:max-w-6xl max-w-2xl max-lg:mx-auto">
                   <div className="grid items-start grid-cols-1 lg:grid-cols-2 ">
+
+                      {/* product image top  */}
                       <div className="w-full p-2 top-0 text-center pt-10 mb-4">
-                          <div className="lg:h-[560px]">
+                          <div className="h-[80vw] lg:h-[560px] flex justify-center">
                               <img
                                 src={selectedColor ? `${Config.baseURL}/static/images/product_images/${product?.product_images[selectedImageIndex]}` : `${Config.baseURL}/static/images/product_images/${product?.product_image}`} // Assuming images are stored relative to API base URL
                                 alt={`Product Image ${product?.product_image}`} 
-                                className="lg:w-11/12 w-fit h-full rounded-md object-cover object-top" />
+                                className="lg:w-10/12 w-fit h-full rounded-md object-cover object-top" />
                           </div>
-
-                          
                       </div>
 
-                      <div className="pt-7 background-light rounded-t-[50px] rounded-b-[10px] pb-4 px-3">
+                      <div className="pt-7 background-light rounded-t-[50px] rounded-b-[10px] pb-4 lg:mx-3 px-3">
                           <div className="flex flex-wrap items-start gap-4 px-2">
                               <div>
-                                  <h2 className="text-lg font-bold text-gray-800">{product?.product_name}</h2>
-                                  <p className="text-sm font-light text-gray-500 mt-2">{product?.description.slice(0, 300)}</p>
+                                  <h2 className="text-2xl font-bold text-gray-800">{product?.product_name}</h2>
+                                  <p className="text-sm text-gray-500 mt-2">{product?.description.slice(0, 300)}</p>
                               </div>
 
+                              {/* product image previews  */}
                               <div className="flex flex-wrap gap-4 justify-center mx-auto mt-4">
                                 {product?.product_images.map((image, index) => (
 
@@ -95,7 +109,7 @@ export const ProductPage = () => {
 
                                       src={`${Config.baseURL}/static/images/product_images/${image}`} // Assuming images are stored relative to API base URL
                                       alt={`Product Image ${index + 1}`}
-                                      className="w-16 cursor-pointer rounded-md"
+                                      className="lg:w-16 w-10 cursor-pointer rounded-md border-1"
                                     />
                                   </Button>
                                 ))}
@@ -104,26 +118,32 @@ export const ProductPage = () => {
                                       <div className="flex min-h-full items-center justify-center p-4 backdrop-blur-xl">
                                         <DialogPanel
                                             transition
-                                            className="w-full max-w-md rounded-xl bg-[#F7F7F7] p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0">
+                                            className="w-full max-w-md rounded-xl  p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0">
+                                          
                                           <div
-                                            className="fixed inset-0 z-50 flex items-center justify-center bg-black/75"
+                                            className="fixed inset-0 z-50 flex items-center justify-center"
                                           >
-                                            {/* <div
+                                            <DialogTitle as="h2"> 
+                                              <div className="flex absolute top-[-40vh] md:right-[-10vw] right-0 p-4 justify-end ">
+                                                <Button
+                                                  className=" items-center gap-2 rounded-md bg-gray-700 py-1.5 px-3 text-sm font-semibold text-white shadow-inner shadow-white/10 focus:outline-none hover:bg-gray-600"
+                                                  onClick={close}
+                                                >
+                                                  X
+                                                </Button>
+                                              </div>
+                                            </DialogTitle>
+                                            <div
                                               className="relative max-w-3xl w-full"
                                               onClick={(e) => e.stopPropagation()} // Prevent background click from closing modal
-                                            > */}
+                                            >
                                               <img
                                                 src={selectedImage}
                                                 // alt="Selected Product"
-                                                className="w-full h-auto rounded-md"
+                                                className="w-full h-auto rounded-md bg-transparent"
                                               />
-                                              {/* <button
-                                                className="absolute top-2 right-2 text-white bg-black/50 rounded-full p-2 hover:bg-black"
-                                                onClick={() => setSelectedImage(null)} // Close modal on button click
-                                              >
-                                                ✕
-                                              </button> */}
-                                            {/* </div> */}
+                            
+                                            </div>
                                           </div>
                                             
                                             
@@ -146,12 +166,33 @@ export const ProductPage = () => {
                                   </button>
                               </div>
                           </div>
+                          <hr className="my-2" />
+                          {/* select product color  */}
+                          <div className="px-3">
+                            <h2 className="text-md font-bold text-gray-800">Choose a Color</h2>
+                            <div className="flex flex-wrap gap-4 mt-4">
+                              {product?.colors.map((color, index) => (
+                                <button
+                                  key={color}
+                                  className={`w-7 h-7 rounded-full ${
+                                    selectedColor === color
+                                      ? "border-red-300 border-2"
+                                      : "border-gray-300"
+                                  }`}
+                                  style={{ backgroundColor: color }}
+                                  onClick={() => updateProductColor(product.id, index, color)}
+                                  aria-label={color}
+                                ></button>
+                              ))}
+                            </div>    
+                         
+                          </div>
 
                           <hr className="my-4" />
 
                           <div className="flex flex-wrap gap-4 items-start px-3">
                               <div>
-                                  <p className="text-gray-800 text-xl font-bold">{formatCurrency(product?.price)}</p>
+                                  <p className="text-gray-800 text-lg font-bold">{formatCurrency(product?.price)}</p>
                                   <p className="text-gray-500 text-sm mt-2"><span className="text-sm ml-1">In Stock</span></p>
                               </div>
 
@@ -168,45 +209,24 @@ export const ProductPage = () => {
                               </div>
                           </div>
 
-                          <hr className="my-4" />
 
-                          <div className="px-3">
-                              <h3 className="text-xl font-bold text-gray-800">Choose a Color</h3>
-                            <div className="flex flex-wrap gap-4 mt-4">
-                              {product?.colors.map((color, index) => (
-                                <button
-                                  key={color}
-                                  className={`w-8 h-8 rounded-full ${
-                                    selectedColor === color
-                                      ? "border-red-300 border-2"
-                                      : "border-gray-300"
-                                  }`}
-                                  style={{ backgroundColor: color }}
-                                  onClick={() => setSelectedColor(color)}
-                                  aria-label={color}
-                                ></button>
-                              ))}
-                             </div>    
-                         
-
+                          
                           <hr className="mt-10" />
 
-                          <div className="flex flex-wrap gap-4 justify-center m-5">
-                              <button type="button" className="min-w-[130px] px-4 py-3 bg-gray-800 hover:bg-gray-900 text-white text-sm font-semibold rounded-md">Buy now</button>
-                              <button type="button" className="min-w-[130px] px-4 py-2.5 border border-gray-800 bg-transparent hover:bg-gray-50 text-gray-800 text-sm font-semibold rounded-md">Add to cart</button>
-                          </div>
+                            <div className="flex flex-wrap gap-4 justify-center m-5">
+                                <button type="button" className="min-w-[130px] px-4 py-3 bg-gray-800 hover:bg-gray-900 text-white text-sm font-semibold rounded-md">Buy now</button>
+                                <button type="button" className="min-w-[130px] px-4 py-2.5 border border-gray-800 bg-transparent hover:bg-gray-50 text-gray-800 text-sm font-semibold rounded-md">Add to cart</button>
+                            </div>
                       </div>
                   </div>
 
-                  <div className="mt-0 max-w-4xl p-2 block">
+                  <div className="mt-0 max-w-4xl p-2 block bg-[#f7f7f7] mx-auto max-h-[70vh]">
                       {product && (
                         <ProductInfos product={product} />
                         )}
                   </div>
               </div>
           </div>
-        </div>
-        <h1>Product Page</h1>
         <ReviewPart />
         <RecommendedPart />
       </Jiki>

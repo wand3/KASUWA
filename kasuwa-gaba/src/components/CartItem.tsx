@@ -40,7 +40,7 @@ const { cartItems, removeFromCart, increaseCartQuantity, decreaseCartQuantity } 
             <div className="sm:col-gap-5 sm:grid sm:grid-cols-2">
               <div className="pr-8 sm:pr-5">
                 <p className="text-md font-semibold text-gray-900">{item.product?.product_name}</p>
-                <p className="mx-0 mt-1 mb-0 text-sm text-gray-400">36EU - 4US</p>
+                <p className="mx-0 mt-1 mb-0 text-sm text-gray-400">Color {item.color}</p>
                 <span className="">
                     <TruckIcon className="h-5 w-5 text-gray-700"/>
                     <p className="mt-1 text-xs text-gray-500">Shipping cost {formatCurrency(item.shipping?.shipping_price)}</p>
@@ -55,7 +55,7 @@ const { cartItems, removeFromCart, increaseCartQuantity, decreaseCartQuantity } 
 
                 <div className="sm:order-1 sm:fixed md:relative md:top-11 md:left-36">
                   <div className="mx-auto flex h-8 items-stretch text-gray-600">
-                    <button onClick={() => {decreaseCartQuantity(item.product.id)}} className="flex items-center justify-center rounded-l-md bg-gray-200 px-4 transition hover:bg-black hover:text-white">-</button>
+                    <button disabled={item.quantity <= 1} onClick={() => {decreaseCartQuantity(item.product.id)}} className="flex items-center justify-center rounded-l-md bg-gray-200 px-4 transition hover:bg-black hover:text-white">-</button>
                     <div className="flex w-full items-center justify-center bg-gray-100 px-4 text-xs uppercase transition">{item.quantity}</div>
                     <button onClick={() => {increaseCartQuantity(item.product.id)}} className="flex items-center justify-center rounded-r-md bg-gray-200 px-4 transition hover:bg-black hover:text-white">+</button>
                   </div>
