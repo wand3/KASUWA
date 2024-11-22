@@ -122,7 +122,7 @@ def update_quantity(product_id):
     if cart_item is None:
         return not_found("Product not found in cart")
 
-    cart_item.quantity = new_quantity
+    cart_item.quantity += new_quantity
     db.session.commit()
 
     return jsonify({'message': 'Quantity updated successfully', 'cart': cart_item.to_dict()}), 200
@@ -158,6 +158,23 @@ def change_shipping(product_id, shipping_id):
     db.session.commit()
 
     return jsonify({'message': 'Shipping method updated successfully.'}), 200
+
+@bp.route('/cart/color/<int:product_id>/<int:color_indent>', methods=['PUT'])
+@token_auth.login_required
+def change_color(product_id, color_indent):
+    user_id = token_auth.current_user().id
+
+    cart_item = Cart.query.filter_by(user_id=user_id, product_id=product_id).first()
+    product = Product.query.get(product_id)
+
+    if not cart_item:
+        return not_found("Cart item not found")
+
+    cart_item.color = product.colors[color_indent]
+    db.session.commit()
+
+    return jsonify({'message': 'Product color updated successfully.'}), 200
+
 
 @bp.route('/cart/apply_coupon', methods=["POST"])
 @token_auth.login_required

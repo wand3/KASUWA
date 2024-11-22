@@ -72,7 +72,7 @@ export const SelectShipping = ( {id, shippingId}:productId ) => {
           <div className="flex min-h-full items-center justify-center backdrop-blur-sm p-4">
             <DialogPanel
               transition
-              className="w-full max-w-md rounded-xl bg-slate-400/50 p-6 backdrop-blur-2xl drop-shadow-lg duration-300 ease-out"
+              className="w-full max-w-md rounded-xl bg-[#eeeeeb] p-6 backdrop-blur-2xl drop-shadow-lg duration-300 ease-out"
             >
               <div className="inside-dialog-text-div-heading">
                 <DialogTitle as="h2">Shipping Methods <span className="flex absolute top-0 right-0 p-4 justify-end "><Button
@@ -111,7 +111,7 @@ export const SelectShipping = ( {id, shippingId}:productId ) => {
                                   <p className="block">Item arrives in {shipping?.delivery_time} days</p>
                                 </div>
                               </div>
-                              <CheckCircleIcon className="size-6 fill-white opacity-0 transition group-data-[checked]:opacity-100" />
+                              <CheckCircleIcon className="size-6 fill-slate-800 opacity-0 transition group-data-[checked]:opacity-100" />
                             </div>
                           </Radio>
                         ))}

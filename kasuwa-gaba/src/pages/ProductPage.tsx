@@ -11,15 +11,33 @@ import { formatCurrency } from "../utilities/formatCurrency";
 import Config from "../config";
 import Jiki from "../components/Jiki";
 import ProductInfos from "../components/Product/ProductSpecification";
+import { CheckBadgeIcon } from "@heroicons/react/24/solid";
+import { Button, Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 
 export const ProductPage = () => {
   const {id} = useParams();
   const api = UseApi();
-  const { fetchproduct } = useProducts();
   const [product, setProduct] = useState<ProductType | null>(null);
+  const [selectedColor, setSelectedColor] = useState<string | ''>(product?.colors[0]);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  let [isOpen, setIsOpen] = useState(false) 
+
+
+  // Get the index of the selected color to display the corresponding image
+  const selectedImageIndex: number = product?.colors.indexOf(selectedColor);
 
   const [status, setStatus] = useState<'initial'| 'uploading'| 'success' | 'fail'>('initial')
 
+  // dialog popup and close 
+  function open() {
+    setIsOpen(true)
+  }
+  function close() {
+    setSelectedImage(null);
+    setIsOpen(false);
+    
+  }
 
   const loadProduct = async () => {
       try {
@@ -40,8 +58,7 @@ export const ProductPage = () => {
     }
   useEffect( () => {
     loadProduct()
-    
-  
+
   }, [])
   
   return (
@@ -53,7 +70,7 @@ export const ProductPage = () => {
                       <div className="w-full p-2 top-0 text-center pt-10 mb-4">
                           <div className="lg:h-[560px]">
                               <img
-                                src={`${Config.baseURL}/static/images/product_images/${product?.product_image}`} // Assuming images are stored relative to API base URL
+                                src={selectedColor ? `${Config.baseURL}/static/images/product_images/${product?.product_images[selectedImageIndex]}` : `${Config.baseURL}/static/images/product_images/${product?.product_image}`} // Assuming images are stored relative to API base URL
                                 alt={`Product Image ${product?.product_image}`} 
                                 className="lg:w-11/12 w-fit h-full rounded-md object-cover object-top" />
                           </div>
@@ -71,15 +88,53 @@ export const ProductPage = () => {
                               <div className="flex flex-wrap gap-4 justify-center mx-auto mt-4">
                                 {product?.product_images.map((image, index) => (
 
-                                  <img
-                                    key={index}
-                                    src={`${Config.baseURL}/static/images/product_images/${image}`} // Assuming images are stored relative to API base URL
-                                    alt={`Product Image ${index + 1}`}
-                                    className="w-16 cursor-pointer rounded-md"
-                                  />
+                                  <Button onClick={open} onMouseOver={() => setSelectedImage(`${Config.baseURL}/static/images/product_images/${image}`)}>
+                                
+                                    <img
+                                      key={index}
 
+                                      src={`${Config.baseURL}/static/images/product_images/${image}`} // Assuming images are stored relative to API base URL
+                                      alt={`Product Image ${index + 1}`}
+                                      className="w-16 cursor-pointer rounded-md"
+                                    />
+                                  </Button>
                                 ))}
+                                  <Dialog open={isOpen} as="div" className="relative z-10 focus:outline-none" onClose={close}>
+                                    <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+                                      <div className="flex min-h-full items-center justify-center p-4 backdrop-blur-xl">
+                                        <DialogPanel
+                                            transition
+                                            className="w-full max-w-md rounded-xl bg-[#F7F7F7] p-6 backdrop-blur-2xl duration-300 ease-out data-[closed]:transform-[scale(95%)] data-[closed]:opacity-0">
+                                          <div
+                                            className="fixed inset-0 z-50 flex items-center justify-center bg-black/75"
+                                          >
+                                            {/* <div
+                                              className="relative max-w-3xl w-full"
+                                              onClick={(e) => e.stopPropagation()} // Prevent background click from closing modal
+                                            > */}
+                                              <img
+                                                src={selectedImage}
+                                                // alt="Selected Product"
+                                                className="w-full h-auto rounded-md"
+                                              />
+                                              {/* <button
+                                                className="absolute top-2 right-2 text-white bg-black/50 rounded-full p-2 hover:bg-black"
+                                                onClick={() => setSelectedImage(null)} // Close modal on button click
+                                              >
+                                                ✕
+                                              </button> */}
+                                            {/* </div> */}
+                                          </div>
+                                            
+                                            
+                                            
+                                        </DialogPanel>
+                                        
+                                      </div>
+                                    </div>
 
+                                    
+                                  </Dialog>
                               </div>
 
                               <div className="ml-auto flex flex-wrap gap-4">
@@ -118,15 +173,18 @@ export const ProductPage = () => {
                           <div className="px-3">
                               <h3 className="text-xl font-bold text-gray-800">Choose a Color</h3>
                             <div className="flex flex-wrap gap-4 mt-4">
-                              {product?.colors.map((color, index) =>(
-
-                                
-                                    <button type="button" className="w-10 h-10 gap-3 bg-black border border-white hover:border-gray-800 rounded-md shrink-0">
-                                        <span className="block relative pt-10 text-slate-800">{color}</span>
-
-                                        <img src={`${Config.baseURL}/static/images/product_images/${product?.product_images?.slice(0, -4)  }+ index`}/>
-                                    </button>
-                                    
+                              {product?.colors.map((color, index) => (
+                                <button
+                                  key={color}
+                                  className={`w-8 h-8 rounded-full ${
+                                    selectedColor === color
+                                      ? "border-red-300 border-2"
+                                      : "border-gray-300"
+                                  }`}
+                                  style={{ backgroundColor: color }}
+                                  onClick={() => setSelectedColor(color)}
+                                  aria-label={color}
+                                ></button>
                               ))}
                              </div>    
                          

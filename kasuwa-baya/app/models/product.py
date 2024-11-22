@@ -84,7 +84,8 @@ class Cart(BaseModel):
                 'id': self.product.id,
                 'product_name': self.product.product_name,
                 'price': self.product.price,
-                'product_image': self.product.product_image
+                'product_image': self.product.product_image,
+                'color': self.product.colors[0]
             },
             'quantity': self.quantity,
             'shipping': {
