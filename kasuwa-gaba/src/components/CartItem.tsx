@@ -5,6 +5,7 @@ import {  TrashIcon } from "@heroicons/react/24/solid"
 import {  TruckIcon } from "@heroicons/react/24/outline"
 import SelectShipping from "./SelectShipping"
 import { formatCurrency } from "../utilities/formatCurrency"
+import { Link } from "react-router-dom"
 
 export type PropsType = {
     cart: CartSchema,
