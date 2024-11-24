@@ -19,7 +19,7 @@ export type AddShippingSchema = {
   id?: number;
   shipping_method_name?: string;
   shipping_price?: number | string;
-  delivery_time?: string;
+  delivery_time?: string | number;
 }
 
 

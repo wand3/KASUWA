@@ -3,6 +3,7 @@ import { ReactElement, memo } from "react"
 import Config from "../config"
 import { useCart } from "../hooks/UseCart"
 import { Link } from "react-router-dom"
+import { ShoppingCartIcon } from "@heroicons/react/24/solid"
 
 type PropsType = {
     product: ProductType,
@@ -12,7 +13,7 @@ type PropsType = {
 
 const Product = ({ product }: PropsType): ReactElement => {
     const {
-        // getItemQuantity,
+        addToCart,
         increaseCartQuantity,
         // decreaseCartQuantity,
         removeFromCart,
@@ -21,7 +22,7 @@ const Product = ({ product }: PropsType): ReactElement => {
     // console.log(img)
     const content =
 
-        <div className="bg-white rounded-2xl p-5 cursor-pointer hover:-translate-y-2 transition-all relative">
+        <div className="bg-white min-h-fit rounded-2xl p-5 cursor-pointer hover:-translate-y-2 transition-all relative">
             <div
               className="bg-gray-100 w-10 h-10 flex items-center justify-center rounded-full cursor-pointer absolute top-4 right-4">
               <svg xmlns="http://www.w3.org/2000/svg" width="16px" className="fill-gray-800 inline-block" viewBox="0 0 64 64">
@@ -37,13 +38,42 @@ const Product = ({ product }: PropsType): ReactElement => {
                     </div>
                 </Link>
                 <div>
-                    <h3 className="text-md font-extrabold text-gray-800">{product.product_name}</h3>
-                    <p className="text-gray-600 text-sm mt-2">Sold: {product.sold}</p>
+                    <h3 className="text-md font-bold text-wrap text-gray-800">{product.product_name}</h3>
+                    <div className="flex space-x-2 mt-4">
+                        <svg className="w-4 fill-[#facc15]" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                            d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
+                        </svg>
+                        <svg className="w-4 fill-[#facc15]" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                            d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
+                        </svg>
+                        <svg className="w-4 fill-[#facc15]" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                            d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
+                        </svg>
+                        <svg className="w-4 fill-[#CED5D8]" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                            d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
+                        </svg>
+                        <svg className="w-4 fill-[#CED5D8]" viewBox="0 0 14 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                            d="M7 0L9.4687 3.60213L13.6574 4.83688L10.9944 8.29787L11.1145 12.6631L7 11.2L2.8855 12.6631L3.00556 8.29787L0.342604 4.83688L4.5313 3.60213L7 0Z" />
+                        </svg>
+                        <span><p className="text-gray-600 text-[12px]">(3.5) </p></span>
+                    </div>
+                    <p className="text-gray-600 text-sm mt-2">{product.sold}+ sold</p>
                     <h4 className="text-md text-gray-800 font-bold mt-4">{new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(product.price)}</h4>
                 </div>
-                {/* <button className="border-solid bg-red-300" type='button' onClick={() => increaseCartQuantity(product.id)}>Add to Cart</button> */}
+                <div className="flex justify-center relative bottom-0 m-3">
+                    <button type='button' onClick={() => addToCart(product.id)} className="group w-full my-1 inline-flex h-12 items-center justify-center overflow-hidden rounded-md bg-slate-800 px-3 font-medium text-neutral-200">
+                        <span className="text-[13px]">Add to cart</span>
+                        <div className="ml-1 transition duration-300 group-hover:rotate-[360deg]">
+                            <ShoppingCartIcon aria-hidden="false" className="h-5 w-5 fill:black" />
+                        </div>
+                    </button>
+                </div>
             </a>
-                <p className="my-5"></p>
                 {/* <button className="border-solid bg-red-300" type='button' onClick={() => removeFromCart(product.id)}>Remove from Cart</button> */}
 
         </div>
