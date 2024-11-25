@@ -62,6 +62,8 @@ def add_to_cart():
     product_id = data.get("product_id")
     default_quantity = data.get("quantity", 1)
     shipping_id = data.get("shipping", 1)
+    default_color = Product.query.get(product_id)
+    color = data.get("color", default_color.colors[0])
 
     if not product_id:
         return bad_request("Product ID is required")
@@ -115,14 +117,14 @@ def update_quantity(product_id):
     data = request.get_json()
     new_quantity = data.get("quantity", 1)
 
-    if new_quantity is None or new_quantity <= 0:
+    if new_quantity is None:
         return bad_request("Quantity must be a positive integer")
 
     cart_item = Cart.query.filter_by(user_id=user_id, product_id=product_id).first()
     if cart_item is None:
         return not_found("Product not found in cart")
 
-    cart_item.quantity = new_quantity
+    cart_item.quantity += new_quantity
     db.session.commit()
 
     return jsonify({'message': 'Quantity updated successfully', 'cart': cart_item.to_dict()}), 200
@@ -158,6 +160,27 @@ def change_shipping(product_id, shipping_id):
     db.session.commit()
 
     return jsonify({'message': 'Shipping method updated successfully.'}), 200
+
+@bp.route('/cart/color/<int:product_id>/<int:color_indent>', methods=['PUT'])
+@token_auth.login_required
+def change_color(product_id, color_indent):
+    user_id = token_auth.current_user().id
+
+    cart_item = Cart.query.filter_by(user_id=user_id, product_id=product_id).first()
+    product = Product.query.get(product_id)
+
+    if not cart_item:
+        return not_found("Cart item not found")
+    logging.error(f'{product.colors[color_indent]}')
+
+    cart_item.color = product.colors[color_indent]
+    db.session.commit()
+
+    logging.error(f'{cart_item.color}')
+
+
+    return jsonify({'message': 'Product color updated successfully.'}), 201
+
 
 @bp.route('/cart/apply_coupon', methods=["POST"])
 @token_auth.login_required

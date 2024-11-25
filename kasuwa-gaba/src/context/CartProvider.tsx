@@ -11,6 +11,7 @@ export type CartItemSchema = {
   product: ProductType;
   quantity: number;
   shipping: AddShippingSchema;
+  color: string;
 }
 
 export type CartSchema = {
@@ -23,12 +24,13 @@ export type CartSchema = {
 export type CartContextType = {
   cartItems: CartSchema| null;
   cartQuantity?: number
-  // getItemQuantity: (id: number) => number;
+  addToCart: (id: number) => void;
   increaseCartQuantity: (id: number) => void;
   decreaseCartQuantity: (id: number) => void;
   removeFromCart: (id: number) => Promise<void>;
   shippings?: AddShippingSchema | null;
   updateShippingMethod: (id: number, shippingId: number) => Promise<void>;
+  // updateProductColor: (id: number, colorIndent: number) => Promise<void>;
   getShipping: () => {};
 
   // getCartItems: () => Promise<[]>;
@@ -74,28 +76,38 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
 
   const cartItemsCount = () => {
       return cartItemsCount
-  
   }
+  async function addToCart(id: number): Promise<void> {
+      console.log('increase begins')
+      const response = await api.post('/cart', {
+        product_id: id,
+      });
+      console.log( response.body)
+      flash('Added', 'success')
+      // fetchCartItems()
+    }
 
   async function increaseCartQuantity(id: number): Promise<void> {
     console.log('increase begins')
-    const response = await api.put('/cart', {
+    const response = await api.put(`/cart/${id}`, {
       product_id: id,
       quantity: 1
-
     });
     console.log( response.body)
-    flash('Added', 'success')
+    flash('Quantity Added', 'success')
     fetchCartItems()
   }
 
   async function decreaseCartQuantity(id: number): Promise<void> {
+    
     try {
       const response = await api.put(`/cart/${id}`, {
+        product_id: id,
+        quantity: -1
       });
       console.log(response.body)
       if (!response.ok) {
-        flash('minimim must be 1', 'error')
+        flash('Minimim must be 1', 'error')
         fetchCartItems()
       
       }
@@ -148,6 +160,8 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
       // Optionally, handle the error (e.g., show a notification)
     }
   };
+
+  
   
 
   return (
@@ -158,9 +172,10 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
         shippings,
         updateShippingMethod,
         getShipping,
+        // updateProductColor,
 
         // getCartItems, 
-        // getItemQuantity, 
+        addToCart,
         increaseCartQuantity,
         removeFromCart,
         decreaseCartQuantity,
