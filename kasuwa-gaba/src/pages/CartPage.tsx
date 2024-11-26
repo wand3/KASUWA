@@ -1,14 +1,19 @@
-import CartItem from "../components/CartItem";
+import CartItem from "../components/Cart/CartItem";
 import { useCart } from "../hooks/UseCart";
-import { PropsType } from "../components/CartItem";
+import { PropsType } from "../components/Cart/CartItem";
 import Jiki from "../components/Jiki";
 import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 import { formatCurrency } from "../utilities/formatCurrency"
+import { useEffect } from "react";
 
 
 export const CartPage = ( ) => {
 
   const { cartItems } = useCart();
+
+  useEffect(() => {
+    cartItems;
+  })
 
 
   return (

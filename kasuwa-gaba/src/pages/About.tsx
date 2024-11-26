@@ -1,5 +1,5 @@
 import Jiki from "../components/Jiki";
-import NavButtom from "../components/NavButtom";
+import NavButtom from "../components/NavMobileTop";
 
 const About = () => {
     return (

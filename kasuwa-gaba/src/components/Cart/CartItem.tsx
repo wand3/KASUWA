@@ -1,10 +1,10 @@
-import { CartItemSchema, CartSchema } from "../context/CartProvider"
-import Config from "../config"
-import { useCart } from "../hooks/UseCart"
+import { CartItemSchema, CartSchema } from "../../context/CartProvider"
+import Config from "../../config"
+import { useCart } from "../../hooks/UseCart"
 import {  TrashIcon } from "@heroicons/react/24/solid"
 import {  TruckIcon } from "@heroicons/react/24/outline"
-import SelectShipping from "./SelectShipping"
-import { formatCurrency } from "../utilities/formatCurrency"
+import SelectShipping from "../SelectShipping"
+import { formatCurrency } from "../../utilities/formatCurrency"
 import { Link } from "react-router-dom"
 
 export type PropsType = {

@@ -72,11 +72,6 @@ const Nav = () => {
                     <span className="absolute -inset-1.5" />
                     <span className="sr-only">Open user menu</span>
                     <UserIcon aria-hidden="true" className="h-6 w-6 bg-transparent fill-white" />
-                    {/* <img
-                      alt=""
-                      src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                      className="h-8 w-8 rounded-full"
-                    /> */}
                     { user.isAuthenticated === true && (
                         <span className='flex absolute justify-center text-md mt-[-50%] ml-[85%] rounded-xl bg:ring-white'>{userEmail}</span>
                       )}
