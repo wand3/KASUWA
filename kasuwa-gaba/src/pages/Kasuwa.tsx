@@ -20,6 +20,8 @@ const Kasuwa = () => {
                 <Jiki nav>
                     
                     <NavButtom />
+                    <NavButtomMobile />
+
                     <MainContent />
                     {/* <AllCategories /> */}
 
@@ -32,7 +34,6 @@ const Kasuwa = () => {
                     
 
 
-                    <NavButtomMobile />
 
                 </Jiki>
               </FilterProvider>
