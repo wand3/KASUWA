@@ -243,7 +243,6 @@ const Nav = () => {
 
               {/* {sidebar && <Sidebar />} */}
 
-      <Sidebar />
 
     </>
   )

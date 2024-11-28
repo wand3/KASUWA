@@ -3,6 +3,8 @@ import { useFilter } from "../context/FilterContext";
 import UseApi from "../hooks/UseApi";
 import { ProductPagType } from "./MainContent";
 import { ProductType } from "../context/ProductProvider";
+import { CategorySchema } from "./Admin/AddCategory";
+import { CategoryType } from "./Product/CategoriesSelect";
 
 interface Product {
   category: string;
@@ -10,6 +12,10 @@ interface Product {
 
 interface FetchResponse {
   products: Product[];
+}
+
+export interface CategoriesResponse {
+  categories: CategorySchema[];
 }
 
 const Sidebar = () => {
@@ -26,7 +32,10 @@ const Sidebar = () => {
     setKeyword,
   } = useFilter();
 
-  const [categories, setCategories] = useState<number[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [allCategories, setAllCategories] = useState<CategoryType[]>([]); // Set correct initial type
+
+
   const [keywords] = useState<string[]>([
     "apple",
     "watch",
@@ -36,6 +45,20 @@ const Sidebar = () => {
     "shirt",
   ]);
 
+  // Fetch categories from the API
+  const fetchCategory = async () => {
+    try {
+      const response = await api.get<CategoriesResponse>(`/categories`); // Use the correct response type
+      const data = response.body;
+      console.log(data);
+
+      setAllCategories(data.categories); // Extract `categories` from the response and set state
+    } catch (error) {
+      console.error("Failed to fetch categories:", error);
+    }
+  };
+
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -43,8 +66,9 @@ const Sidebar = () => {
         const data = response.body;
         console.log(data?.products);
         const uniqueCategories = Array.from(
-          new Set(data?.products.map((product) => product.category_id))
+          new Set(data?.products.map((product) => product.category))
         );
+        console.log(uniqueCategories)
         setCategories(uniqueCategories);
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -52,6 +76,7 @@ const Sidebar = () => {
     };
 
     fetchCategories();
+    fetchCategory(); // Fetch categories on component mount
   }, []);
 
   const handleRadioChangeCategories = (category: string) => {
@@ -79,15 +104,17 @@ const Sidebar = () => {
     const value = e.target.value;
     setMaxPrice(value ? parseFloat(value) : undefined);
   };
+  console.log(`categoriesss ${categories}`)
 
   return (
-    <div className="hidden md:block w-64 p-5 h-screen">
+    <>
+    <div className="hidden md:block w-[20%] py-5 px-2 h-screen">
       <h1 className="text-2xl font-bold mb-10 mt-4">React Store</h1>
 
-      <section>
+      <section className="w-fit py-1">
         <input
           type="text"
-          className="border-2 rounded px-2 p-2 sm:mb-0"
+          className="border-2 rounded w-fit px-2 p-2 sm:mb-0"
           placeholder="Search Product"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -110,40 +137,28 @@ const Sidebar = () => {
         </div>
 
         {/* Categories Section */}
-        {/* <div className="mb-5">
+        <div className="mb-5">
           <h2 className="text-xl font-semibold mb-3">Categories</h2>
           <div>
-            {categories.map((category, index) => (
-              <label key={index} className="block mb-2">
+            {allCategories.map((category) => (
+              <label key={category.id} className="block mb-2">
                 <input
                   type="radio"
                   name="category"
-                  value={category}
-                  onChange={() => handleRadioChangeCategories(category)}
-                  checked={selectedCategory === category_id}
+                  value={category.category_name}
+                  onChange={() => handleRadioChangeCategories(category.category_name)}
+                  checked={selectedCategory === category.category_name}
                   className="mr-2 w-[16px] h-[16px]"
                 />
-                {category.toUpperCase()}
+                {category.category_name.toUpperCase()}
               </label>
             ))}
           </div>
-        </div> */}
+        </div>
+       
 
         {/* Keywords Section */}
-        <div className="mb-5">
-          <h2 className="text-xl font-semibold mb-3">Keywords</h2>
-          <div>
-            {keywords.map((keyword, index) => (
-              <button
-                key={index}
-                onClick={() => handleKeywordClick(keyword)}
-                className="block mb-2 px-4 py-2 w-full text-left border rounded hover:bg-gray-200"
-              >
-                {keyword.toUpperCase()}
-              </button>
-            ))}
-          </div>
-        </div>
+        
 
         <button
           onClick={handleResetFilters}
@@ -153,6 +168,7 @@ const Sidebar = () => {
         </button>
       </section>
     </div>
+    </>
   );
 };
 

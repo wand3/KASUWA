@@ -12,6 +12,9 @@ import NavButtomMobile from "./NavMobileBottom";
 import NavMobileTop from "./NavMobileTop";
 import { FilterProvider } from "../context/FilterContext";
 import { ProductType } from "../context/ProductProvider";
+import Footer from "../components/Footer";
+import Sidebar from "../components/Sidebar";
+
 
 export type ProductPagType = {
   products: ProductType[],
@@ -26,7 +29,7 @@ const MainContent = () => {
   const [filter, setFilter] = useState("all");
   const [currentPage, setCurrentPage] = useState(1);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const itemsPerPage = 20;
+  const itemsPerPage = 8;
 
   const api = UseApi();
   useEffect(() => {
@@ -62,7 +65,6 @@ const MainContent = () => {
         console.log("api.getpag");
         const getProducts = async () => {
           const response = await api.get<ProductPagType>(`${url}`);
-          console.log("api.getpinsideag");
           console.log(response.body);
 
 
@@ -83,15 +85,6 @@ const MainContent = () => {
         console.error("Error fetching data: ", error); // Handle error state
       }
         
-      // }
-      // axios
-      //   .get(url)
-      //   .then((response) => {
-      //     setProducts(response.data.products);
-      //   })
-      //   .catch((error) => {
-      //     console.error("Error fetching data: ", error);
-      //   });
   // }, [currentPage, keyword]);
     }, [currentPage]);
 
@@ -128,8 +121,6 @@ const MainContent = () => {
         return filteredProducts.sort((a, b) => b.price - a.price);
       case "cheap":
         return filteredProducts.sort((a, b) => a.price - b.price);
-      case "popular":
-        return filteredProducts.sort((a, b) => b.rating - a.rating);
       default:
         return filteredProducts;
     }
@@ -167,18 +158,8 @@ const MainContent = () => {
 
   return (
   <>
-  {/* <FilterProvider> */}
-  {/* <Jiki nav> */}
-    
-                    
-    {/* <NavMobileTop /> */}
-    
-    
-
-
-    {/* <NavButtomMobile /> */}
-
-    <section className="absolute top-[10vh] md:h-[fit] right-0 xl:w-[55rem] md:w-[70%] sm:w-[40rem] xs:w-[20rem] p-5">
+    <Sidebar />
+    <section className="absolute top-[15vh] md:h-[fit] bg-[#eeeeeb] right-0 md:max-w-[75%] sm:w-[90%] xs:w-[20rem] p-5">
       <div className="mb-5">
         <div className="flex flex-col sm:flex-row justify-between items-center">
           <div className="relative mb-5 mt-5">
@@ -204,12 +185,6 @@ const MainContent = () => {
                   className="block px-4 py-2 w-full text-left hover:bg-gray-200"
                 >
                   Expensive
-                </button>
-                <button
-                  onClick={() => setFilter("popular")}
-                  className="block px-4 py-2 w-full text-left hover:bg-gray-200"
-                >
-                  Popular
                 </button>
               </div>
             )}
@@ -258,10 +233,13 @@ const MainContent = () => {
           </button>
         </div>
       </div>
-    </section>
-  {/* </Jiki> */}
-  {/* </FilterProvider> */}
+          <NavButtomMobile />
 
+      <Footer />
+    </section>
+    {/* <NavButtomMobile /> */}
+    
+  
   </>
   );
 };

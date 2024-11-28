@@ -34,6 +34,7 @@ function App() {
     <>
         <FlashProvider>
           <ApiProvider>
+            <FilterProvider>
             <UserProvider>
               <CartProvider>
               
@@ -106,8 +107,9 @@ function App() {
                 </Routes>
               
               </CartProvider>
-
             </UserProvider>
+            </FilterProvider>
+
           </ApiProvider>
         </FlashProvider>  
        
@@ -115,4 +117,4 @@ function App() {
   )
 }
 
-export default App
+export default App;

@@ -1,6 +1,5 @@
 import Jiki from "../components/Jiki";
 import NavButtom from "../components/NavMobileTop";
-import NavButtomMobile from "../components/NavMobileBottom";
 import KasuwaItems from "../components/KasuwaItems";
 import { ProductsProvider } from "../context/ProductProvider";
 import useProducts from "../hooks/UseProducts";
@@ -20,7 +19,6 @@ const Kasuwa = () => {
                 <Jiki nav>
                     
                     <NavButtom />
-                    <NavButtomMobile />
 
                     <MainContent />
                     {/* <AllCategories /> */}
@@ -33,9 +31,10 @@ const Kasuwa = () => {
                     {/* <KasuwaItems /> */}
                     
 
-
+                                    {/* <NavButtomMobile /> */}
 
                 </Jiki>
+
               </FilterProvider>
             </ProductsProvider>          
         </>

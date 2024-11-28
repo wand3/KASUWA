@@ -38,7 +38,7 @@ def get_products():
     # itemsPerPage = request.args.get('itemsPerPage', default=8, type=int)  # Default to 16 items per page
     # offset = request.args.get('offset', default=0, type=int)  # Default to start from the first item
 
-    limit = int(request.args.get('limit', 8))  # Default to 10 items per page
+    limit = int(request.args.get('limit', 6))  # Default to 10 items per page
     skip = int(request.args.get('skip', 0))    # Default to skipping 0 items
 
 

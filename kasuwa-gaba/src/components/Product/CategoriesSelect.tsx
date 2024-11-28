@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import UseApi from "../../hooks/UseApi";
 
+
 // Define the type for a single category
 export interface CategoryType {
-  id: number; // Use `number` since `id` in your response is a number
+  id: number;
   category_name: string;
 }
 
 // Define the type for the API response
-interface CategoriesResponse {
+export interface CategoriesResponse {
   categories: CategoryType[];
 }
 

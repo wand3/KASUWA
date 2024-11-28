@@ -5,6 +5,7 @@ from .base_model import BaseModel
 from typing import Optional, List, Dict
 from sqlalchemy import Column, Integer, String, Table, Boolean, ForeignKey, Float, Enum, DateTime, JSON
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from .category import Category
 
 class Product(BaseModel):
     __tablename__ = 'products'
@@ -40,6 +41,8 @@ class Product(BaseModel):
         }
 
     def to_summary_dict(self):
+        category = Category.query.filter_by(id=self.category_id).first()
+
         return {
             'id': self.id,
             'product_name': self.product_name,
@@ -47,7 +50,9 @@ class Product(BaseModel):
             'price': self.price,
             'quantity': self.quantity,
             'sold': self.sold,
-            'product_image': self.product_image
+            'product_image': self.product_image,
+            'category_name': category.category_name if category else None,
+
         }
 
     def __repr__(self):

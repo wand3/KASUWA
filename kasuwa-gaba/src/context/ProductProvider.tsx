@@ -19,6 +19,7 @@ export type ProductType = {
     quantity: number;
     specifications: { [key: string]: string};
     reviews: { id: number; rating: number; message: string; images: string[]; }[];
+    category: string;
 
 };
 

@@ -22,7 +22,7 @@ const Product = ({ product }: PropsType): ReactElement => {
     // console.log(img)
     const content =
 
-        <div className="bg-white max-h-[fit] rounded-2xl p-3 cursor-pointer hover:-translate-y-2 transition-all relative">
+        <div className="bg-white max-h-[fit] rounded-2xl px-3 py-4 cursor-pointer hover:-translate-y-2 transition-all relative">
             <div
               className="bg-gray-100 w-10 h-10 flex items-center justify-center rounded-full cursor-pointer absolute top-[0.5rem] right-[3%]">
               <svg xmlns="http://www.w3.org/2000/svg" width="16px" className="fill-gray-800 inline-block" viewBox="0 0 64 64">
