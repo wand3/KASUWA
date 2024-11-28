@@ -2,6 +2,7 @@ import './App.css'
 import { Routes, Route, Navigate } from "react-router-dom"
 import Kasuwa from './pages/Kasuwa';
 import ApiProvider from './context/ApiProvider';
+import { FilterProvider } from '../src/context/FilterContext';
 import About from './pages/About';
 
 import LoginPage from './pages/LoginPage';
@@ -11,6 +12,8 @@ import FavouritesPage from './pages/FavouritesPage';
 import OrdersPage from './pages/OrdersPage';
 import CartPage from './pages/CartPage';
 import { ProductPage } from './pages/ProductPage';
+import MainContent from "./components/MainContent";
+
 
 import ChangePasswordPage from './pages/ChangePassword';
 import { FlashProvider } from './context/FlashProvider';
@@ -36,7 +39,9 @@ function App() {
               
               
                 <Routes>
-
+                  <Route path="/" element={
+                    <PublicRoute><Kasuwa /></PublicRoute>
+                  } />
                   <Route path='/product/:id' element={
                     <PublicRoute><ProductPage /></PublicRoute>
                   } />
@@ -51,6 +56,12 @@ function App() {
                   } />
                   <Route path="/register" element={
                     <PublicRoute><RegisterPage /></PublicRoute>
+                  } />
+                  <Route path="/category/:id" element={
+                    <PublicRoute><Kasuwa /></PublicRoute>
+                  } />
+                  <Route path="/categories" element={
+                    <PublicRoute><Kasuwa /></PublicRoute>
                   } />
 
 

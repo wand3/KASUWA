@@ -2,7 +2,7 @@ import { createContext, ReactElement, useEffect, useState } from "react";
 import UseApi from "../hooks/UseApi";
 import useFlash from "../hooks/UseFlash";
 import { useParams } from "react-router-dom";
-
+import {CategoryType} from "../components/Product/CategoriesSelect"
 // Define ProductType
 export type ProductType = {
     category_id: number;
@@ -18,7 +18,7 @@ export type ProductType = {
     sold: number;
     quantity: number;
     specifications: { [key: string]: string};
-    reviews: { id: number; rating: number; message: string; images: string[]; }[]
+    reviews: { id: number; rating: number; message: string; images: string[]; }[];
 
 };
 
@@ -29,6 +29,8 @@ export type UseProductsContextType = {
   fetchproduct: (id: number) => void;
   deleteProduct: (id: number) => void,
   editProduct: (id: number) => void,
+  fetchCategory: () => void;
+
 };
 
 // Initialize the context with default values
@@ -36,9 +38,11 @@ const initContextState: UseProductsContextType = {
   products: null,
   fetchproducts: () => {},
   fetchproduct: () => {},
+  fetchCategory: () => {},
 
   deleteProduct: () => Promise<void>,
   editProduct: () => Promise<void>,
+
   }
 
 const ProductsContext = createContext<UseProductsContextType>(initContextState);
@@ -49,6 +53,8 @@ export const ProductsProvider = ({ children }: ChildrenType): ReactElement => {
   // Correctly type the state as an array of products or null
   const [products, setProducts] = useState<ProductType[] | null>(null);
   const [product, setProduct] = useState<ProductType[] | null>(null);
+
+  const [category, setCategoryProducts] = useState<CategoryType[]>([]);
 
 
 
@@ -97,8 +103,22 @@ export const ProductsProvider = ({ children }: ChildrenType): ReactElement => {
     }
   };
 
+  // fetch by category 
+  const fetchCategory = async () => {
+        try {
+            const response = await api.get<CategoryType>(`/categories`)
+            const data = await response.data;
+            // console.log(`category ${data}`)
+            setCategoryProducts(data);
+            console.log(data)
+        } catch (error) {
+            console.error("Failed to fetch products:", error);
+        }
+    };
+
   useEffect(() => {
-    fetchproducts(); // Fetch products on component mount
+    fetchproducts();
+    fetchCategory(); // Fetch products on component mount
   }, []);
 
 
@@ -145,6 +165,7 @@ export const ProductsProvider = ({ children }: ChildrenType): ReactElement => {
     products,
     fetchproducts, 
     fetchproduct,
+    fetchCategory,
     deleteProduct,
     editProduct,
      }}>

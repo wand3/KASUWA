@@ -13,7 +13,7 @@ def create_app(config_class=Config):
 
     db.init_app(app)
     migrate.init_app(app, db)
-    CORS(app, supports_credentials=True, resources={r"/api/*": {"origins": "http://localhost:5173"}})
+    CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173"}})
 
     from app.api import bp as api_bp
     app.register_blueprint(api_bp, url_prefix='/api')

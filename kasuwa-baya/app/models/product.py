@@ -43,6 +43,7 @@ class Product(BaseModel):
         return {
             'id': self.id,
             'product_name': self.product_name,
+            'category_id': self.category_id,
             'price': self.price,
             'quantity': self.quantity,
             'sold': self.sold,

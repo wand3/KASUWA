@@ -32,7 +32,7 @@ export const CartPage = ( ) => {
                 </div>
             {/* <!-- Sub total --> */}
 
-            <div className="mt-6 h-full rounded-lg border bg-white p-6 shadow-md md:mt-6 md:w-2/4">
+            <div className="hidden lg:block mt-6 h-full rounded-lg border bg-white p-6 shadow-md md:mt-6 md:w-2/4">
                 <div className="mb-2 flex justify-between">
                 <p className="text-gray-700">Subtotal</p>
 
@@ -44,14 +44,15 @@ export const CartPage = ( ) => {
                 {/* <p className="text-gray-700">${cartItems.total}</p> */}
                 </div>
                 <div className="flex justify-between">
-                <p className="text-gray-700">Shipping</p>
-                { cartItems ? cartItems && (
-                    <p className="text-gray-700">{formatCurrency(0)}</p>
+                    <p className="text-gray-700">Shipping</p>
+                    { cartItems ? cartItems && (
+                        <p className="text-gray-700">{formatCurrency(0)}</p>
 
-                    ): (<p className="text-gray-700">{formatCurrency(0)}</p>
-                )}
+                        ): (<p className="text-gray-700">{formatCurrency(0)}</p>
+                    )}
 
                 </div>
+                
                 <hr className="my-4" />
                 <div className="flex justify-between">
                 <p className="text-lg font-bold">Total</p>

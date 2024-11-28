@@ -3,6 +3,8 @@ import { Bars3Icon, BellIcon, XMarkIcon, ShoppingCartIcon, UserIcon } from '@her
 import clsx from 'clsx'
 import { useCart } from '../hooks/UseCart';
 import useUser from '../hooks/UseUser';
+import Sidebar from "../components/Sidebar";
+
 
 
 const navigation = [
@@ -238,6 +240,11 @@ const Nav = () => {
 
         
       </Disclosure>
+
+              {/* {sidebar && <Sidebar />} */}
+
+      <Sidebar />
+
     </>
   )
 }

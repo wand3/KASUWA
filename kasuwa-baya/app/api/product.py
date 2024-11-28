@@ -34,8 +34,29 @@ def search():
 
 @bp.route('/products', methods=['GET'])
 def get_products():
-    products = Product.query.all()
-    return jsonify([product.to_summary_dict() for product in products]), 200
+    # products = Product.query.all()
+    # itemsPerPage = request.args.get('itemsPerPage', default=8, type=int)  # Default to 16 items per page
+    # offset = request.args.get('offset', default=0, type=int)  # Default to start from the first item
+
+    limit = int(request.args.get('limit', 8))  # Default to 10 items per page
+    skip = int(request.args.get('skip', 0))    # Default to skipping 0 items
+
+
+    # Query the products from the database with limit and offset
+    # products = Product.query.offset(offset).limit(itemsPerPage).all()
+
+    products = Product.query.offset(skip).limit(limit).all()
+    total_products = Product.query.count()
+
+
+
+    # return jsonify([product.to_summary_dict() for product in products]), 200
+    return jsonify({
+            "products": [product.to_summary_dict() for product in products],
+            "total": total_products,
+            "limit": limit,
+            "skip": skip,
+        })
 
 @bp.route('/product/<int:product_id>', methods=['GET'])
 def get_product(product_id):
@@ -86,6 +107,7 @@ def add_to_cart():
             product_id=product_id,
             quantity=default_quantity,
             shipping_id=shipping_id,
+            color=color
         )
         db.session.add(cart_item)
 

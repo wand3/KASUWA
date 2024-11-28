@@ -2,15 +2,18 @@ import useProducts from "../hooks/UseProducts";
 // import { ProductType } from "../context/ProductsProvider";
 import { ReactElement } from "react";
 import Product from "./KasuwaItem";
+import { ProductType } from "../context/ProductProvider";
+import { ProductPagType } from "./MainContent";
 
 
-export const KasuwaItems = () => {
-  const {products} = useProducts();
+
+export const KasuwaItems = (products: ProductPagType) => {
+//   const {products} = useProducts();
 
   let pageContent: ReactElement | ReactElement[] = <p>Loading...</p>
 
-  if (products?.length) {
-      pageContent = products.map(product => {
+  if (products.products?.length) {
+      pageContent = products.products.map(product => {
 
           return (
               <Product
@@ -22,8 +25,9 @@ export const KasuwaItems = () => {
     }
 
     const content = (
+        <main className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
 
-        <main className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 max-xl:gap-4 gap-6 pt-10 px-3">
+         {/* <main className="grid grid-cols-2 md:h-[80vh] sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 max-xl:gap-4 gap-6 pt-10 px-3"> */}
             {pageContent}
         </main>
     )

@@ -15,11 +15,10 @@ const Jiki: FC<BodyProps> = ({ nav, children }) => {
       <div className="bg-[#eeeeeb] h-full font-sans">
         {nav && <Nav />}
         {children}
-        <FlashMessage />
-       
-        <Footer />
+        <FlashMessage />       
+        
       </div>
-      
+      <Footer />
     </>
 )};
 
