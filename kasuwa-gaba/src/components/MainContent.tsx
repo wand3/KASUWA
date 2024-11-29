@@ -7,7 +7,7 @@ import { useFilter } from "../context/FilterContext";
 import Product from "./KasuwaItem";
 import KasuwaItems from "./KasuwaItems";
 
-import { Tally3 } from "lucide-react";
+import { Filter, Tally3 } from "lucide-react";
 import NavButtomMobile from "./NavMobileBottom";
 import NavMobileTop from "./NavMobileTop";
 import { FilterProvider } from "../context/FilterContext";
@@ -117,9 +117,9 @@ const MainContent = () => {
     }
 
     switch (filter) {
-      case "expensive":
+      case "High to low":
         return filteredProducts.sort((a, b) => b.price - a.price);
-      case "cheap":
+      case "Low to high":
         return filteredProducts.sort((a, b) => a.price - b.price);
       default:
         return filteredProducts;
@@ -159,46 +159,38 @@ const MainContent = () => {
   return (
   <>
     <Sidebar />
-    <section className="absolute top-[15vh] md:h-[fit] bg-[#eeeeeb] right-0 md:max-w-[75%] sm:w-[90%] xs:w-[20rem] p-5">
+    <section className="absolute md:top-[15vh] md:h-[fit] bg-[#eeeeeb] right-0 md:max-w-[75%] sm:w-[100%] xs:w-[20rem] p-5">
       <div className="mb-5">
         <div className="flex flex-col sm:flex-row justify-between items-center">
           <div className="relative mb-5 mt-5">
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="border px-4 py-2 rounded-full flex items-center"
+              className="border px-4 py-2 rounded-full shadow-md flex items-center"
             >
-              <Tally3 className="mr-2" />
+              <Filter className="mr-2 text-slate-600" />
               {filter === "all"
                 ? "Filter"
                 : filter.charAt(0).toUpperCase() + filter.slice(1)}
             </button>
             {dropdownOpen && (
-              <div className="absolute bg-white border border-gray-300 rounded mt-2 w-full sm:w-40">
+              <div className="absolute z-10 text-xs bg-white border border-gray-300 rounded mt-2 w-full sm:w-40">
                 <button
-                  onClick={() => setFilter("cheap")}
+                  onClick={() => setFilter("Low to high")}
                   className="block px-4 py-2 w-full text-left hover:bg-gray-200"
                 >
-                  Cheap
+                  Lowest to highest
                 </button>
                 <button
-                  onClick={() => setFilter("expensive")}
+                  onClick={() => setFilter("High to low")}
                   className="block px-4 py-2 w-full text-left hover:bg-gray-200"
                 >
-                  Expensive
+                  Highest to lowest
                 </button>
               </div>
             )}
           </div>
         </div>
 
-        {/* <div className="grid grid-cols-4 sm:grid-cols-3 md:grid-cols-4 gap-5">
-          {filteredProducts.map((product) => (
-            <Product
-              key={product.id}
-              product={product}             
-            />
-          ))}
-        </div> */}
         <KasuwaItems products={filteredProducts} total={0} limit={0} skip={0} />
 
         <div className="flex flex-col sm:flex-row justify-between items-center mt-5">

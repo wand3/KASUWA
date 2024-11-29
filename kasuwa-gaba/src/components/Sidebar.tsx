@@ -36,13 +36,16 @@ const Sidebar = () => {
   const [allCategories, setAllCategories] = useState<CategoryType[]>([]); // Set correct initial type
 
 
-  const [keywords] = useState<string[]>([
-    "apple",
-    "watch",
-    "Fashion",
-    "trend",
-    "shoes",
-    "shirt",
+  // const [keywords] = useState<string[]>([
+  //   "apple",
+  //   "watch",
+  //   "Fashion",
+  //   "trend",
+  //   "shoes",
+  //   "shirt",
+  // ]);
+  const [keywords, setKeywords] = useState<CategoryType[]>([
+  
   ]);
 
   // Fetch categories from the API
@@ -52,7 +55,7 @@ const Sidebar = () => {
       const data = response.body;
       console.log(data);
 
-      setAllCategories(data.categories); // Extract `categories` from the response and set state
+      setKeywords(data?.categories); // Extract `categories` from the response and set state
     } catch (error) {
       console.error("Failed to fetch categories:", error);
     }
@@ -65,11 +68,28 @@ const Sidebar = () => {
         const response = await api.get<ProductPagType>('/products');
         const data = response.body;
         console.log(data?.products);
-        const uniqueCategories = Array.from(
-          new Set(data?.products.map((product) => product.category))
-        );
+        // const uniqueCategories = Array.from(
+        //   new Set(data?.products.map((product) => product.category))
+        // );
+        // console.log(uniqueCategories)
+        // setCategories(uniqueCategories);
+        if (data?.products) {
+          // Map categories dynamically and ensure uniqueness
+          const uniqueCategories = Array.from(
+            new Map(
+              data.products.map((product) => [
+                product.category_id, // Use category_id as the key for uniqueness
+                {
+                  id: product.category_id,
+                  category_name: product.category,
+                },
+              ])
+            ).values()
+          );
         console.log(uniqueCategories)
-        setCategories(uniqueCategories);
+
+          setCategories(uniqueCategories);
+        }
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -137,11 +157,11 @@ const Sidebar = () => {
         </div>
 
         {/* Categories Section */}
-        <div className="mb-5">
+        {/* <div className="mb-5">
           <h2 className="text-xl font-semibold mb-3">Categories</h2>
           <div>
-            {allCategories.map((category) => (
-              <label key={category.id} className="block mb-2">
+            {allCategories.map((category, index) => (
+              <label key={index} className="block mb-2">
                 <input
                   type="radio"
                   name="category"
@@ -150,14 +170,28 @@ const Sidebar = () => {
                   checked={selectedCategory === category.category_name}
                   className="mr-2 w-[16px] h-[16px]"
                 />
-                {category.category_name.toUpperCase()}
+                {category?.category_name.toUpperCase()}
               </label>
             ))}
           </div>
         </div>
-       
+        */}
 
         {/* Keywords Section */}
+        <div className="mb-5">
+          <h2 className="text-xl font-semibold mb-3">Keywords</h2>
+          <div>
+            {keywords.map((keyword, index) => (
+              <button
+                key={keyword.id}
+                onClick={() => handleKeywordClick(keyword.category_name)}
+                className="block mb-2 px-4 py-2 w-full text-left border rounded hover:bg-gray-200"
+              >
+                {keyword.category_name.toUpperCase()}
+              </button>
+            ))}
+          </div>
+        </div>
         
 
         <button
