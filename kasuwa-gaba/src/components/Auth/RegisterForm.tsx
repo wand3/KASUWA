@@ -19,7 +19,7 @@ export const RegInputField = ({ name, label, type, placeholder, error, Fieldref 
     return(
     
         <>
-            <div className="col-span-6 sm:col-span-3 py-2">
+            <div className="sm:w-[full] md:w-[100%] py-2">
                 { label && (
                 <Field>
                     <Label className="block text-sm font-medium text-gray-700" htmlFor={name}>{label}</Label>
@@ -27,7 +27,7 @@ export const RegInputField = ({ name, label, type, placeholder, error, Fieldref 
                     placeholder={placeholder}
                     type={type}
                     ref={Fieldref}
-                    className={ clsx("mt-1 w-full my-3 rounded-md border-gray-200 bg-white text-sm text-gray-700 shadow-sm",
+                    className={ clsx("mt-1 w-full my-3 h-8 shadow-md rounded-md border-gray-600 px-2 bg-[#efefec] text-sm text-gray-700",
                         "focus:outline-none data-[focus]:outline-2 data-[focus]:-outline-offset-2 data-[focus]:outline-white/25"
                     ) }
                     />

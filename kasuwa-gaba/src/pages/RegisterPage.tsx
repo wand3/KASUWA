@@ -78,28 +78,28 @@ const RegisterPage = () => {
 
   return (
     <>
-      <Jiki nav>
+      <Jiki nav={false}>
         <section className="bg-white">
           <div className="lg:grid lg:min-h-screen lg:grid-cols-12">
             <aside className="relative block h-16 lg:order-last lg:col-span-5 lg:h-full xl:col-span-6">
-              <img src="../../public/pexels-gabby-k-9430875.jpg" className="absolute inset-0 h-full w-full object-cover"/>
+              <img src="/pexels-gabby-k-9430875.jpg" className="absolute inset-0 h-full w-full object-cover"/>
             </aside>
 
             <main
               className="flex items-center justify-center px-8 py-8 sm:px-12 lg:col-span-7 lg:px-16 lg:py-12 xl:col-span-6"
             >
-              <div className="max-w-xl lg:max-w-3xl">
+              <div className="max-w-xl lg:max-w-3xl shadow-lg pb-5 px-3 rounded-md">
                 <a className="block text-[#ba2a25]" href="/">
                   <span className="sr-only">Home</span>
                   <StoreIcon className="h-[4rem] w-fit"/>
                 </a>
 
                 <h1 className="mt-6 text-2xl font-bold text-gray-900 sm:text-3xl md:text-4xl">
-                  Welcome to Ksuwa <span className="inline-flex"><ShoppingBag /></span>
+                  Welcome to Ksuwa <span className="inline-flex absolute mt-1 ml-1"><ShoppingBag /></span>
                 </h1>
 
                 <form onSubmit={onSubmit} className="mt-8 grid grid-cols-6 gap-6">
-                  <div className="col-span-6 sm:col-span-3">
+                  <div className="col-span-6">
                      <RegInputField
                       name="email"
                       label="Email"
@@ -152,21 +152,21 @@ const RegisterPage = () => {
                     </div>
 
           
-                    <div className="col-span-6 sm:flex py-4 sm:items-center sm:gap-4">
+                    <div className="max-w-max sm:flex py-4 sm:items-center sm:gap-4">
 
                       <Button
-                        className="inline-block shrink-0 rounded-md border border-green-600 bg-gray-700 py-3 px-12 text-sm font-semibold text-white transition shadow-inner shadow-white/10 focus:outline-none data-[hover]:bg-transparent hover:text-slate-700 data-[focus]:outline-2"
+                        className="inline-block shrink-0 rounded-md border border-slate-900 bg-slate-800 hover:bg-transparent py-3 px-12 text-sm font-semibold text-white transition shadow-slate-600 focus:outline-1 hover:text-slate-900 data-[focus]:outline-2"
                         type="submit"
                       >
                         Create an account
 
                       </Button>
-                      
+                        <p className="mt-4 text-sm text-gray-500 sm:mt-0">
+                          Already have an account?
+                          <a href="/login" className="text-gray-700 underline"> Log in</a>.
+                        </p>
                     </div>
-                    <p className="mt-4 text-sm text-gray-500 sm:mt-0">
-                        Already have an account?
-                        <a href="/login" className="text-gray-700 underline">Log in</a>.
-                      </p>
+                    
                   </div>
                 </form>
 
