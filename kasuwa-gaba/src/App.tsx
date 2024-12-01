@@ -58,9 +58,7 @@ function App() {
                   <Route path="/register" element={
                     <PublicRoute><RegisterPage /></PublicRoute>
                   } />
-                  <Route path="/category/:id" element={
-                    <PublicRoute><Kasuwa /></PublicRoute>
-                  } />
+                  <Route path="/category/:id" />
                   <Route path="/categories" element={
                     <PublicRoute><Kasuwa /></PublicRoute>
                   } />

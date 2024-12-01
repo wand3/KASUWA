@@ -1,8 +1,9 @@
 import { createContext, ReactElement, useEffect, useState } from "react";
 import UseApi from "../hooks/UseApi";
 import useFlash from "../hooks/UseFlash";
-import { useParams } from "react-router-dom";
 import {CategoryType} from "../components/Product/CategoriesSelect"
+
+
 // Define ProductType
 export type ProductType = {
     category_id: number;

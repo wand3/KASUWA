@@ -1,15 +1,10 @@
 import { useEffect, useState } from "react";
 import UseApi from "../hooks/UseApi";
-import Jiki from "./Jiki";
-import axios from "axios";
 import { useFilter } from "../context/FilterContext";
-// import BookCard from "./BookCard";
-import Product from "./KasuwaItem";
 import KasuwaItems from "./KasuwaItems";
 
-import { Filter, Tally3 } from "lucide-react";
+import { Filter} from "lucide-react";
 import NavButtomMobile from "./NavMobileBottom";
-import NavMobileTop from "./NavMobileTop";
 import { FilterProvider } from "../context/FilterContext";
 import { ProductType } from "../context/ProductProvider";
 import Footer from "../components/Footer";
@@ -42,15 +37,6 @@ const MainContent = () => {
   //     url = `https://dummyjson.com/products/search?q=${keyword}`;
   //   }
 
-  //   axios
-  //     .get(url)
-  //     .then((response) => {
-  //       setProducts(response.data.products);
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error fetching data: ", error);
-  //     });
-  // }, [currentPage, keyword]);
     let url = `/products?limit=${itemsPerPage}&skip=${
       (currentPage - 1) * itemsPerPage
     }`;
@@ -62,7 +48,6 @@ const MainContent = () => {
       console.log("api.getpag");
 
       try {
-        console.log("api.getpag");
         const getProducts = async () => {
           const response = await api.get<ProductPagType>(`${url}`);
           console.log(response.body);
@@ -86,7 +71,7 @@ const MainContent = () => {
       }
         
   // }, [currentPage, keyword]);
-    }, [currentPage]);
+  }, [currentPage]);
 
 
   const getFilteredProducts = () => {
@@ -176,13 +161,13 @@ const MainContent = () => {
               <div className="absolute z-10 text-xs bg-white border border-gray-300 rounded mt-2 w-full sm:w-40">
                 <button
                   onClick={() => setFilter("Low to high")}
-                  className="block px-4 py-2 w-full text-left hover:bg-gray-200"
+                  className="block px-4 py-2 shadow-sm w-full text-left hover:bg-gray-200"
                 >
                   Lowest to highest
                 </button>
                 <button
                   onClick={() => setFilter("High to low")}
-                  className="block px-4 py-2 w-full text-left hover:bg-gray-200"
+                  className="block px-4 py-2 w-full shadow-sm text-left hover:bg-gray-200"
                 >
                   Highest to lowest
                 </button>

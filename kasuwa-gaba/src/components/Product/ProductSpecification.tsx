@@ -8,7 +8,7 @@ type PropsType = {
 export default function ProductInfos( {product}: ProductType) {
   return (
     <>
-      <div className="flex h-screen w-full justify-center pt-0 px-4">
+      <div className="flex h-fit w-full justify-center pt-0 pb-5 px-4">
         <div className="w-full max-w-[80vw]">
           <TabGroup>
             <TabList className="flex gap-4">

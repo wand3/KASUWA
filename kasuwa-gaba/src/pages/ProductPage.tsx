@@ -1,25 +1,36 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import UseApi from "../hooks/UseApi";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import useProducts from "../hooks/UseProducts";
 import { ProductType } from "../context/ProductProvider";
 import ProductPart from "../components/Product/Product";
+import RecommendedItems from "../components/Product/RecommendedItems";
 import RecommendedPart from "../components/Product/Recommended";
 import ReviewPart from "../components/Product/Reviews";
 import { formatCurrency } from "../utilities/formatCurrency";
 import Config from "../config";
 import Jiki from "../components/Jiki";
 import ProductInfos from "../components/Product/ProductSpecification";
-import { CheckBadgeIcon } from "@heroicons/react/24/solid";
 import { Button, Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
+import Footer from "../components/Footer";
+import { ArrowLeftIcon } from "lucide-react";
+
+
+interface ApiResponse {
+  products: ProductType[];
+}
+
 
 export const ProductPage = () => {
   const {id} = useParams();
   const api = UseApi();
+  const navigate = useNavigate();
+
   const [product, setProduct] = useState<ProductType | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | ''>(product?.colors[0]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [productCategory, setProductCategory] = useState<ProductType[]>([]);
 
   let [isOpen, setIsOpen] = useState(false) 
 
@@ -39,25 +50,67 @@ export const ProductPage = () => {
     
   }
 
+  // back button 
+  const goBack = () => {
+    return navigate(-1);
+  }
+  
+
+
   const loadProduct = async () => {
       try {
       const response = await api.get<ProductType>(`/product/${id}`);
-      // console.log("api.get");
-
-      // const data = response.body;
-      // const response = fetchproduct(id);
       console.log("api.get");
 
       const data = response.body;
       console.log(data)
-      setProduct(data); 
 
+      setProduct(data); 
+            // console.log(product?.description)
     } catch (error) {
       setProduct(null); // Handle error state
     }
+  }
+
+            
+
+  const laodCategory = async (catId: number) => {
+    try {
+
+      const response = await api.get<ApiResponse>(`/category/${catId}`);
+      console.log("api.get");
+
+      const data = response.body;
+      console.log('catin')
+          // console.log(data)
+
+      // setProducts(data); // Assume data is an array of products
+      // Type assertion: assert that data is an array of ProductType
+      // if (Array.isArray(data)) {
+        console.log(data)
+
+        setProductCategory(data?.products); // Type assertion
+        console.log(productCategory)
+
+
+
+      // } else {
+        // throw new Error("Invalid data format");
+      // }
+    } catch (error) {
+      setProductCategory([]); // Handle error state
     }
+   
+  }
+  
   useEffect( () => {
-    loadProduct()
+    loadProduct();
+    if (product) {
+      laodCategory(product?.category_id);
+    }
+    laodCategory(product?.category_id || 2);
+    // console.log(productCategory)
+
   }, [])
 
    // Function to update Color for a selected product
@@ -78,11 +131,23 @@ export const ProductPage = () => {
     <>
       <Jiki nav>
         <div className="">
+          <button onClick={() => {goBack()}}>
+            <span className="absolute m-4 top-[5%] md:top-[10%] md:ml-[-40px] hover:text-red-600"><ArrowLeftIcon className="w-6 h-6 font-extrabold"/>
+            </span>
+          </button>
               <div className="px-0 py-5 lg:max-w-6xl max-w-2xl max-lg:mx-auto">
                   <div className="grid items-start grid-cols-1 lg:grid-cols-2 ">
 
                       {/* product image top  */}
                       <div className="w-full p-2 top-0 text-center pt-10 mb-4">
+                      <div
+                        className="bg-gray-100 w-10 h-10 shadow-lg flex items-center justify-center rounded-full cursor-pointer relative ml-[88%] sm:mt-[-10%] lg:mt-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16px" className="fill-gray-800 inline-block" viewBox="0 0 64 64">
+                          <path
+                            d="M45.5 4A18.53 18.53 0 0 0 32 9.86 18.5 18.5 0 0 0 0 22.5C0 40.92 29.71 59 31 59.71a2 2 0 0 0 2.06 0C34.29 59 64 40.92 64 22.5A18.52 18.52 0 0 0 45.5 4ZM32 55.64C26.83 52.34 4 36.92 4 22.5a14.5 14.5 0 0 1 26.36-8.33 2 2 0 0 0 3.27 0A14.5 14.5 0 0 1 60 22.5c0 14.41-22.83 29.83-28 33.14Z"
+                            data-original="#000000"></path>
+                        </svg>
+                      </div>
                           <div className="h-[80vw] lg:h-[560px] flex justify-center">
                               <img
                                 src={selectedColor ? `${Config.baseURL}/static/images/product_images/${product?.product_images[selectedImageIndex]}` : `${Config.baseURL}/static/images/product_images/${product?.product_image}`} // Assuming images are stored relative to API base URL
@@ -91,7 +156,7 @@ export const ProductPage = () => {
                           </div>
                       </div>
 
-                      <div className="pt-7 background-light rounded-t-[50px] rounded-b-[10px] pb-4 lg:mx-3 px-3">
+                      <div className="pt-5 background-light rounded-t-[50px] rounded-b-[10px] pb-4 mb-5 lg:mx-3 px-3 lg:mt-[6%] shadow-md">
                           <div className="flex flex-wrap items-start gap-4 px-2">
                               <div>
                                   <h2 className="text-2xl font-bold text-gray-800">{product?.product_name}</h2>
@@ -220,15 +285,24 @@ export const ProductPage = () => {
                       </div>
                   </div>
 
-                  <div className="mt-0 max-w-4xl p-2 block bg-[#f7f7f7] mx-auto max-h-[70vh]">
+                  <div className="mt-0 max-w-4xl p-2 block bg-[#f7f7f7] mx-auto max-h-[70vh] rounded-md shadow-md">
                       {product && (
                         <ProductInfos product={product} />
                         )}
                   </div>
               </div>
           </div>
-        <ReviewPart />
-        <RecommendedPart />
+        <p className="font-semibold text-slate-600 text-sm pl-[5%] py-2">Related Products</p>
+        <div className="overflow-scroll flex gap-5 px-3 md:px-5 pb-12 md:justify-center">
+          
+          { productCategory.map((category) => (
+            <RecommendedPart key={category.id} category={category}/>
+          
+          ))}
+        </div>
+        
+
+        <Footer />
       </Jiki>
     </>
   
