@@ -6,6 +6,7 @@ import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 import { formatCurrency } from "../utilities/formatCurrency"
 import { useEffect } from "react";
 import { Button } from "@headlessui/react";
+import ShoppingCartIcon from "@heroicons/react/24/outline/ShoppingCartIcon";
 
 
 export const CartPage = ( ) => {
@@ -78,10 +79,15 @@ export const CartPage = ( ) => {
 
             </div>
             {/* sticky footer for checkout  */}
-            <div className="flex sticky bottom-0 h-[8vh] px-[1rem] text-white py-2 text-1xl bg-slate-800/80 backdrop-blur-sm font-mono">
+            <div className="flex sticky bottom-0 h-[8vh] px-[1rem] text-slate-900 py-2 text-1xl bg-gray-300 font-mono">
                 <h3>Subtotal </h3>
                 <span className="px-3">{new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(cartItems?.total)}</span>
-                <Button className="absolute right-0 pr-[3rem]" >Checkout</Button>
+                <a type='button' onClick={() => {}} className="group w-fit my-1 p-2 inline-flex h-auto items-center justify-center overflow-hidden rounded-md bg-slate-800 px-3 font-medium text-white absolute right-0 mr-8">
+                    <span className="text-[13px]">Checkout</span>
+                    <div className="ml-1 transition duration-300 group-hover:rotate-[360deg]">
+                        <ShoppingCartIcon aria-hidden="false" className="h-5 w-5 fill:black" />
+                    </div>
+                </a>
             </div>
         </Jiki>
     </>

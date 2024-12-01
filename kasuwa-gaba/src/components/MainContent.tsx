@@ -29,11 +29,6 @@ const MainContent = () => {
   const api = UseApi();
   useEffect(() => {
 
-
-  //   if (keyword) {
-  //     url = `https://dummyjson.com/products/search?q=${keyword}`;
-  //   }
-
     let url = `/products?limit=${itemsPerPage}&skip=${
       (currentPage - 1) * itemsPerPage
     }`;
@@ -100,7 +95,7 @@ const MainContent = () => {
 
     if (searchQuery) {
       filteredProducts = filteredProducts.filter((product) =>
-        product.title.toLowerCase().includes(searchQuery.toLowerCase())
+        product.product_name.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
@@ -149,7 +144,7 @@ const MainContent = () => {
     <Sidebar />
     <section className="absolute md:top-[15vh] md:h-[fit] bg-[#eeeeeb] right-0 md:max-w-[75%] sm:w-[100%] xs:w-[20rem] p-5">
       <div className="mb-5">
-        <div className="flex flex-col sm:flex-row justify-between items-center">
+        <div className="flex sm:flex-row justify-between items-center">
           <div className="relative mb-5 mt-5">
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -196,7 +191,7 @@ const MainContent = () => {
                 key={page}
                 onClick={() => handlePageChange(page)}
                 className={`border px-4 py-2 mx-1 rounded-full ${
-                  page === currentPage ? "bg-black text-white" : ""
+                  page === currentPage ? "bg-slate-800 text-white" : ""
                 }`}
               >
                 {page}
@@ -217,7 +212,6 @@ const MainContent = () => {
 
       <Footer />
     </section>
-    {/* <NavButtomMobile /> */}
     
   
   </>

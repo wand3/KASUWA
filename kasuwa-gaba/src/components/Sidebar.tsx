@@ -33,17 +33,7 @@ const Sidebar = () => {
   } = useFilter();
 
   const [categories, setCategories] = useState<string[]>([]);
-  const [allCategories, setAllCategories] = useState<CategoryType[]>([]); // Set correct initial type
 
-
-  // const [keywords] = useState<string[]>([
-  //   "apple",
-  //   "watch",
-  //   "Fashion",
-  //   "trend",
-  //   "shoes",
-  //   "shirt",
-  // ]);
   const [keywords, setKeywords] = useState<CategoryType[]>([]);
 
   // Fetch categories from the API
@@ -59,18 +49,12 @@ const Sidebar = () => {
     }
   };
 
-
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const response = await api.get<ProductPagType>('/products');
         const data = response.body;
         console.log(data?.products);
-        // const uniqueCategories = Array.from(
-        //   new Set(data?.products.map((product) => product.category))
-        // );
-        // console.log(uniqueCategories)
-        // setCategories(uniqueCategories);
         if (data?.products) {
           // Map categories dynamically and ensure uniqueness
           const uniqueCategories = Array.from(
@@ -126,13 +110,12 @@ const Sidebar = () => {
 
   return (
     <>
-    <div className="hidden md:block w-[20%] py-5 px-2 h-screen">
-      <h1 className="text-2xl font-bold mb-10 mt-4">React Store</h1>
+    <div className="hidden md:block w-[20%] py-5 px-2 h-[200vh]">
 
       <section className="w-fit py-1">
         <input
           type="text"
-          className="border-2 rounded w-fit px-2 p-2 sm:mb-0"
+          className="border-2 rounded-lg w-[100%] px-2 p-2 sm:mb-0 "
           placeholder="Search Product"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -140,14 +123,14 @@ const Sidebar = () => {
         <div className="flex justify-center items-center">
           <input
             type="number"
-            className="border-2 mr-2 px-5 py-3 mb-3 w-full"
+            className="border-2 mr-2 px-4 py-3 mb-3 rounded-lg w-[100%]"
             placeholder="Min"
             value={minPrice ?? ""}
             onChange={handleMinPriceChange}
           />
           <input
             type="number"
-            className="border-2  px-5 py-3 mb-5 mt-2 w-full"
+            className="border-2  px-4 py-3 mb-5 mt-2 rounded-lg w-[100%]"
             placeholder="Max"
             value={maxPrice ?? ""}
             onChange={handleMaxPriceChange}
@@ -177,13 +160,13 @@ const Sidebar = () => {
 
         {/* Keywords Section */}
         <div className="mb-5">
-          <h2 className="text-xl font-semibold mb-3">Keywords</h2>
+          <h2 className="text-1xl font-semibold mb-3">Category</h2>
           <div>
             {keywords.map((keyword, index) => (
               <button
                 key={index}
                 onClick={() => handleKeywordClick(keyword.category_name)}
-                className="block mb-2 px-4 py-2 w-full text-left border rounded hover:bg-gray-200"
+                className="block mb-2 px-4 py-2 w-full text-left border shadow-lg text-sm rounded hover:bg-gray-300"
               >
                 {keyword.category_name.toUpperCase()}
               </button>

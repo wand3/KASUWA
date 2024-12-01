@@ -35,7 +35,7 @@ const NavButtomMobile = () => {
 
     return (
         <> 
-            <div className={`sticky ${ scrollDirection === "down" ? "-top-24" : "bottom-0"}  rounded-full bg-slate-500/50 md:hidden z-10 p-3 transition-all duration-500`}>
+            <div className={`sticky ${ scrollDirection === "down" ? "-top-24" : "bottom-0"} hidden rounded-full bg-slate-500/50 md:hidden z-10 p-3 transition-all duration-500`}>
                 <div className="grid h-full max-w-lg grid-cols-4 mx-auto">
                     <a href="/" className="inline-flex flex-col items-center justify-center px-5 rounded-s-full hover:bg-gray-50 dark:hover:bg-gray-800 group">
                         <HomeIcon className="w-6 h-6 mb-1  text-gray-100 dark:text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-400" />
