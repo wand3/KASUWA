@@ -29,9 +29,6 @@ const MainContent = () => {
   const api = UseApi();
   useEffect(() => {
 
-  //   let url = `https://dummyjson.com/products?limit=${itemsPerPage}&skip=${
-  //     (currentPage - 1) * itemsPerPage
-  //   }`;
 
   //   if (keyword) {
   //     url = `https://dummyjson.com/products/search?q=${keyword}`;
@@ -41,37 +38,43 @@ const MainContent = () => {
       (currentPage - 1) * itemsPerPage
     }`;
 
+    if (keyword) {
+      url = `/search?query=${keyword}`;
+    }
 
-    // if (keyword) {
-    //   url = `https://dummyjson.com/products/search?q=${keyword}`;
-    // }
-      console.log("api.getpag");
+    console.log("api.getpag");
 
+    if (!keyword) {
       try {
         const getProducts = async () => {
           const response = await api.get<ProductPagType>(`${url}`);
           console.log(response.body);
-
-
           const data = response.body;
           console.log(data)
-          // setProducts(data); // Assume data is an array of products
-          // Type assertion: assert that data is an array of ProductType
-          // if (Array.isArray(data)) {
           setProducts(data?.products as ProductType[]); // Type assertion
-          // }// } else {
-          //   console.log("Invalid data format");
-          // }
         }
         const p = getProducts();
         console.log(p)
-        
       } catch (error) {
         console.error("Error fetching data: ", error); // Handle error state
       }
+    } else {
+      try {
+        const searchProducts = async () => {
+          const response = await api.post(`${url}`,{ "query": keyword});
+          const data = response.body;
+          console.log(data)
+          setProducts(data as ProductType[]); // Type assertion
+        }
+        const p = searchProducts();
+        console.log(p)
+      } catch (error) {
+        console.error("Error fetching data: ", error); // Handle error state
+      }
+    
+    }
         
-  // }, [currentPage, keyword]);
-  }, [currentPage]);
+  }, [currentPage, keyword]);
 
 
   const getFilteredProducts = () => {

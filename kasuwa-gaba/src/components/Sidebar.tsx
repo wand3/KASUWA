@@ -44,9 +44,7 @@ const Sidebar = () => {
   //   "shoes",
   //   "shirt",
   // ]);
-  const [keywords, setKeywords] = useState<CategoryType[]>([
-  
-  ]);
+  const [keywords, setKeywords] = useState<CategoryType[]>([]);
 
   // Fetch categories from the API
   const fetchCategory = async () => {
@@ -183,7 +181,7 @@ const Sidebar = () => {
           <div>
             {keywords.map((keyword, index) => (
               <button
-                key={keyword.id}
+                key={index}
                 onClick={() => handleKeywordClick(keyword.category_name)}
                 className="block mb-2 px-4 py-2 w-full text-left border rounded hover:bg-gray-200"
               >
