@@ -2,11 +2,21 @@ import { createContext } from "react";
 import React, {useState, useEffect, useCallback} from "react";
 import UseApi from "../hooks/UseApi";
 
+export interface AddressSchema {
+  street: string;
+  city: string;
+  state: string;
+  country: string;
+  zipcode: string;
+  is_default: boolean;
+}
+
 export interface UserSchema {
   id: number;
   fullname?: string;
   email: string;
   role: number;
+  shipping_address: AddressSchema;
 }
 
 export type UserContextType = {
@@ -16,6 +26,9 @@ export type UserContextType = {
   logout: () => void;
   setUser: (user: UserSchema | null | undefined) => void;
   fetchUser: () => void;
+  fetchAddress: () => void;
+  address: AddressSchema | null | undefined;
+  setAddress: ( address: AddressSchema | null | undefined ) => void;
 }
 
 const UserContext = createContext<UserContextType | null>(null);
@@ -26,8 +39,6 @@ export const UserProvider = ({children}: React.PropsWithChildren<{}>) => {
 
   const api = UseApi()
 
-    
-    
   
   const login = useCallback(async (email: string, password: string) => {
     const result = await api.login(email, password);
@@ -51,7 +62,6 @@ export const UserProvider = ({children}: React.PropsWithChildren<{}>) => {
     console.log(response)
 
   }, [api]);
-
 
   // Fetch products function
   const fetchUser = async () => {

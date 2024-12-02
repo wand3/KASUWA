@@ -125,7 +125,7 @@ export const ProductPage = () => {
                       {/* product image top  */}
                       <div className="w-full p-2 top-0 text-center pt-10 mb-4">
                       <div
-                        className="bg-gray-100 w-10 h-10 shadow-lg flex items-center justify-center rounded-full cursor-pointer absolute ml-[75%] sm:mt-[2%] md:mt-5 md:ml-[67%] lg:mt-[15px] lg:ml-[40%]">
+                        className="bg-gray-100 w-10 h-10 shadow-lg flex items-center justify-center rounded-full cursor-pointer absolute ml-[75%] sm:mt-[-50px] md:mt-5 md:ml-[67%] lg:mt-[15px] lg:ml-[40%] xl:ml-[29%]">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16px" className="fill-gray-800 inline-block" viewBox="0 0 64 64">
                           <path
                             d="M45.5 4A18.53 18.53 0 0 0 32 9.86 18.5 18.5 0 0 0 0 22.5C0 40.92 29.71 59 31 59.71a2 2 0 0 0 2.06 0C34.29 59 64 40.92 64 22.5A18.52 18.52 0 0 0 45.5 4ZM32 55.64C26.83 52.34 4 36.92 4 22.5a14.5 14.5 0 0 1 26.36-8.33 2 2 0 0 0 3.27 0A14.5 14.5 0 0 1 60 22.5c0 14.41-22.83 29.83-28 33.14Z"
@@ -269,7 +269,7 @@ export const ProductPage = () => {
                       </div>
                   </div>
 
-                  <div className="mt-0 max-w-4xl p-2 block bg-[#f7f7f7] mx-auto max-h-[70vh] rounded-md shadow-md">
+                  <div className="mt-0 max-w-4xl p-2 block bg-[#f7f7f7] mx-auto min-h-[70vh] rounded-md shadow-md">
                       {product && (
                         <ProductInfos product={product} />
                         )}

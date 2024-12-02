@@ -28,6 +28,8 @@ import AdminEditProductPage from './pages/Admin/AdminEditProductPage';
 import AdminEditShippingPage from './pages/Admin/AdminEditShippingPage';
 import AdminEditCategoryPage from './pages/Admin/AdminEditCategoryPage';
 
+import UserShippingPage from './pages/User/ShippingPage';
+
 
 function App() {
   return (
@@ -83,7 +85,7 @@ function App() {
                     <PrivateRoute>
                       <Routes>
                         <Route path="/" element={<Kasuwa />} />
-                        {/* <Route path="/explore" element={<ExplorePage />} /> */}
+                        <Route path="/shipping" element={<UserShippingPage />} />
                         <Route path="/orders" element={<OrdersPage />} />
 
                         <Route path="/cart" element={<CartPage cart={{
@@ -92,7 +94,7 @@ function App() {
                       }} />} />
 
 
-                        <Route path='/shipping' />
+                        {/* <Route path='/shipping' /> */}
                         
 
                         <Route path="/favs" element={<FavouritesPage />} />

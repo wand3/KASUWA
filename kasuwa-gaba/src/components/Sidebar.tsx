@@ -110,7 +110,7 @@ const Sidebar = () => {
 
   return (
     <>
-    <div className="hidden md:block w-[20%] py-5 px-2 h-[200vh]">
+    <div className="hidden md:block w-[20%] py-5 px-2 h-[275vh]">
 
       <section className="w-fit py-1">
         <input

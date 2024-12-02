@@ -75,8 +75,6 @@ export const CartPage = ( ) => {
                 <button className="mt-6 w-full rounded-md bg-blue-500 py-1.5 font-medium text-blue-50 hover:bg-blue-600">Check out</button>
             </div>
 
-            
-
             </div>
             {/* sticky footer for checkout  */}
             <div className="flex sticky bottom-0 h-[8vh] px-[1rem] text-slate-900 py-2 text-1xl bg-gray-300 font-mono">

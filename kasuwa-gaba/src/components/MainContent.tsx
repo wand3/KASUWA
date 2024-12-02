@@ -142,7 +142,7 @@ const MainContent = () => {
   return (
   <>
     <Sidebar />
-    <section className="absolute md:top-[15vh] md:h-[fit] bg-[#eeeeeb] right-0 md:max-w-[75%] sm:w-[100%] xs:w-[20rem] p-5">
+    <section className="absolute md:top-[17vh] md:h-[fit] bg-[#eeeeeb] right-0 md:max-w-[75%] sm:w-[100%] xs:w-[20rem] p-5">
       <div className="mb-5">
         <div className="flex sm:flex-row justify-between items-center">
           <div className="relative mb-5 mt-5">
