@@ -29,7 +29,7 @@ import AdminEditShippingPage from './pages/Admin/AdminEditShippingPage';
 import AdminEditCategoryPage from './pages/Admin/AdminEditCategoryPage';
 
 import UserShippingPage from './pages/User/ShippingPage';
-
+import AddShippingAddressPage from './pages/User/AddShippingAddress';
 
 function App() {
   return (
@@ -86,6 +86,8 @@ function App() {
                       <Routes>
                         <Route path="/" element={<Kasuwa />} />
                         <Route path="/shipping" element={<UserShippingPage />} />
+                        <Route path="/addAddress" element={<AddShippingAddressPage />} />
+
                         <Route path="/orders" element={<OrdersPage />} />
 
                         <Route path="/cart" element={<CartPage cart={{
