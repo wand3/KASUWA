@@ -87,6 +87,8 @@ function App() {
                         <Route path="/" element={<Kasuwa />} />
                         <Route path="/shipping" element={<UserShippingPage />} />
                         <Route path="/addAddress" element={<AddShippingAddressPage />} />
+                        <Route path="/address" />
+
 
                         <Route path="/orders" element={<OrdersPage />} />
 

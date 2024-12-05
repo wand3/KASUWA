@@ -50,9 +50,7 @@ export const AddShipping = ({}: AddShippingSchema) => {
 
   const handleSubmit = async (ev: React.FormEvent) => {
     ev.preventDefault();
-    // const shipping_method_name = shippingNameField.current ? shippingNameField.current.value : "";
-    // const shipping_price = priceField.current ? priceField.current.value : "";
-    // const delivery_time = deliveryTimeField.current ? deliveryTimeField.current.value : "";
+
     const shipping_method_name = shippingNameField.current ? shippingNameField.current.value : "";
     const shipping_price = priceField.current ? priceField.current.value : "";
     const delivery_time = deliveryTimeField.current ? deliveryTimeField.current.value : "";
