@@ -62,24 +62,8 @@ export const AddShippingAddressPage = () => {
       zipcode: "",
       is_default: false,
     });
-    // const [deliveryForm, setDeliveryForm] = useState({
-    //     country: "",
-    //     state: "",
-    //     city: "",
-    //     street: "",
-    //     zipcode: "",
-    //     is_default: false
-    // });
-  // const [countries, setCountries] = useState([]);
-  // const [states, setStates] = useState('');
-  // const [cities, setCities] = useState([]);
-
+   
   const [enabled, setEnabled] = useState(false);
-  // const [zipcode, setZipcode] = useState('')
-  // const [city, setCity] = useState('');
-  // const [street, setStreet] = useState('');
-
-
 
 
   const [errors, setErrors] = useState<FormAddressErrorType>({});
@@ -92,15 +76,6 @@ export const AddShippingAddressPage = () => {
   const navigate = useNavigate();
 
   const formData = new FormData();
-
-  // const countryField= useRef<HTMLSelectElement>(null);
-  // const cityField = useRef<HTMLInputElement>(null);
-  // const stateField = useRef<HTMLInputElement>(null);
-  // const streetField = useRef<HTMLInputElement>(null);
-  // const zipcodeField = useRef<HTMLInputElement>(null);
-  // const isDefaultField = useRef<HTMLInputElement>(null);
-
- 
 
   // back button 
   const goBack = () => {
@@ -171,12 +146,6 @@ export const AddShippingAddressPage = () => {
     
 
     console.log('after def ')
-    // setCountry(country);
-    // setCity(city);
-    // setZipcode(zipcode)
-    // setStates(state);
-    // setEnabled(isDeafult);
-    // setStreet(stree t);
     // Validate form fields
     let formErrors: FormAddressErrorType = {};
 
@@ -220,7 +189,7 @@ export const AddShippingAddressPage = () => {
          city: city,
          street: street,
          zipcode: zipcode,
-        //  is_default: isDeafult,
+         is_default: isDeafult,
          user_id: user?.id }
        );
        if(result.ok) {

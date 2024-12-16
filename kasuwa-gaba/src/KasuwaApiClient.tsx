@@ -110,13 +110,16 @@ export default class KasuwaApiClient {
   }
 
   async login(email: string, password: string): Promise<'ok' | 'fail' | 'error'> {
+    // console.log(`login apiclient ${email}`)
     const response = await this.post<null, Token>('/tokens', null, {
       headers: {
         Authorization:  'Basic ' + btoa(email + ":" + password),
-        'Access-Control-Allow-Origin': 'http://127.0.0.1:5000'
-
+        'Access-Control-Allow-Origin': 'http://127.0.0.1:5000/',
       }
+
     });
+        console.log(`login apiclient ${response}`)
+
     if (!response.ok || !response.body) {
       return response.status === 401 ? 'fail' : 'error';
     }

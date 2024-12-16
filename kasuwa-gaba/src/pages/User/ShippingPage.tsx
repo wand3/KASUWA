@@ -102,17 +102,17 @@ export const UserShippingPage = () => {
 
                     <div className="relative flex flex-1 justify-between">
                       
-                      <div className="absolute top-0 right-0 flex sm:bottom-0 ">
+                      <div className="relative top-0 right-0 flex sm:bottom-0 ">
                           <button className="" onClick={() => {}}>
                               <Edit className="h-6 w-6 cursor-pointer hover:text-red-500" />
                           </button>
                           <button onClick={() => {deleteAddress(address.id)}}
-                          className="relative h-10 max-h-[40px] w-10 max-w-[40px] select-none rounded-lg text-center align-middle font-sans text-xs font-medium uppercase text-slate-900 transition-all hover:bg-slate-900/10 active:bg-slate-900/20 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+                          className="absolute h-10 max-h-[40px] w-10 max-w-[40px] select-none rounded-lg text-center font-sans text-xs font-medium uppercase text-slate-900 transition-all hover:bg-slate-900/10 active:bg-slate-900/20 disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
                           type="button" >
-                            <span className="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
-                                <TrashIcon className="h-4 w-4 cursor-pointer hover:text-red-500" />
+                            {/* <span className="transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2"> */}
+                                <TrashIcon className="h-6 w-6 cursor-pointer hover:text-red-500" />
 
-                            </span>
+                            {/* </span> */}
                           </button>
                       </div>
                     </div>
@@ -122,7 +122,10 @@ export const UserShippingPage = () => {
 
 
               </div> 
-              <a className="flex justify-end underline text-sm text-blue-600" href="/addAddress">Add another address</a>
+              <div>
+                <a className="flex justify-center my-2 underline text-sm text-blue-600" href="/addAddress">Add another address</a>
+
+              </div>
 
 
             </div> 

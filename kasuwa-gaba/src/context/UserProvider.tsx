@@ -40,7 +40,18 @@ export const UserProvider = ({children}: React.PropsWithChildren<{}>) => {
   const api = UseApi()
 
   
-  const login = useCallback(async (email: string, password: string) => {
+  // const login = useCallback(async (email: string, password: string) => {
+  //   const result = await api.login(email, password);
+  //   console.log(result)
+  //   if (result === 'ok') {
+  //     const response = await api.get<UserSchema>('/user');
+  //     console.log(response)
+  //     setUser(response.ok ? response.body : null);
+  //     console.log('login callback success')
+  //   }
+  //   return result;
+  // }, [api]);
+  const login = async (email: string, password: string) => {
     const result = await api.login(email, password);
     console.log(result)
     if (result === 'ok') {
@@ -50,7 +61,8 @@ export const UserProvider = ({children}: React.PropsWithChildren<{}>) => {
       console.log('login callback success')
     }
     return result;
-  }, [api]);
+  
+  }
 
   const logout = useCallback(async () => {
     await api.logout();

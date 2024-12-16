@@ -3,7 +3,7 @@ import { Bars3Icon, BellIcon, XMarkIcon, ShoppingCartIcon, UserIcon } from '@her
 import clsx from 'clsx'
 import { useCart } from '../hooks/UseCart';
 import useUser from '../hooks/UseUser';
-import Sidebar from "../components/Sidebar";
+import { useEffect, useMemo } from 'react';
 
 
 
@@ -22,10 +22,14 @@ function classNames(...classes: string[]) {
 const Nav = () => {
 
   const {cartItems, cartQuantity} = useCart();
+  // const {setUser, user, fetchUser} = useUser();
+
 
   console.log(cartQuantity)
   const user = useUser();
   const userEmail = user.user?.email.slice(0, 6).toString()
+
+  
 
   return (
     <>

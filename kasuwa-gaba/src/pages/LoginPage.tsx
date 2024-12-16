@@ -22,7 +22,8 @@ const LoginPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const flash = useFlash();
-  // const {setUser, user, fetchUser} = useUser();
+  const api = UseApi();
+  const {setUser, user, fetchUser} = useUser();
 
   const emailField = useRef<HTMLInputElement>(null);
   const passwordField = useRef<HTMLInputElement>(null);
@@ -67,6 +68,27 @@ const LoginPage = () => {
     //   flash('login success', 'success')
     //   navigate(next);
     // }
+
+    // const result = await api.login(email, password)
+    // console.log(`login ${result}`)
+    // if (result === 'fail') {
+    //   flash('Invalid username or password', 'danger');
+    // }
+    // else if (result === 'ok') {
+    //   let next = '/';
+    //   if (location.state && location.state.next) {
+    //     next = location.state.next;
+    //   }
+    //   navigate(next);
+
+    // }
+    const update_user = async () => {
+      // useEffect(() => {
+        fetchUser()
+        setUser(user)
+      // }, [user])  
+    }
+
     try {
       const response = await fetch("http://127.0.0.1:5000/api/tokens", {
         method: "POST",
@@ -80,15 +102,16 @@ const LoginPage = () => {
         if (data.token) {
           localStorage.setItem("token", data.token);
           console.log("Login successful:", data.token);
-          
+
           let next = '/';
             if (location.state && location.state.next) {
                 next = location.state.next;
+                          // await update_user()
+
             }
             flash('login success', 'success')
             navigate(next);
             // fetchUser();
-            // setUser(user);
 
 
             
