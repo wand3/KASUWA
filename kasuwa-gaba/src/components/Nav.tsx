@@ -3,7 +3,10 @@ import { Bars3Icon, BellIcon, XMarkIcon, ShoppingCartIcon, UserIcon } from '@her
 import clsx from 'clsx'
 import { useCart } from '../hooks/UseCart';
 import useUser from '../hooks/UseUser';
-import { useEffect, useMemo } from 'react';
+import UseApi from '../hooks/UseApi';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { UserSchema } from '../context/UserProvider';
+import { CartSchema } from '../context/CartProvider';
 
 
 
@@ -12,7 +15,7 @@ const navigation = [
 ]
 
 const notUser = [
- {name: 'Logout', href: '/logout', current: true},
+  { name: 'Logout', href: '/logout', current: true},
 ]
 
 function classNames(...classes: string[]) {
@@ -20,16 +23,82 @@ function classNames(...classes: string[]) {
 }
 
 const Nav = () => {
+  const [username, setUsername] = useState<string>('')
+  const [ isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [ cartQuantity, setcartQuantity] = useState<number>(0);
 
-  const {cartItems, cartQuantity} = useCart();
-  // const {setUser, user, fetchUser} = useUser();
 
+  const {getCartItemCount} = useCart();
+  const cartItemsCountRef = useRef<number>(getCartItemCount); // Using `useRef` to track cart count
 
-  console.log(cartQuantity)
   const user = useUser();
-  const userEmail = user.user?.email.slice(0, 6).toString()
 
-  
+  const api = UseApi();
+
+  // Fetch user function
+  const fetchUser = async () => {
+      try {
+          const response = await api.get<UserSchema>('/user');
+          console.log(response)
+          const data = response.body;
+          setUsername(data?.email as string)
+      } catch (error) {
+          setUsername('Guest'); // Handle error state
+      }
+  };
+
+  // Fetch cart function
+  const fetchCartItems = async () => {
+      try {
+
+          const response = await api.get<CartSchema>('/cart');
+          console.log(response)
+          // const count = response.body?.items.length
+          const data = response.body;
+          // cartItemsCountRef.current = response.body?.items?.length || 0; // Update the `useRef` value directly
+          console.log(data)
+          // setCartItems(data)
+          // cartQuantity = getCartItemCount
+          
+      } catch (error) {
+          // setCartItems(null); // Handle error state
+          // setcartQuantity(0);
+      }
+  };
+
+
+  useEffect(() => {
+    (async () => {
+      await fetchUser();
+      if (api.isAuthenticated()) {
+        setIsAuthenticated(true);
+        console.log('authentication state updated')
+        const response = await api.get<UserSchema>('/user');
+        console.log(response)
+        if (response.body === null){
+          setUsername('Guest')
+        } else {
+        setUsername(response.body?.email as string);
+        console.log(getCartItemCount)
+        setcartQuantity(getCartItemCount as number)
+        console.log(cartQuantity)
+        
+        }
+      }
+      else {
+        setUsername('Guest');
+      }
+    })();
+    fetchCartItems();
+  }, [api]);
+
+  useEffect(() => {
+    (async () => {
+      await fetchUser();
+      await fetchCartItems();
+    })();
+  }, []);
+
 
   return (
     <>
@@ -78,10 +147,10 @@ const Nav = () => {
                     <span className="absolute -inset-1.5" />
                     <span className="sr-only">Open user menu</span>
                     <UserIcon aria-hidden="true" className="h-6 w-6 bg-transparent fill-white" />
-                    { user.isAuthenticated === true && (
-                        <span className='flex absolute justify-center text-md mt-[-50%] ml-[85%] rounded-xl bg:ring-white'>{userEmail}</span>
+                    { isAuthenticated === true && (
+                        <span className='flex absolute justify-center text-md mt-[-50%] ml-[85%] rounded-xl bg:ring-white'>{username.slice(0, 6).toString()}</span>
                       )}
-                    { !user.isAuthenticated && (
+                    { isAuthenticated === false && (
                        <span className='flex absolute justify-center text-md mt-[-50%] ml-[85%] rounded-xl bg:ring-white'>Guest!</span>
                       )} 
                     <p className='text-[0.6rem] font-semibold font-mono'>Hi!</p>
@@ -91,7 +160,7 @@ const Nav = () => {
                   transition
                   className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
                 >
-                  { !user.isAuthenticated && (
+                  { isAuthenticated === false && (
                     <>
                     <MenuItem>
 
@@ -104,14 +173,14 @@ const Nav = () => {
                         Sign up
                       </a>
                     </MenuItem>
-                    <MenuItem>
+                    {/* <MenuItem>
                       <a href="#" className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100">
                         Sign out
                       </a>
-                    </MenuItem>
+                    </MenuItem> */}
                     </>
                   )}
-                  { user.isAuthenticated && (
+                  { isAuthenticated === true && (
                     <>
                     <MenuItem>
 
@@ -125,7 +194,7 @@ const Nav = () => {
                       </a>
                     </MenuItem>
                     <MenuItem>
-                      <a href="#" className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100">
+                      <a href="/logout" onClick={user.logout} className="block px-4 py-2 text-sm text-gray-700 data-[focus]:bg-gray-100">
                         Sign out
                       </a>
                     </MenuItem>
@@ -141,9 +210,10 @@ const Nav = () => {
                   >
                     {/* shopping cart */}
                     <ShoppingCartIcon aria-hidden="false" className="h-6 w-6 fill:black" />
-                    {cartItems ? cartItems && (
-                      <span className='flex absolute justify-center text-md text-white mt-[-55%] ml-[85%] rounded-xl bg:ring-white'>{cartQuantity}</span>
-                    ): <span className='flex absolute justify-center text-md text-white mt-[-55%] ml-[85%] rounded-xl bg:ring-white'>0</span>}
+                    <span className='flex absolute justify-center text-md text-white mt-[-55%] ml-[85%] rounded-xl bg:ring-white'>{getCartItemCount}</span>
+                    {/* {cartQuantity ? cartQuantity > 0 && (
+                      <span className='flex absolute justify-center text-md text-white mt-[-55%] ml-[85%] rounded-xl bg:ring-white' >{cartQuantity}</span>
+                    ): <span className='flex absolute justify-center text-md text-white mt-[-55%] ml-[85%] rounded-xl bg:ring-white'>0</span>} */}
                     <p className='text-[0.6rem] font-semibold font-mono'>Cart</p>
                   </button>
                 </a>
@@ -154,7 +224,7 @@ const Nav = () => {
               <div className="flex flex-none items-center justify-center sm:items-stretch sm:justify-start">
               
                 <div className="hidden sm:ml-6 sm:block">
-                  { user.isAuthenticated === true && (
+                  { isAuthenticated ? isAuthenticated && (
                     <div className="flex space-x-4">
                       
                       {notUser.map((item) => (
@@ -172,9 +242,8 @@ const Nav = () => {
                         </a>
                       ))}
                     </div>
-                  )}
-                  { !user.isAuthenticated && (
-                    <div className="flex space-x-4">
+                  ): 
+                  <div className="flex space-x-4">
                       
                       {navigation.map((item) => (
                         <a
@@ -190,9 +259,8 @@ const Nav = () => {
                         </a>
                       ))}
                     </div>
-
-                  )} 
-                  
+                  }
+                          
                 </div>
               </div>
 
@@ -203,7 +271,7 @@ const Nav = () => {
 
         <DisclosurePanel className="sm:hidden">
 
-          { user.isAuthenticated === true && (
+          { isAuthenticated === true && (
             <div className="space-y-1 px-2 pb-3 pt-2">
               {notUser.map((item) => (
                 <DisclosureButton
@@ -221,7 +289,7 @@ const Nav = () => {
               ))}
             </div>
           )}
-          { !user.isAuthenticated && (
+          { username === "Guest" && (
             <div className="space-y-1 px-2 pb-3 pt-2">
               {navigation.map((item) => (
                 <DisclosureButton

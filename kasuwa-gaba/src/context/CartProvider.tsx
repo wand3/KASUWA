@@ -1,9 +1,8 @@
-import { createContext, ReactElement, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useRef } from "react";
 import UseApi from "../hooks/UseApi";
 import useFlash from "../hooks/UseFlash";
 import { ProductType } from "./ProductProvider";
 import { AddShippingSchema } from "../components/Admin/AddShipping";
-import Config from "../config";
 
 
 export type CartItemSchema = {
@@ -19,8 +18,6 @@ export type CartSchema = {
   total: number;
 }
 
-
-
 export type CartContextType = {
   cartItems: CartSchema| null;
   cartQuantity?: number
@@ -30,10 +27,8 @@ export type CartContextType = {
   removeFromCart: (id: number) => Promise<void>;
   shippings?: AddShippingSchema | null;
   updateShippingMethod: (id: number, shippingId: number) => Promise<void>;
-  // updateProductColor: (id: number, colorIndent: number) => Promise<void>;
   getShipping: () => {};
-
-  // getCartItems: () => Promise<[]>;
+  getCartItemCount: number;
 }
 
 export const CartContext = createContext({} as CartContextType);
@@ -47,11 +42,14 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
   });
   let [shippings, setShippings] = useState<AddShippingSchema | null>();
   const [ cartQuantity, setcartQuantity] = useState<number>();
+  const cartItemsCountRef = useRef<number>(0); // Using `useRef` to track cart count
+  let [ getCartItemCount, setGetCartItemCount] = useState<number>(cartItems?.items.length);
+
 
   const api = UseApi();
   const flash = useFlash();
 
-  // Fetch products function
+  // Fetch cart function
   const fetchCartItems = async () => {
       try {
 
@@ -59,9 +57,13 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
           console.log(response)
           const count = response.body?.items.length
           const data = response.body;
+
           console.log(data)
           setCartItems(data)
           setcartQuantity(count)
+          cartItemsCountRef.current = response.body?.items?.length || cartQuantity || 0; // Update the `useRef` value directly
+
+          setGetCartItemCount(cartItemsCountRef.current)
           console.log(count)
       } catch (error) {
           setCartItems(null); // Handle error state
@@ -70,19 +72,19 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
 
   useEffect(() => {
       fetchCartItems(); // Fetch products on component mount
-      cartItemsCount();
+      setGetCartItemCount(cartItemsCountRef.current) 
       getShipping();
   }, []);
 
-  const cartItemsCount = () => {
-      return cartItemsCount
-  }
+
+ 
   async function addToCart(id: number): Promise<void> {
       console.log('increase begins')
       const response = await api.post('/cart', {
         product_id: id,
       });
       console.log( response.body)
+      setGetCartItemCount(cartItemsCountRef.current += 1)
       flash('Added', 'success')
       // fetchCartItems()
     }
@@ -161,6 +163,9 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
     }
   };
 
+  // async function getCartItemCount () {
+  //   return cartItemsCountRef
+  // }
   
   
 
@@ -179,8 +184,8 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
         increaseCartQuantity,
         removeFromCart,
         decreaseCartQuantity,
+        getCartItemCount
     }}>
-    
       {children}
     </CartContext.Provider>
   )
