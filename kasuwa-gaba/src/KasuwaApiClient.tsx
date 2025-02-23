@@ -35,14 +35,18 @@ export default class KasuwaApiClient {
 
   async request<TREQ, TRES>(options: Options<TREQ>): Promise<Response<TRES>> {
     let response = await this.requestInternal<TREQ, TRES>(options);
-    if (response.status === 401 && options.url !== '/tokens') {
+    const hadToken = localStorage.getItem('token') !== null;
+    if (response.status === 401 && hadToken && options.url !== '/tokens') {
       const refreshResponse = await this.put<Token, Token>('/tokens', {
         access_token: localStorage.getItem('token'),
       });
+
       if (refreshResponse.ok && refreshResponse.body) {
         localStorage.setItem('token', refreshResponse.body.access_token || '');
         response = await this.requestInternal<TREQ, TRES>(options);
-        console.log(response.body)
+      } else {
+        // Clear invalid token if refresh fails
+        localStorage.removeItem('token');
       }
     }
     if (response.status >= 500 && this.onError) {
@@ -63,9 +67,11 @@ export default class KasuwaApiClient {
         method: options.method,
         headers: {
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Credentials': 'true',
-          'Access-Control-Allow-Origin': 'http://127.0.0.1:5000',
-          'Authorization': 'Bearer ' + localStorage.getItem('token'),
+          // Conditionally add Authorization header
+          ...(localStorage.getItem('token') ? { 'Authorization': 'Bearer ' + localStorage.getItem('token') } : {}),
+          // 'Access-Control-Allow-Credentials': 'true',
+          // 'Access-Control-Allow-Origin': `${Config.baseURL}`,
+          // 'Authorization': 'Bearer ' + localStorage.getItem('token'),
           ...options.headers,
         },
         credentials: options.url === '/tokens' ? 'include' : 'omit',
@@ -114,11 +120,11 @@ export default class KasuwaApiClient {
     const response = await this.post<null, Token>('/tokens', null, {
       headers: {
         Authorization:  'Basic ' + btoa(email + ":" + password),
-        'Access-Control-Allow-Origin': 'http://127.0.0.1:5000/',
+        // 'Access-Control-Allow-Origin': 'http://127.0.0.1:5000/',
       }
 
     });
-        console.log(`login apiclient ${response}`)
+    console.log(`login apiclient ${response}`)
 
     if (!response.ok || !response.body) {
       return response.status === 401 ? 'fail' : 'error';

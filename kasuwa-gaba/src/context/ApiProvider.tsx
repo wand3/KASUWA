@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useCallback, useMemo } from 'react';
+import React, { createContext, useMemo } from 'react';
 import KasuwaApiClient from "../KasuwaApiClient";
 
 export const ApiContext = createContext<KasuwaApiClient | null>(null)
@@ -14,5 +14,6 @@ export function ApiProvider({ children, onError }: React.PropsWithChildren<{ onE
     )
 
 }
+
 
 export default ApiProvider;

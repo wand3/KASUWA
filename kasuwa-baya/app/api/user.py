@@ -58,6 +58,7 @@ def delete_address(address_id):
 @token_auth.login_required
 def add_address():
     data = request.json
+    logging.info(f'{data}')
     user_id = token_auth.current_user().id
     data['user_id'] = user_id
 
