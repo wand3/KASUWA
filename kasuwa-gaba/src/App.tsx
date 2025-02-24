@@ -11,6 +11,7 @@ import UserPage from './pages/UserPage';
 import FavouritesPage from './pages/FavouritesPage';
 import OrdersPage from './pages/OrdersPage';
 import CartPage from './pages/CartPage';
+import CheckoutPage from './pages/Checkout';
 import { ProductPage } from './pages/ProductPage';
 import MainContent from "./components/MainContent";
 
@@ -91,6 +92,7 @@ function App() {
 
 
                         <Route path="/orders" element={<OrdersPage />} />
+                        <Route path='/checkout' element={<CheckoutPage />} />
 
                         <Route path="/cart" element={<CartPage cart={{
                         items: [],

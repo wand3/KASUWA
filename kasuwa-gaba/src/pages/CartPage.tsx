@@ -7,6 +7,7 @@ import { formatCurrency } from "../utilities/formatCurrency"
 import { useEffect } from "react";
 import { Button } from "@headlessui/react";
 import ShoppingCartIcon from "@heroicons/react/24/outline/ShoppingCartIcon";
+import { Link } from "react-router-dom";
 
 
 export const CartPage = ( ) => {
@@ -95,7 +96,9 @@ export const CartPage = ( ) => {
                             <ShoppingCartIcon aria-hidden="false" className="h-5 w-5 fill:black" />
                         </div>
                     </a> */}
-                <button className="absolute right-[5%] top-[20%] w-[30%] rounded-md bg-[#18202a] py-2 font-medium text-blue-50 hover:bg-[#090c10]">Check out</button>
+                <Link to={`/checkout`}>
+                    <button className="absolute right-[5%] top-[20%] w-[30%] rounded-md bg-[#18202a] py-2 font-medium text-blue-50 hover:bg-[#090c10]">Check out</button>
+                </ Link >
 
             </div>
         </Jiki>
