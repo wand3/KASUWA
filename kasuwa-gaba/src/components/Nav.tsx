@@ -1,13 +1,14 @@
 import { Disclosure, DisclosureButton, DisclosurePanel, Menu, MenuButton, MenuItem, MenuItems, Description, Field, Input, Label } from '@headlessui/react'
 import { Bars3Icon, BellIcon, XMarkIcon, ShoppingCartIcon, UserIcon } from '@heroicons/react/24/solid'
 import clsx from 'clsx'
-import { useCart } from '../hooks/UseCart';
 import useUser from '../hooks/UseUser';
 import UseApi from '../hooks/UseApi';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { UserSchema } from '../context/UserProvider';
 import { CartSchema } from '../context/CartProvider';
 
+// redux thunk 
+import { useGetCartDetailsQuery } from "../slices/CartSlice"
 
 
 const navigation = [
@@ -23,16 +24,21 @@ function classNames(...classes: string[]) {
 }
 
 const Nav = () => {
-  const [username, setUsername] = useState<string>('')
+  // const { loading, error, success } = useSelector((state: RootState) => state.cartApi); // Type-safe selector
+
+  const [username, setUsername] = useState<string>('');
   const [ isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [ cartQuantity, setcartQuantity] = useState<number>(0);
+  
+  // use store 
+  const { data: currentCart, error } = useGetCartDetailsQuery(undefined, {
+    skip: !localStorage.getItem('token'), // Skip query if no token
+    refetchOnMountOrArgChange: true,
+    pollingInterval: 4000
+  });
 
-
-  const {getCartItemCount} = useCart();
-  const cartItemsCountRef = useRef<number>(getCartItemCount); // Using `useRef` to track cart count
 
   const user = useUser();
-
   const api = UseApi();
 
   // Fetch user function
@@ -48,30 +54,40 @@ const Nav = () => {
   };
 
   // Fetch cart function
-  const fetchCartItems = async () => {
-      try {
+  // const fetchCartItems = async () => {
+  //     try {
+  //       const response = await api.get<CartSchema>('/cart');
+  //       console.log(response)
+  //       // const count = response.body?.items.length
+  //       const data = response.body;
+  //       console.log(data)
+  //       setCartItems(data)
+  //       // console.log(count)
+  //       if (cartItems?.items) {
+  //         setcartQuantity(data?.items.length as number);
+  //       }
+  //       // setcartQuantity(count as number);
 
-          const response = await api.get<CartSchema>('/cart');
-          console.log(response)
-          // const count = response.body?.items.length
-          const data = response.body;
-          // cartItemsCountRef.current = response.body?.items?.length || 0; // Update the `useRef` value directly
-          console.log(data)
-          // setCartItems(data)
-          // cartQuantity = getCartItemCount
-          
-      } catch (error) {
-          // setCartItems(null); // Handle error state
-          // setcartQuantity(0);
-      }
-  };
+  //     } catch (error) {
+  //         // setCartItems(null); // Handle error state
+  //         setcartQuantity(0);
+  //     }
+  // };
 
 
   useEffect(() => {
     (async () => {
       await fetchUser();
+      // await fetchCartItems();
+
+      // await refetch();
+
       if (api.isAuthenticated()) {
         setIsAuthenticated(true);
+        // if (currentCart) {
+        //   setcartQuantity(currentCart.items.length)
+
+        // }
         console.log('authentication state updated')
         const response = await api.get<UserSchema>('/user');
         console.log(response)
@@ -79,25 +95,18 @@ const Nav = () => {
           setUsername('Guest')
         } else {
         setUsername(response.body?.email as string);
-        console.log(getCartItemCount)
-        setcartQuantity(getCartItemCount as number)
-        console.log(cartQuantity)
-        
+        if (currentCart) {
+          if (currentCart.items.length > 0) {
+            setcartQuantity(currentCart.items.length)
+          }
+          else {
+            setcartQuantity(0)
+          }
+        }
         }
       }
-      else {
-        setUsername('Guest');
-      }
     })();
-    fetchCartItems();
   }, [api]);
-
-  useEffect(() => {
-    (async () => {
-      await fetchUser();
-      await fetchCartItems();
-    })();
-  }, []);
 
 
   return (
@@ -210,10 +219,10 @@ const Nav = () => {
                   >
                     {/* shopping cart */}
                     <ShoppingCartIcon aria-hidden="false" className="h-6 w-6 fill:black" />
-                    <span className='flex absolute justify-center text-md text-white mt-[-55%] ml-[85%] rounded-xl bg:ring-white'>{getCartItemCount}</span>
-                    {/* {cartQuantity ? cartQuantity > 0 && (
-                      <span className='flex absolute justify-center text-md text-white mt-[-55%] ml-[85%] rounded-xl bg:ring-white' >{cartQuantity}</span>
-                    ): <span className='flex absolute justify-center text-md text-white mt-[-55%] ml-[85%] rounded-xl bg:ring-white'>0</span>} */}
+                    <span className='flex absolute justify-center text-md text-white mt-[-55%] ml-[85%] rounded-xl bg:ring-white'>
+                      {currentCart?.items?.length ?? 0}
+                    </span>
+              
                     <p className='text-[0.6rem] font-semibold font-mono'>Cart</p>
                   </button>
                 </a>

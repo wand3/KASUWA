@@ -11,11 +11,11 @@ import ShoppingCartIcon from "@heroicons/react/24/outline/ShoppingCartIcon";
 
 export const CartPage = ( ) => {
 
-  const { cartItems } = useCart();
+  const { cartItems, getShipping } = useCart();
 
   useEffect(() => {
-    cartItems;
-  })
+    getShipping();
+  }, [])
 
 
   return (

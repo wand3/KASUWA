@@ -29,6 +29,8 @@ export type CartContextType = {
   updateShippingMethod: (id: number, shippingId: number) => Promise<void>;
   getShipping: () => {};
   getCartItemCount: number;
+  setCartItems: (cart: CartSchema | null ) => void;
+
 }
 
 export const CartContext = createContext({} as CartContextType);
@@ -49,7 +51,7 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
   const api = UseApi();
   const flash = useFlash();
 
-  // Fetch cart function
+  // Fetch cart items
   const fetchCartItems = async () => {
       try {
 
@@ -70,14 +72,6 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
       }
   };
 
-  useEffect(() => {
-      fetchCartItems(); // Fetch products on component mount
-      setGetCartItemCount(cartItemsCountRef.current) 
-      getShipping();
-  }, []);
-
-
- 
   async function addToCart(id: number): Promise<void> {
       console.log('increase begins')
       const response = await api.post('/cart', {
@@ -167,6 +161,19 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
   //   return cartItemsCountRef
   // }
   
+  useEffect(() => {
+    fetchCartItems(); // Fetch products on component mount
+    setGetCartItemCount(cartItemsCountRef.current) 
+    getShipping();
+  }, []);
+
+  // useEffect(() => {
+  //     (async () => {
+  //       await fetchCartItems(); // Fetch products on component mount
+  //       setGetCartItemCount(cartItemsCountRef.current) 
+  //       getShipping();
+  //     })();
+  //   }, []);
   
 
   return (
@@ -177,6 +184,7 @@ export const CartProvider = ( {children}: React.PropsWithChildren<{}>) => {
         shippings,
         updateShippingMethod,
         getShipping,
+        setCartItems,
         // updateProductColor,
 
         // getCartItems, 

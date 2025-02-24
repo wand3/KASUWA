@@ -1,6 +1,7 @@
 import { createContext } from "react";
 import React, {useState, useEffect, useCallback} from "react";
 import UseApi from "../hooks/UseApi";
+import { CartSchema } from "./CartProvider";
 
 export interface AddressSchema {
   street: string;
@@ -29,6 +30,10 @@ export type UserContextType = {
   fetchAddress: () => void;
   address: AddressSchema | null | undefined;
   setAddress: ( address: AddressSchema | null | undefined ) => void;
+  fetchCartItems: () => void;
+  setCartItems: (cart: CartSchema | null ) => void;
+
+  cartItems: CartSchema | null;
 }
 
 const UserContext = createContext<UserContextType | null>(null);
@@ -36,21 +41,14 @@ const UserContext = createContext<UserContextType | null>(null);
 export const UserProvider = ({children}: React.PropsWithChildren<{}>) => {
   const [ user, setUser ] = useState<UserSchema | null | undefined >();
   const [ isAuthenticated, setIsAuthenticated] = useState(false);
+  const [ cartItems, setCartItems] = useState<CartSchema | null>({
+    items: [],
+    total: 0,
+  });
 
   const api = UseApi()
 
   
-  // const login = useCallback(async (email: string, password: string) => {
-  //   const result = await api.login(email, password);
-  //   console.log(result)
-  //   if (result === 'ok') {
-  //     const response = await api.get<UserSchema>('/user');
-  //     console.log(response)
-  //     setUser(response.ok ? response.body : null);
-  //     console.log('login callback success')
-  //   }
-  //   return result;
-  // }, [api]);
   const login = async (email: string, password: string) => {
     const result = await api.login(email, password);
     console.log(result)
@@ -75,30 +73,56 @@ export const UserProvider = ({children}: React.PropsWithChildren<{}>) => {
 
   }, [api]);
 
-  // Fetch products function
+  // Fetch user function
   const fetchUser = async () => {
-      try {
+    try {
 
-          const response = await api.get<UserSchema>('/user');
-          console.log(response)
-          const data = response.body;
-          console.log(data)
-          setUser(data)
-      } catch (error) {
-          setUser(null); // Handle error state
-      }
+        const response = await api.get<UserSchema>('/user');
+        console.log(response)
+        const data = response.body;
+        console.log(data)
+        setUser(data)
+    } catch (error) {
+        setUser(null); // Handle error state
+    }
+  };
+
+  // Fetch cart items
+  const fetchCartItems = async () => {
+    try {
+
+        const response = await api.get<CartSchema>('/cart');
+        console.log(response)
+        const count = response.body?.items.length
+        const data = response.body;
+
+        console.log(data)
+        setCartItems(data)
+        // setcartQuantity(count)
+        // cartItemsCountRef.current = response.body?.items?.length || cartQuantity || 0; // Update the `useRef` value directly
+
+        // setGetCartItemCount(cartItemsCountRef.current)
+        console.log(count)
+    } catch (error) {
+        setCartItems(null); // Handle error state
+    }
   };
 
 
   useEffect(() => {
     (async () => {
       await fetchUser();
+      await fetchCartItems();
       if (api.isAuthenticated()) {
         setIsAuthenticated(true);
         console.log('authentication state updated')
         const response = await api.get<UserSchema>('/user');
+        const cartdata = await api.get<CartSchema>('/cart');
         console.log(response)
+        console.log(cartdata)
+
         setUser(response.body);
+        setCartItems(cartdata.body)
       }
       else {
         setUser(null);
@@ -143,7 +167,7 @@ export const UserProvider = ({children}: React.PropsWithChildren<{}>) => {
     // logout()
   return (
     <>
-      <UserContext.Provider value={{ user, fetchUser, setUser, isAuthenticated, login, logout }}>
+      <UserContext.Provider value={{ user, fetchUser, setUser, isAuthenticated, login, logout, fetchCartItems }}>
         {children}
       </UserContext.Provider>
     

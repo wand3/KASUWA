@@ -2,7 +2,7 @@ import Jiki from "../components/Jiki";
 import { InputField } from "../components/Auth/FormInput";
 import { Button } from "@headlessui/react";
 import React, { useRef, useState, useEffect } from "react";
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import useFlash from "../hooks/UseFlash";
 import UseApi from "../hooks/UseApi";
 import useUser from "../hooks/UseUser";
@@ -24,9 +24,12 @@ const LoginPage = () => {
   const flash = useFlash();
   const api = UseApi();
   const {setUser, user, fetchUser} = useUser();
+  
 
   const emailField = useRef<HTMLInputElement>(null);
   const passwordField = useRef<HTMLInputElement>(null);
+
+  // const { data: currentCart, refetch } = useGetCartDetailsQuery();
 
   const handleSubmit = async (ev: React.FormEvent) => {
     ev.preventDefault();
@@ -41,8 +44,8 @@ const LoginPage = () => {
     //   }
     // }, []);
 
-    console.log("data: ", email);
-    console.log("data2: ", password);
+    // console.log("data: ", email);
+    // console.log("data2: ", password);
 
     const errors: FormErrorType = {};
     if (!email) {
@@ -106,12 +109,9 @@ const LoginPage = () => {
           let next = '/';
             if (location.state && location.state.next) {
                 next = location.state.next;
-                          // await update_user()
-
-            }
+            } 
             flash('login success', 'success')
             navigate(next);
-            // fetchUser();
 
 
             

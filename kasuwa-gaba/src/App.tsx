@@ -38,7 +38,7 @@ function App() {
           <ApiProvider>
             <FilterProvider>
             <UserProvider>
-              <CartProvider>
+            <CartProvider>
               
               
                 <Routes>
@@ -110,7 +110,7 @@ function App() {
                   } />                  
                 </Routes>
               
-              </CartProvider>
+            </CartProvider>
             </UserProvider>
             </FilterProvider>
 
