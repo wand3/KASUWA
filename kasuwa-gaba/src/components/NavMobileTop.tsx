@@ -5,6 +5,7 @@ import useUser from "../hooks/UseUser";
 import React from "react";
 import { UserSchema } from "../context/UserProvider";
 import { HandshakeIcon, Heart, InfoIcon, LayoutDashboardIcon, Lock, LogOutIcon, MenuIcon, SettingsIcon, UserCircleIcon, Waypoints } from "lucide-react";
+import { useGetCartDetailsQuery } from "../slices/CartSlice";
 
 
 // Profile Dropdown
@@ -110,6 +111,12 @@ export default () => {
     const {cartItems, cartQuantity} = useCart();
     const user = useUser();
 
+    const { data: currentCart, error } = useGetCartDetailsQuery(undefined, {
+        skip: !localStorage.getItem('token'), // Skip query if no token
+        refetchOnMountOrArgChange: true,
+        pollingInterval: 4000
+    });
+
     const profileRef = useRef<UserSchema>();
     // use scroll direction defined above 
     const scrollDirection = useScrollDirection();
@@ -213,10 +220,8 @@ export default () => {
                                 className=""
                             >
                                 {/* shopping cart */}
-                                {cartItems ? cartItems && (
-                                <span className='justify-center text-md text-slate-800 rounded-xl bg:ring-white'>{cartQuantity}</span>
-                                ): <span className='justify-center text-md text-slate-800 rounded-xl bg:ring-white'>0</span>}
-                                {/* <p className='text-[0.6rem] font-semibold font-mono'>Cart</p> */}
+                                <span className='justify-center text-md text-slate-800 rounded-xl bg:ring-white'>{currentCart?.items?.length ?? 0}</span>                     
+
                                 <ShoppingCartIcon aria-hidden="false" className="h-5 w-5 fill:black" />
 
                             </button>

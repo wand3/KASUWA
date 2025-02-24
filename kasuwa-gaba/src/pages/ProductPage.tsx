@@ -151,7 +151,12 @@ export const ProductPage = () => {
                               <div className="flex flex-wrap gap-4 justify-center mx-auto mt-4">
                                 {product?.product_images.map((image, index) => (
 
-                                  <Button onClick={open} onMouseOver={() => setSelectedImage(`${Config.baseURL}/static/images/product_images/${image}`)}>
+                                  <Button 
+                                    onClick={() => {
+                                      setSelectedImage(`${Config.baseURL}/static/images/product_images/${image}`);
+                                      open();
+                                    }} 
+                                    onMouseOver={() => setSelectedImage(`${Config.baseURL}/static/images/product_images/${image}`)}>
                                 
                                     <img
                                       key={index}
@@ -187,9 +192,8 @@ export const ProductPage = () => {
                                               onClick={(e) => e.stopPropagation()} // Prevent background click from closing modal
                                             >
                                               <img
-                                                src={selectedImage}
-                                                // alt="Selected Product"
-                                                className="w-full h-auto rounded-md bg-transparent"
+                                                src={`${selectedImage}`}
+                                                className="w-full max-h-[80vh] rounded-md object-contain"
                                               />
                             
                                             </div>
