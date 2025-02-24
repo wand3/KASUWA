@@ -51,11 +51,20 @@ export const CartPage = ( ) => {
                 </div>
                 <div className="flex justify-between">
                     <p className="text-gray-700">Shipping</p>
-                    { cartItems ? cartItems && (
+                        <p> {
+                        cartItems?.items?.reduce(
+                        (sum, item) => sum + (item.shipping?.shipping_price || 0),
+                        0
+                        ).toLocaleString('en-NG', {
+                        style: 'currency',
+                        currency: 'NGN'
+                        })
+                    }</p>
+                    {/* { cartItems ? cartItems && (
                         <p className="text-gray-700">{formatCurrency(0)}</p>
 
                         ): (<p className="text-gray-700">{formatCurrency(0)}</p>
-                    )}
+                    )} */}
 
                 </div>
                 
@@ -72,20 +81,22 @@ export const CartPage = ( ) => {
                         <p className="text-sm text-gray-700">including VAT</p>
                     </div>
                 </div>
-                <button className="mt-6 w-full rounded-md bg-blue-500 py-1.5 font-medium text-blue-50 hover:bg-blue-600">Check out</button>
+                <button className="mt-6 w-full rounded-md bg-[#18202a] py-1.5 font-medium text-blue-50 hover:bg-[#090c10]">Check out</button>
             </div>
 
             </div>
             {/* sticky footer for checkout  */}
-            <div className="flex sticky bottom-0 h-[8vh] px-[1rem] text-slate-900 py-2 text-1xl bg-gray-300 font-mono">
-                <h3>Subtotal </h3>
-                <span className="px-3">{new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(cartItems?.total)}</span>
-                <a type='button' onClick={() => {}} className="group w-fit my-1 p-2 inline-flex h-auto items-center justify-center overflow-hidden rounded-md bg-slate-800 px-3 font-medium text-white absolute right-0 mr-8">
-                    <span className="text-[13px]">Checkout</span>
-                    <div className="ml-1 transition duration-300 group-hover:rotate-[360deg]">
-                        <ShoppingCartIcon aria-hidden="false" className="h-5 w-5 fill:black" />
-                    </div>
-                </a>
+            <div className="flex sticky bottom-0 h-[10vh] px-[1rem] text-slate-900 py-3 text-1xl bg-gray-300 font-mono">
+                <h3 className="pt-1">Subtotal </h3>
+                <span className="pt-1 px-3">{new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN' }).format(cartItems?.total)}</span>
+                    {/* <a type='button' onClick={() => {}} className="group w-fit my-1 p-2 inline-flex h-auto items-center justify-center overflow-hidden rounded-md bg-slate-800 px-3 font-medium text-white absolute right-0 mr-8">
+                        <span className="text-[13px]">Checkout</span>
+                        <div className="ml-1 transition duration-300 group-hover:rotate-[360deg]">
+                            <ShoppingCartIcon aria-hidden="false" className="h-5 w-5 fill:black" />
+                        </div>
+                    </a> */}
+                <button className="absolute right-[5%] top-[20%] w-[30%] rounded-md bg-[#18202a] py-2 font-medium text-blue-50 hover:bg-[#090c10]">Check out</button>
+
             </div>
         </Jiki>
     </>
