@@ -57,7 +57,10 @@ def create_order():
     user_email = user.email
 
     try:
+
         address_id = request.json.get('address')
+        logging.info("in checkout ")
+
         if not address_id:
             return bad_request("Address is required")
 

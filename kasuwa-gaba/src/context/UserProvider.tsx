@@ -4,12 +4,12 @@ import UseApi from "../hooks/UseApi";
 import { CartSchema } from "./CartProvider";
 
 export interface AddressSchema {
-  street: string;
-  city: string;
-  state: string;
-  country: string;
-  zipcode: string;
-  is_default: boolean;
+  street?: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  zipcode?: string;
+  is_default?: boolean;
 }
 
 export interface UserSchema {
@@ -28,7 +28,7 @@ export type UserContextType = {
   setUser: (user: UserSchema | null | undefined) => void;
   fetchUser: () => void;
   fetchAddress: () => void;
-  address: AddressSchema | null | undefined;
+  addresses: AddressSchema[] | null | undefined;
   setAddress: ( address: AddressSchema | null | undefined ) => void;
   fetchCartItems: () => void;
   setCartItems: (cart: CartSchema | null ) => void;
@@ -45,6 +45,8 @@ export const UserProvider = ({children}: React.PropsWithChildren<{}>) => {
     items: [],
     total: 0,
   });
+  const [ addresses, setAddress ] = useState<AddressSchema[] | null>();
+
 
   const api = UseApi()
 
@@ -87,6 +89,23 @@ export const UserProvider = ({children}: React.PropsWithChildren<{}>) => {
     }
   };
 
+  // Fetch user address
+  const fetchAddress = async () => {
+    try {
+
+        const response = await api.get<AddressSchema>('/address');
+        console.log(response)
+        const data = response.body;
+        if (Array.isArray(data)) {
+            setAddress(data as AddressSchema[]); // Type assertion
+          }
+        console.log(addresses)
+        // setAddress(data as AddressSchema)
+    } catch (error) {
+        setUser(null); // Handle error state
+    }
+  };
+
   // Fetch cart items
   const fetchCartItems = async () => {
     try {
@@ -113,6 +132,7 @@ export const UserProvider = ({children}: React.PropsWithChildren<{}>) => {
     (async () => {
       await fetchUser();
       await fetchCartItems();
+      await fetchAddress();
       if (api.isAuthenticated()) {
         setIsAuthenticated(true);
         console.log('authentication state updated')
@@ -167,7 +187,7 @@ export const UserProvider = ({children}: React.PropsWithChildren<{}>) => {
     // logout()
   return (
     <>
-      <UserContext.Provider value={{ user, fetchUser, setUser, isAuthenticated, login, logout, fetchCartItems }}>
+      <UserContext.Provider value={{ user, fetchUser, setUser, isAuthenticated, login, logout, fetchCartItems, addresses }}>
         {children}
       </UserContext.Provider>
     
