@@ -1,5 +1,5 @@
 <div align="center">
-  :clapper:
+ 
 
   <br />
   <br />
@@ -10,7 +10,7 @@
   <br />
 </div>
 
-
+<a href="https://youtu.be/JIHIs_4hMK0" target="_blank"> :clapper:  Watch</a>
 ## <a name="introduction">🤖 Introduction</a>
 
 KASUWA - Modern E-commerce website, developed using Flask, Typescript, React and Tailwind CSS, exemplifies modern online shopping principles. Its sleek responsive design, integrations and overall user experience set a high standard, serving as a reference or inspiration for future modern webapps.
@@ -98,4 +98,6 @@ Open [http://localhost:5173](http://localhost:5173) in your browser to view the 
 
 
 ## <a name="tech-stack">Contributors</a>
+[https://github.com/ezraliberty](https://github.com/ezraliberty)
+[https://github.com/wand3](https://github.com/wand3)
 
